@@ -51,35 +51,47 @@
 
 ### 3.2 文献選定プロセス (Screening Process)
 
-分野特有の論文構造（要旨の記述粒度など）を考慮し、HCI分野と心理分野でAIスクリーニングのアプローチを分岐させる。
+> **プロトコル改訂 (2026-07-16):** 本サーベイでは包含/除外判定に LLM を一切使用しない。理由: (a) モデルバージョン依存で第三者再現が不可能、(b) プロンプト感度の報告方法が確立していない、(c) PRISMA/Kitchenham 系ガイドラインに標準手続きが存在しない。全ての自動判定は決定論的基準に限定し、意味的判断は人手ダブルスクリーニング（Cohen's κ 報告）で行う。旧版の「AI支援による要旨判定」（HCI/心理の分岐フロー）は本改訂で廃止した。変更履歴は `protocol_changelog.md` を参照。
 
-### 【HCI分野（ACM / IEEE）の選定フロー】
+選定フローは全データベース共通の単一フローとする（旧版の HCI / 心理分野の分岐は AI 判定戦略の違いに由来したため、廃止に伴い統合）。
 
-システム提案に紙幅が割かれ、要旨に実験の詳細が省略されやすい特性を考慮する。
-
-- **Phase 1: 学会ランクでスクリーニング**
-    - **カンファレンス:** 学会ランク（CORE Ranking等）A以上を採用
+- **Phase 1: 重複削除（決定論的・実装済み）**
+    - DOI 完全一致 → Zotero Key 完全一致 → 正規化タイトル完全一致の優先順位で検出し、先出レコードを正とする。
+- **Phase 2: 学会ランクスクリーニング（決定論的・実装済み）**
+    - **カンファレンス:** 学会ランク（CORE Ranking）**A* または A** のみ採用
     - **ジャーナル:** 分野別ランク（SJR等）Q1（上位25%）を原則とし、不足時のみQ2まで採用
-- **Phase 2: タイトル・アブストラクト自動選別 (Python)**
-    - Exclusion 1: 非没入型（Desktop等）、AR/MR、ロボット遠隔操作。
-    - Exclusion 2: ユーザー実験を伴わない技術提案（レンダリング、通信等）。
-    - Exclusion 3: 臨床研究、リハビリテーション。
-- **Phase 3: AI支援による要旨判定（構造的寛容アプローチ）**
-    - LLM（Google Gemini）を使用。要旨にシステム提案しか書かれていなくても、スケール操作の記述があれば「Included」とする**保守的戦略（再現率優先）**を採用し、取りこぼしを防ぐ。
+      <!-- TODO(未確定・保留): 上記「不足時のみQ2」は現行実装（pipeline.py = Q1のみ採用）と乖離している。
+           Q2による脱落は 823件/332誌（outputs/sjr_q2_excluded_venues.csv）。上位は臨床系ジャーナル
+           （Phase 3a の Cat3 でどのみち除外される層）だが、IEEE Trans. on Haptics (13件),
+           Computer Animation and Virtual Worlds (15件), Multisensory Research (3件) 等の
+           主題関連誌を含む。証拠を確認のうえ「Q1のみ」に本文を合わせるか、実装をQ2まで
+           広げるかを確定し、この TODO を削除すること。 -->
+- **Phase 3a: 決定論的キーワード除外（実装済み・`pipeline.py`）**
+    - Title + Abstract に対する正規表現マッチング（大文字小文字区別なし・単語境界 `\b` 適用）。マッチした文献を除外する。全パターンと追加理由は下表の通り（適格性基準 PICOS との対応を明記）。
 
-### 【心理分野（PubMed / Scopus / PsycInfo）の選定フロー】
+    | カテゴリ | 除外パターン | 追加理由（適格性基準との対応） |
+    | --- | --- | --- |
+    | Cat1 非没入・スコープ外 | `desktop display` `desktop monitor` `computer monitor` `flat-screen` `flat panel` `2d display` | 非没入型ディスプレイ研究の除外（I基準: HMDを用いたVR環境が介入の前提） |
+    | Cat1 | `augmented reality` `ar` `mixed reality` `mr` | AR/MRでは実環境が視野に残り、完全な視覚的置換を前提とする自己スケール操作が成立しないため（I基準） |
+    | Cat1 | `360[-]video` `spherical video` `panoramic video` `omnidirectional video` | 実写全天球映像の受動視聴は身体表象の操作を伴わないため（I基準） |
+    | Cat1 | `smartphone` `mobile phone` `tablet` | モバイル画面提示＝非没入のため（I基準） |
+    | Cat1 | `projection mapping` `projected display` `cave automatic virtual` `cave system` `cave display` | HMD以外の投影型提示（自己身体が実視野に残る）のため（I基準） |
+    | Cat2 技術論文・非実証 | `rendering algorithm/engine/pipeline/technique/performance` `real-time rendering` `shader` `gpu` | 描画技術の提案・性能評価でありユーザー実験を伴わないため（S基準: 実証研究） |
+    | Cat2 | `point cloud` `depth camera` `stereo reconstruction` | 3D再構成・センシング技術の提案のため（S基準） |
+    | Cat2 | `motion-to-photon` `frame rate` `refresh rate` `tracking algorithm` `segmentation algorithm` `optimization algorithm` | 表示遅延・アルゴリズム性能の評価であり知覚実験でないため（S基準） |
+    | Cat2 | `technical report` `system architecture` `software framework/architecture/library` | 非実証的な技術文書のため（S基準） |
+    | Cat3 臨床・医療 | `rehabilitation` `physical therapy` `occupational therapy` | リハビリテーション研究の除外（P基準: 健常成人） |
+    | Cat3 | `cognitive behavio(u)ral therapy` `exposure therapy` `therapeutic intervention` | 治療目的の介入研究のため（P/I基準） |
+    | Cat3 | `surgical training/simulation/procedure/planning` `surgery` `laparoscop*` `minimally invasive` | 外科手技・手術支援研究のため（スコープ外） |
+    | Cat3 | `patient(s)` `clinical trial/study/outcome/setting/population` `stroke ...` | 患者対象・臨床研究のため（P基準・S基準） |
+    | Cat3 | `phobia` `ptsd` `post-traumatic stress` `autism spectrum` `dementia` `alzheimer` `psychosis` `schizophrenia` `neurological disorder...` `psychiatric ...` | 特定疾患集団を対象とするため（P基準: 健常成人） |
+    | Cat3 | `chronic pain` `pain management` `pain relief` | 疼痛治療への応用研究のため（スコープ外） |
 
-要旨の段階でPICOS（対象者・介入・評価）が詳細に記述されている特性を活かす。
-
-- **Phase 1: 学会ランクでスクリーニング**
-    - **カンファレンス:** 学会ランク（CORE Ranking等）A以上を採用
-    - **ジャーナル:** 分野別ランク（SJR等）Q1（上位25%）を原則とし、不足時のみQ2まで採用
-- **Phase 2: タイトル・アブストラクト自動選別 (Python)**
-    - （除外基準はHCI分野と同様）
-- **Phase 3: AI支援による要旨判定（変数抽出・厳格除外アプローチ）**
-    - LLMを使用し、要旨記載の被験者属性や評価指標を**PICOS基準と厳密に照合**。生理的指標のみの研究や特定疾患患者を対象とした研究をこの段階で高い確度で除外（Excluded）し、適合率を高める。
-
-*(※両分野共通: Phase 3完了後、無作為抽出した文献を著者が目視確認し、AI判定の信頼性を担保する)*
+    - 正確な正規表現の全文は `pipeline.py`（EXCLUSION_CATEGORIES）を正とし、パターン別ヒット件数は `pipeline_log.txt` に記録される。パターンを追加・削除した場合は本表・`protocol_changelog.md`・README を同時に更新する。
+- **Phase 3b: Title/Abstract 二重スクリーニング（人手）**
+    - Phase 3a 通過文献の全件に対し、**評価者2名が独立に** Title/Abstract を読み、適格性基準（§Phase 4 の PICOS を Title/Abstract レベルに緩和したもの）で Include / Exclude / Unsure を判定する。
+    - 評価者間一致度として **Cohen's κ を算出・報告**する。判定の不一致および Unsure は2名の**協議（consensus meeting）**で解決し、解決できない場合は Include 側に倒して Phase 4（全文評価）へ送る（再現率優先）。
+    - 判定シート（文献ID・両評価者の判定・最終判定・協議メモ）を成果物として保存し、監査可能性を担保する。
 
 ### Phase 4: 全文適格性評価 (Full-Text Eligibility)
 

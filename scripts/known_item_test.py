@@ -36,10 +36,12 @@ cf. Kitchenham & Charters 2007)で示すため。段階別の脱落理由を特�
   3. Levenshtein 類似度 ≥ 0.9 の候補を「FUZZY(要手動確認)」として提示するのみ。
      曖昧マッチを自動で生存扱いにはしない(recall には数えない)。
 
-【制限事項】
-  DB別(ACM/IEEE/PubMed/Scopus)の統合前生データファイルは保存されていないため、
-  step0 は「統合生データ ResearchVR2.csv に存在するか」の判定となる。
-  参考情報として URL/DOI プレフィックスから取得元DBを推定して併記する。
+【step0 の判定単位】
+  step0 は「統合生データ ResearchVR2.csv に存在するか」の判定。
+  raw/*.csv(ZoteroのDB別コレクションエクスポート、2026-07-17 追加)が存在する場合は、
+  どのDBコレクションに含まれるかを step0_source_dbs 列に併記する
+  (= どのDBの検索式がその文献を捕捉したかまで特定できる)。
+  raw/ が無い環境では URL/DOI プレフィックスからの出版社推定(source_db_guess)のみとなる。
 
 実行: python -X utf8 scripts/known_item_test.py
 """
@@ -295,6 +297,10 @@ def main() -> None:
     datasets = {key: Dataset(ROOT / fname) for key, fname, _ in STEPS}
     excl2 = Dataset(ROOT / "step2_rank_excluded.csv")
     excl3 = Dataset(ROOT / "step3_kw_excluded.csv")
+    # DB別コレクション(あれば): どのDBの検索式が捕捉したかの特定用
+    raw_datasets = {p.stem: Dataset(p) for p in sorted((ROOT / "raw").glob("*.csv"))}
+    if raw_datasets:
+        print(f"[INFO] DB別生データ: {', '.join(raw_datasets)} を照合に使用")
     compiled_excl = compile_exclusions(EXCLUSION_CATEGORIES)
 
     results: list[dict] = []
@@ -348,11 +354,14 @@ def main() -> None:
                 matched_row_step0.get("Url", ""), matched_row_step0.get("DOI", ""))
         else:
             rec["source_db_guess"] = ""
+        rec["step0_source_dbs"] = "; ".join(
+            db for db, ds in raw_datasets.items()
+            if ds.match(doi, title_n)[0] is not None)
         results.append(rec)
 
     # ---- outputs/known_item_test.csv ----
     fieldnames = ["#", "Title", "DOI", "Year", "Venue_expected", "Role",
-                  "source_db_guess"]
+                  "source_db_guess", "step0_source_dbs"]
     for key, _, _ in STEPS:
         fieldnames += [f"{key}_survived", f"{key}_match_method",
                        f"{key}_fuzzy_candidates"]

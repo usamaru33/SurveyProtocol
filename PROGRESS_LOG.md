@@ -62,9 +62,10 @@
 
 ## まだやっていないこと（rule.md のプロトコルとの差分）
 
-1. **Phase 3.5: LLM（Gemini）による要旨判定** — rule.md の本来の Phase 3。
-   - HCI系: 保守的（再現率優先）／心理系: PICOS厳格照合（適合率優先）の分岐戦略。**未実装・未実行**。
-   - 現状の「Phase 3」はキーワード正規表現による機械的除外であり、rule.md の Phase 2 相当に留まる。
+1. **Phase 3b: Title/Abstract 人手二重スクリーニング** — 評価者2名・独立・Cohen's κ 報告・不一致協議。**未実施**。
+   - （旧計画の LLM 要旨判定は 2026-07-16 のプロトコル改訂 Rev.2 で廃止。protocol_changelog.md 参照）
+1.5. **検索の再実行（PRISMA上段の再構築）** — DB別 verbatim 検索式・実行日・ヒット数が未記録のため、
+   `search_replication.md` の手順で全DB再検索が必要。DB別生データを `raw/` に保全すること。
 2. **引用数の補完** — Semantic Scholar API で DOI → citationCount を取得し CSV に列追加（README末尾にコード例あり）。足切りシミュレーションの実質化に必須。
 3. **AI判定の目視検証** — 無作為抽出サンプルの著者チェック（rule.md 記載の信頼性担保手続き）。
 4. **Phase 4: 全文適格性評価** — PICOS基準（健常成人 / HMD+スケール操作 / 比較条件 / 定量指標 / 実証研究）での全文精査。
@@ -76,7 +77,7 @@
 
 - **Abstract欠損が30.8%（550件）** — KWスコアやLLM判定の精度に直結。Crossref/S2 APIでのAbstract補完を検討。
 - **Phase 2 の未判定（Unmatched）5,126件をまとめて除外している** — 2026-07-16 に上位50 Venue（2,152件=42.0%をカバー）を監査した結果、Levenshtein類似度0.85以上で A*/A/Q1 に一致する「表記ゆれ脱落」は **0件**（`outputs/unmatched_venues_top50.csv`）。上位は VRCAI/VRIC 系 proceedings・CHI Extended Abstracts・Venue名空欄(233件) が中心。残り58%のロングテールは未監査。
-- **rule.md と実装の軽微な乖離:** rule.md は「SJR Q1原則・不足時Q2まで」だが実装は Q1 のみ。CORE も A/A* のみ。本文執筆時に整合させること。
+- **rule.md と実装の乖離（SJR Q2）— 判断待ち:** Q2による脱落は **823件/332誌**（`outputs/sjr_q2_excluded_venues.csv`）。上位は臨床系＋LNCSだが、IEEE Trans. on Haptics(13)・Computer Animation and Virtual Worlds(15)・Multisensory Research(3)・QJEP(6)・Neuropsychologia(5) 等の主題関連誌を含む。rule.md 該当箇所に TODO 埋め込み済み。決定後 protocol_changelog.md に Rev.3 として記録する。CORE 側は「A*/A のみ」で rule.md を実装に合わせて確定済み（Rev.2）。
 - **KW=1点の残存層480件（2023年以降）** — VR環境KWのみヒット。Phase 4 で要注意層。
 - Windows での実行は `python -X utf8` を付けること（文字化け防止）。
 
@@ -111,3 +112,59 @@
   2. `python -X utf8 scripts/known_item_test.py` を実行し、known_item_analysis.md の脱落分析に基づき検索式/ホワイトリスト/除外KWを修正
   3. step2 Q2 脱落が出た場合、rule.md「Q1原則・不足時Q2」と実装「Q1のみ」の乖離をどちらに寄せるか決定
   4. rule.md の Phase 3(AI判定)を決定論的手法へ書き換え
+
+### 2026-07-16 (3) — プロトコル改訂 Rev.2 と検索記録の現状把握
+- **rule.md 改訂(Rev.2)**: 「Phase 3: AI支援による要旨判定」を削除し、
+  Phase 3a(決定論的キーワード除外・全パターンの追加理由をPICOS対応表で明記)+
+  Phase 3b(人手2名独立のTitle/Abstract二重スクリーニング・Cohen's κ 報告・不一致協議)に置換。
+  HCI/心理の分岐フローは AI 戦略差に由来したため単一フローに統合。
+  重複削除を Phase 1 として明文化、CORE「A以上」→「A*/A のみ」に表記確定。
+  変更履歴は `protocol_changelog.md` に記録(CSUR 方法論セクション用)。
+- **SJR Q2 乖離の判断材料を出力(判断は保留・TODO埋め込み済み)**:
+  Q2脱落 = **823件/332誌**、全リスト `outputs/sjr_q2_excluded_venues.csv`。
+  臨床系(Cat3でどのみち除外)+LNCS(131)が主だが、IEEE Trans. on Haptics(13)、
+  Computer Animation and Virtual Worlds(15)、Multisensory Research(3)、QJEP(6)、Neuropsychologia(5) など主題関連誌あり。
+- **検索記録の現状把握(結論: 全滅)**: 4DB すべてで verbatim 検索式・実行日・DB別ヒット数が未記録。
+  PsycInfo は実行有無自体が不明。統合CSVに取得元DB列なし(URL/DOIによる出版社推定:
+  ACM 8,345 / Scopus系 3,475 / IEEE 1,913 / 不明 650 / PubMed 2 — PRISMA報告には使用不可)。
+- `search_strings.md` 作成(記録表テンプレート+現状の判明分+REQUIRES RE-RUN 明記)。
+- `search_replication.md` 作成(DB別の検索構文・エクスポート形式・文字コード・上限・ID列・
+  統合時のDB間/DB内重複の区別、再実行後チェックリスト)。
+- **次回やること(優先度順):**
+  1. SJR Q2 の扱いを確定(outputs/sjr_q2_excluded_venues.csv を目視)→ rule.md の TODO 解消 + changelog Rev.3
+  2. known_items.md 記入 → Known-Item Test 実行(検索再実行の前に現行データで一度回し、検索式改訂の要否も判断)
+  3. search_replication.md の手順で全DB再検索(同日実行・DB別生データを raw/ に保全・Source_DB列付与)
+  4. 再検索データでパイプライン再実行 → PRISMA フロー図を上段から再構築
+
+### 2026-07-16 (4) — 訂正: 検索データは Zotero でDB別コレクション管理されていた
+- 著者より: 検索結果は Zotero で管理し、**取得元DB(ライブラリ)ごとにフォルダ分けしている**。
+  リポジトリの CSV はその統合エクスポート。→ **「全DB再検索が必要」という (3) の結論を訂正**。
+- `Date Added` 分析: 取り込みは **2025-12-25(1,276件)/ 2026-05-15(13,109件)の2波**。
+  検索実行日の上限近似として使用可(2波の経緯は要著者確認)。
+- `search_replication.md` を再構成: **Option A = Zotero コレクション別エクスポートによる復元(推奨・再検索不要)**、
+  Option B = 再検索(verbatim 検索式の確定が必要な場合のみ)。search_strings.md も同様に更新。
+- 依然として欠けるのは **verbatim 検索式・使用フィルタ**のみ(Zotero に保存されない情報)。
+- **著者への依頼事項:**
+  1. Zotero の各DBコレクションを CSV エクスポートして `SurveyProtocol/raw/` に保存
+     (ファイル名: `<db>_zotero_YYYYMMDD.csv`)+ コレクション別件数を search_strings.md に記入
+  2. 検索式の手元記録(メモ・DBアカウントの検索履歴等)の有無を確認
+  3. 2025-12-25 と 2026-05-15 の2回取り込みの経緯(予備検索+本検索?追加DB?)を教える
+
+### 2026-07-17 — PRISMA 上段の確定(raw/ 提供を受けて)
+- 著者が `raw/` に Zotero コレクション別エクスポート4本を配置(acm/ieee/PubMed/Scopus)。
+- `scripts/raw_db_audit.py` 作成・実行(`outputs/raw_db_audit.csv`):
+  - **Records identified 確定: ACM 7,997 / IEEE 1,276 / PubMed 781 / Scopus 4,331 = 計 14,385**
+  - 統合CSVと Zotero Key で **1:1 完全一致**(欠落・混入・複数コレクション所属 すべて0件)→ 統合エクスポートの完全性を確認
+  - **2波の経緯が判明: 2025-12-25 = IEEE のみ / 2026-05-15 = ACM+PubMed+Scopus**
+  - DB間重複: PubMed∩Scopus 606 / Scopus∩IEEE 352 / Scopus∩ACM 142 / PubMed∩IEEE 39 / ACM∩IEEE 0 / ACM∩PubMed 0
+  - **PsycInfo は未実行が確定**(コレクション無し)。不実行判断の理由を本文に書く必要あり
+- `scripts/known_item_test.py` を拡張: step0 で **どのDBコレクションが既知文献を捕捉したか**を
+  `step0_source_dbs` 列に出力(raw/ 存在時のみ)。スモークテスト済み(例: IEEE VR 2018 論文 → 'ieee; Scopus')
+- search_strings.md に確定値を記入(残りの未記録は verbatim 検索式・フィルタのみ)
+- **新たな課題: 検索時点の非対称** — IEEE のみ 2025-12 実行で他DBより約5ヶ月古い。
+  IEEE の更新検索(差分追加)か Threats to Validity 明記かの判断が必要
+- **次回やること(優先度順):**
+  1. SJR Q2 の扱いを確定(前日から継続、outputs/sjr_q2_excluded_venues.csv)
+  2. IEEE 検索時点の非対称への対応方針を決定(更新検索 or Threats 明記)
+  3. verbatim 検索式の手元記録を確認(無ければ Option B で該当欄のみ確定)
+  4. known_items.md 記入 → Known-Item Test 実行
