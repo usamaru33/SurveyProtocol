@@ -168,3 +168,120 @@
   2. IEEE 検索時点の非対称への対応方針を決定(更新検索 or Threats 明記)
   3. verbatim 検索式の手元記録を確認(無ければ Option B で該当欄のみ確定)
   4. known_items.md 記入 → Known-Item Test 実行
+
+### 2026-07-17 (2) — IEEE更新検索の統合(Rev.3)と Known-Item Test 初回実行
+- **IEEE更新検索を統合**: `raw/IEEE_2025-2026.csv`(297件、出版年2025:201/2026:96)。既存とDOI重複196、**新規101件**。
+  `ResearchVR3.csv`(14,682件)を新入力としてパイプライン再実行:
+  **14,682 → 12,543(-2,139) → 2,909(-9,634) → 最終候補 1,827件(+43、全てIEEE分)**。
+  README・search_strings.md 更新、protocol_changelog.md に Rev.3 記録。検索時点の非対称は解消。
+  year_distribution.png・outputs/sjr_q2_excluded_venues.csv(Q2脱落 826件/332誌に微増)を再生成。
+- **Known-Item Test 初回実行**(`self_scale_references.csv`、18件。スクリプトは列エイリアス・--items・
+  最新 ResearchVR*.csv 自動選択に対応拡張):
+  - **recall: step0 50%(9/18)→ step2 16.7%(3/18)→ 最終 16.7%(3/18)**
+  - **発見1(検索式のギャップ)**: 多感覚系の必須文献4件(footsteps音・action sounds・audio-tactile・足裏振動)が
+    step0 で全滅。G3(スケール知覚語)に body weight/height, arm dimension 等が無く、非VRの心理実験は G1 も不成立。
+    Being Barbie(原典)も脱落(タイトルに VR 語なし。G1 に "head-mounted display"/"immersive" が無い)。
+  - **発見2(実行検索式への疑義)**: 「The effects of eye height and self-avatars on distance estimation in
+    virtual environments」はタイトルだけで3コンセプト群すべて命中するのに生データに不在
+    → 実際に実行された検索式が文書化クエリと異なる疑い。verbatim 検索式の確認が急務。
+  - **発見3(Venueスクリーニングの実害)**:
+    - Kilteni 2012(SoE定義・必須)が「Presence 誌 → CORE『Annual International Workshop on Presence』(C)」への
+      **誤照合**で除外(同誌の誤照合は本体データで29件)。なお Presence:TVE は SJR Q3 のため正しく照合しても現基準では除外
+      → 分野の歴史的中核誌がランク基準で落ちる構造問題。
+    - Gulliver's virtual travels が Cognitive Processing **Q2** で脱落 → Q2判断に実害の証拠。
+    - APGV/MIG/ACM ICPS の3件が Venue 未照合で脱落(ロングテール未照合にも関連文献が実在)。
+  - 書籍(Gallagher 2005)・非VR理論(Tsakiris 2010)の step0 脱落は想定内(検索対象外)。
+    known_items の「検索で拾えるべき群」と「手動追加の背景文献群」を分ける列の追加が必要。
+- **次回やること(優先度順):**
+  1. **検索式の再設計判断**: G1 に "head-mounted display"/"immersive"、G3 に body weight/height,
+     arm/limb dimension, body representation 等の追加を検討(known_item_analysis.md の提案参照)→ 追加時は再検索
+  2. **SJR Q2 の確定**(Gulliver 脱落という実害が判明。Q1+主題直結Q2誌の個別採用が有力)
+  3. Venue誤照合(Presence 29件)への対処: CORE照合のファジー閾値/頭字語処理の見直し、または例外表
+  4. self_scale_references.csv に「検索スコープ内/外」列を追加し recall を層別に再計算
+
+### 2026-07-17 (3) — SJR Q1のみ確定(Rev.4)・実行検索式の判明(Rev.5)・脱落原因の完全分離
+- **SJR は「Q1のみ」で著者決定(= A案)** → rule.md の TODO 解消、changelog Rev.4。
+  Q2脱落(826件/332誌、Gulliver 論文含む)は Threats to Validity で報告する方針。実装・数値の変更なし。
+- **実行された検索式が判明(著者提供)**:
+  `("Virtual Reality" OR "VR" OR "HMD") AND ("Avatar" OR "Body" OR "Embodiment") AND ("Size" OR "Scale" OR "Height" OR "Distance")`
+  → rule.md 旧版の詳細クエリは**計画段階のもので実行されていなかった**(Rev.5 で記録訂正)。
+  実行版は G2/G3 が広く(単独語)、**G1 に "Virtual Environment"/"head-mounted display"/"immersive" が無い**。
+  前回の「実行検索式への疑義」はこれで解決。
+- **known_item_test.py を実行版クエリに更新**し、self_scale_references.csv に `SearchScope` 列を追加
+  (background=書籍・非VR理論/心理5件は recall 分母から除外)。**in-scope recall: step0 69.2%(9/13)→ 最終 23.1%(3/13)**
+- **step0 脱落4件の原因を完全分離**:
+  - **DBカバレッジ欠落(3件)**: [9][12][18] すべて **Frontiers in Virtual Reality** 掲載。
+    [9] はタイトルが実クエリに完全適合するのに不在 → 検索対象DBが同誌を索引していないことが確定。
+    **同誌は SJR Q1** なので、捕捉できれば Phase 2 も通過し最終候補まで残れる。
+  - **クエリG1ギャップ(1件)**: Being Barbie(PLoS ONE = Scopus/PubMed 索引済み・SJR Q1)。
+    ライブラリ追加では直らず、**G1 拡張("head-mounted display"/"immersive"等)+再検索が必要**。
+- **次回やること(優先度順):**
+  1. **検索改訂 Rev.6 の実行判断(著者)**: (i) G1 拡張クエリで全DB再検索(第2波)、
+     (ii) Frontiers in Virtual Reality のカバレッジ確保(Scopusの索引状況確認 or 誌内検索を
+     supplementary source として追加、PRISMA の Other sources 行で報告)
+  2. Venue誤照合(Presence→COREワークショップ、29件)と未照合3件(ACM ICPS/APGV/MIG)への対処
+     (エイリアス表 or 例外表。Presence:TVE は SJR Q3 のため救済しても現基準では除外という論点も記録)
+  3. Phase 3b(人手二重スクリーニング)の準備(データセットが検索改訂で動くため、Rev.6 確定後に着手)
+
+### 2026-07-17 (4) — Rev.6 実装: G1拡張・Venue照合の再設計・誤照合監査
+- **著者確定(Rev.6)**: 検索式 G1 を拡張(+"head-mounted display"/"head mounted display"/
+  "Virtual Environment*"/"immersive virtual"。"immersive"単独は precision 悪化のため不採用)。
+  スコープ不変。rule.md §3.1・search_strings.md に反映。**再検索は実施待ち**。
+- **誤照合監査(`scripts/venue_match_audit.py` 新規・実行済み)**:
+  - 照合成功7,377レコードの全数を段階別に再導出: SJR exact 3,137 / CORE exact 2,525 /
+    **CORE fuzzy 966 / SJR ISSN 532 / CORE acronym 217**
+  - **非完全一致が採否を左右: 1,183件(採用590/除外593)**。誤照合疑い 238ユニーク/707件
+    → `outputs/venue_suspect_matches.csv`(著者目視待ち)
+  - Presence 誤照合の正体は fuzzy ではなく**正規化同名衝突(exact_norm)**と判明
+    → fuzzy 監査では原理的に検出不能なタイプ
+- **監査設計の穴を changelog に自己申告**: 2026-07-16 の Task 4 監査は未照合側のみ対象で、
+  誤照合(false positive)は検出できていなかった。「A*/A/Q1脱落0件」は Venue フィルタ全体の
+  妥当性を保証しない。
+- **`venue_aliases.csv` ドラフト作成(著者確認待ち)+ pipeline.py をエイリアス最優先に改修**
+  (生文字列一致→正規化一致の2段。正規化キー衝突は警告して exact 側で解決):
+  - Presence誌29件: CORE C 誤照合 → SJR Q3(基準による除外)に是正
+  - **新発見: TAP誌(ACM Transactions on Applied Perception)49件が SAP シンポジウムとの
+    正規化同名衝突で CORE B 誤照合** → SJR Q2 に是正(基準による除外)
+  - **旧称 IEEE Virtual Reality Conference(2007〜2011)の8件を A* として救済**
+  - scratchpad での試験実行: 2,909→**2,917**(+8)、最終 1,827→**1,831**(+4)。
+    **公式の step ファイルは未更新**(エイリアス表の著者確認+Rev.6再検索データ統合後に公式再実行)
+- Frontiers in VR の supplementary source 手順を search_replication.md に追加
+  (Scopus索引確認 → 無ければ誌内検索、PRISMA "other methods" 行で報告)。
+- **次回やること(優先度順):**
+  1. **著者**: venue_aliases.csv の目視確認(特に「著者確認待ち」行)+
+     outputs/venue_suspect_matches.csv(238ユニーク)の確認
+  2. **著者**: Rev.6 クエリで全DB再検索(第2波)+ Scopus の Frontiers in VR 索引確認
+     → raw/ に第2波エクスポートを配置
+  3. 第2波統合 → エイリアス有効で公式パイプライン再実行 → 全数値更新
+  4. **Task 4: known_item_test.py で recall 再測定(目標: step0 in-scope ≥ 80%)**
+  5. ICPS(46件)の個別解決(ISBN/Extra列から会議名復元)は優先度低として保留
+
+### 2026-07-17 (5) — 正規化同名衝突の全数監査・suspect優先度付け・正規化設計文書
+- **`scripts/normalization_collision_audit.py` 新規・実行**(公式stepファイルは不変更):
+  - CORE∪SJR のキー空間を pipeline と同一手順で再構築し、同名衝突を全数列挙:
+    **衝突キー899件**(現行データ出現 133キー/489レコード)、
+    **採否が変わる衝突(rank_conflict)426件**(データ出現 74キー)
+    → `outputs/normalization_collisions.csv` / `collisions_rank_conflict.csv`
+  - rank_conflict 全426件を venue_aliases.csv に MANUAL 行として**自動追記**(冪等・著者確認待ち)
+  - 実例: `sensors`(Sensors Q1 vs Journal of Sensors Q2、19件)、`ieee multimedia`
+    (Trans. Q1 vs Symposium CORE C、10件)、`psychological research`(Q1 vs Q3、6件)等
+  - 限界を文書化: データ側の短い誌名×リストエントリ型(Presence型)はリスト内衝突として
+    現れないため本監査対象外 → venue_match_audit の P2 で捕捉
+- **suspect 238ユニークに優先度付与**(venue_match_audit.py 拡張・再実行):
+  **P1(採否が変わり得る)91ユニーク/240件**、P2(別会場疑い)29/90、P3(表記ゆれ)118/377。
+  P1 最大は `Proceedings of the ACM on Human-Computer Interaction`(**82件**)が
+  CORE『Indian Conference on HCI』に fuzzy 誤照合 — SJR に Q2 で正確に収載されているのに
+  **CORE fuzzy が SJR exact より先に走る段階順序**が原因(新発見の設計問題)
+- **`normalization_design.md` 作成**(提案のみ・実装保留): 現行正規化仕様の明文化、
+  衝突原因5類型+段階順序問題の特定、改善案6件のトレードオフ表、
+  エイリアス表 vs 正規化修正の議論(多層防御を推奨: 案6順序修正→案1種別マーカー+
+  案3短キーガード→案4サニティチェック+エイリアス表+監査常設)
+- changelog に Task C 注記(Rev.6 試験値は第1波のみの測定であり、エイリアス表の効果評価に
+  使ってはならない)と衝突監査の追記を記録
+- **次回やること(優先度順):**
+  1. **著者**: normalization_design.md の採否判断(推奨: 案6+案1+案3+案4)と閾値決定
+  2. **著者**: outputs/venue_suspect_matches.csv の P1(91件)から目視。
+     venue_aliases.csv の自動追記426行は P1/HIGH 優先で確認
+  3. **著者**: Rev.6 クエリで全DB再検索(第2波)+ Frontiers in VR の Scopus 索引確認
+  4. 第2波統合 + 正規化改修(著者決定後)+ エイリアス確定 → 公式再実行(Rev.7)
+     → known_item_test で recall 再測定(目標 step0 ≥ 80%)

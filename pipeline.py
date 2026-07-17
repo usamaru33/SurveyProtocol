@@ -23,6 +23,7 @@ _HERE = Path(__file__).parent
 DEFAULT_INPUT   = _HERE / "ResearchVR2.csv"
 DEFAULT_CORE    = _HERE / "CORE.csv"
 DEFAULT_SJR     = _HERE / "scimagojr 2025.csv"
+DEFAULT_ALIASES = _HERE / "venue_aliases.csv"
 DEFAULT_OUTDIR  = _HERE
 
 # ---------------------------------------------------------------------------
@@ -167,6 +168,56 @@ def load_core(core_path: Path) -> dict:
             if acronym:
                 core[acronym.lower()] = entry
     return core
+
+
+def load_aliases(path: Path) -> dict:
+    """venue_aliases.csv を読み、2段の照合辞書を返す。
+
+    著者確認済みの中核会場エイリアス表。**CORE/SJR 照合より先に参照**する
+    (誤照合・正規化同名衝突の防止。protocol_changelog.md Rev.6)。
+    rank 列は 'CORE A*' / 'SJR Q3' 形式。'MANUAL' 行は文書化のみで照合には使わない。
+
+    返り値: {"exact": {raw.lower(): entry}, "norm": {normalize_venue(raw): entry}}
+    照合は exact(生文字列の小文字一致)を優先する。正規化キーはストップワード除去で
+    別会場が同一キーになり得るため(例: TAP誌 と SAPシンポジウム は共に
+    'acm applied perception')、正規化側で衝突した場合は後勝ちさせず警告して先勝ちを保持。
+    """
+    aliases = {"exact": {}, "norm": {}}
+    if not path.exists():
+        return aliases
+    with path.open(encoding="utf-8-sig", newline="", errors="replace") as f:
+        for row in csv.DictReader(f):
+            raw = (row.get("Raw venue string") or "").strip()
+            canonical = (row.get("Canonical name") or "").strip()
+            rank_field = (row.get("CORE/SJR rank") or "").strip()
+            if not raw or not rank_field or rank_field.upper().startswith("MANUAL"):
+                continue
+            parts = rank_field.split(None, 1)
+            if len(parts) != 2 or parts[0] not in ("CORE", "SJR"):
+                continue
+            entry = {"canonical": canonical, "source": parts[0],
+                     "rank": parts[1].strip()}
+            aliases["exact"][raw.lower()] = entry
+            norm = normalize_venue(raw)
+            if norm in aliases["norm"] and \
+                    aliases["norm"][norm]["canonical"] != canonical:
+                print(f"  [WARN] alias正規化キー衝突: '{raw}' (norm='{norm}') は "
+                      f"'{aliases['norm'][norm]['canonical']}' と衝突。"
+                      "exact一致でのみ照合されます。")
+                continue
+            aliases["norm"][norm] = entry
+    return aliases
+
+
+def alias_lookup(raw_venue: str, aliases: dict):
+    """エイリアス表の2段照合: 生文字列小文字一致 → 正規化一致。無ければ None。"""
+    if not aliases:
+        return None
+    low = raw_venue.strip().lower()
+    hit = aliases.get("exact", {}).get(low)
+    if hit is not None:
+        return hit
+    return aliases.get("norm", {}).get(normalize_venue(raw_venue))
 
 
 def load_sjr(sjr_path: Path) -> dict:
@@ -416,9 +467,11 @@ def phase1_dedup(rows: list[dict], fieldnames: list[str],
 # ---------------------------------------------------------------------------
 
 def phase2_core(rows: list[dict], fieldnames: list[str],
-                core: dict, sjr: dict, outdir: Path, log_lines: list[str]) -> list[dict]:
+                core: dict, sjr: dict, outdir: Path, log_lines: list[str],
+                aliases: dict | None = None) -> list[dict]:
     SEP = "=" * 72
     log_lines += [SEP, "  PHASE 2: CORE A/A* + SJR Q1 SCREENING", SEP, ""]
+    aliases = aliases or {}
 
     venue_col = resolve_col(fieldnames, VENUE_ALIASES)
     issn_col  = resolve_col(fieldnames, ISSN_ALIASES)
@@ -426,6 +479,8 @@ def phase2_core(rows: list[dict], fieldnames: list[str],
     log_lines.append(f"  Venue column    : {venue_col!r}")
     log_lines.append(f"  CORE entries    : {len(core):>8,}")
     log_lines.append(f"  SJR entries     : {len(sjr):>8,}")
+    n_alias_keys = len(aliases.get("exact", {})) + len(aliases.get("norm", {}))
+    log_lines.append(f"  Venue aliases   : {n_alias_keys:>8,} keys")
     log_lines.append("")
 
     included: list[dict] = []
@@ -441,6 +496,31 @@ def phase2_core(rows: list[dict], fieldnames: list[str],
 
     for row in rows:
         raw_venue = (row.get(venue_col, "") or "") if venue_col else ""
+
+        # --- Step 0: 著者確認済みエイリアス表(照合より先に参照。誤照合防止) ---
+        alias = alias_lookup(raw_venue, aliases)
+        if alias is not None:
+            row["Matched_Venue"]  = alias["canonical"]
+            row["Ranking_Source"] = f"{alias['source']}(alias)"
+            row["CORE_Rank"]      = alias["rank"] if alias["source"] == "CORE" else ""
+            row["SJR_Quartile"]   = alias["rank"] if alias["source"] == "SJR" else ""
+            adopted = (alias["source"] == "CORE" and alias["rank"] in HIGH_RANKS) or \
+                      (alias["source"] == "SJR" and alias["rank"] == "Q1")
+            if alias["source"] == "CORE":
+                rank_dist[alias["rank"]] += 1
+            else:
+                sjr_q_dist[alias["rank"]] += 1
+            if adopted:
+                stats["alias_included"] += 1
+                row["Excl_Reason_Phase2"] = ""
+                included.append(row)
+            else:
+                stats["alias_low_rank"] += 1
+                row["Excl_Reason_Phase2"] = (
+                    f"{alias['source']} rank '{alias['rank']}' below threshold "
+                    f"(via author-verified alias)")
+                excluded.append(row)
+            continue
 
         # --- Step A: CORE lookup ---
         matched_title, rank = best_core_match(raw_venue, core)
@@ -491,7 +571,8 @@ def phase2_core(rows: list[dict], fieldnames: list[str],
         row["Excl_Reason_Phase2"] = "Venue not found in CORE or SJR"
         excluded.append(row)
 
-    total_included = stats.get("core_included", 0) + stats.get("sjr_included", 0)
+    total_included = (stats.get("core_included", 0) + stats.get("sjr_included", 0)
+                      + stats.get("alias_included", 0))
 
     log_lines.append("  --- CORE Rank Distribution ---")
     for r, cnt in sorted(rank_dist.items(), key=lambda x: -RANK_ORDER.get(x[0], 0)):
@@ -506,9 +587,11 @@ def phase2_core(rows: list[dict], fieldnames: list[str],
     log_lines.append(f"  INCLUDED total         : {total_included:>8,}")
     log_lines.append(f"    CORE A/A*            : {stats.get('core_included',0):>8,}")
     log_lines.append(f"    SJR Q1               : {stats.get('sjr_included',0):>8,}")
+    log_lines.append(f"    Alias (high rank)    : {stats.get('alias_included',0):>8,}")
     log_lines.append(f"  EXCLUDED total         : {len(excluded):>8,}")
     log_lines.append(f"    CORE low rank (B/C)  : {stats.get('core_low_rank',0):>8,}")
     log_lines.append(f"    SJR Q2/Q3/Q4         : {stats.get('sjr_low_rank',0):>8,}")
+    log_lines.append(f"    Alias (low rank)     : {stats.get('alias_low_rank',0):>8,}")
     log_lines.append(f"    Unmatched            : {stats.get('unmatched',0):>8,}")
     log_lines.append("")
 
@@ -656,6 +739,8 @@ def main(argv=None):
     parser.add_argument("--input",  "-i", type=Path, default=DEFAULT_INPUT)
     parser.add_argument("--core",   "-c", type=Path, default=DEFAULT_CORE)
     parser.add_argument("--sjr",    "-s", type=Path, default=DEFAULT_SJR)
+    parser.add_argument("--aliases", "-a", type=Path, default=DEFAULT_ALIASES,
+                        help="著者確認済み Venue エイリアス表(照合より先に参照)")
     parser.add_argument("--outdir", "-o", type=Path, default=DEFAULT_OUTDIR)
     args = parser.parse_args(argv)
 
@@ -701,11 +786,18 @@ def main(argv=None):
     sjr = load_sjr(args.sjr)
     print(f"  SJR  entries loaded: {len(sjr):,}")
 
+    # Load venue aliases (author-verified; consulted BEFORE CORE/SJR matching)
+    aliases = load_aliases(args.aliases)
+    n_alias_keys = len(aliases.get("exact", {})) + len(aliases.get("norm", {}))
+    print(f"  Venue aliases loaded: {n_alias_keys:,} keys "
+          f"({args.aliases.name if args.aliases.exists() else 'not found'})")
+
     # ── Phase 1 ──────────────────────────────────────────────
     after_p1 = phase1_dedup(rows, fieldnames, args.outdir, log_lines)
 
     # ── Phase 2 ──────────────────────────────────────────────
-    after_p2 = phase2_core(after_p1, fieldnames, core, sjr, args.outdir, log_lines)
+    after_p2 = phase2_core(after_p1, fieldnames, core, sjr, args.outdir, log_lines,
+                           aliases=aliases)
 
     # ── Phase 3 ──────────────────────────────────────────────
     after_p3 = phase3_keywords(after_p2, fieldnames, args.outdir, log_lines)

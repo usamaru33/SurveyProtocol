@@ -41,13 +41,24 @@
 - **Scopus**
 - **PsycInfo** (PubMedでの検索が不十分な場合の補完として導入)
 
-検索クエリは、再現率と適合率のバランスを最適化するため、「没入環境」「身体表象」「知覚評価」の3つのコンセプトをAND条件で結合し、TitleおよびAbstractを対象に実行する。
+検索クエリは、「没入環境」「身体表象」「知覚評価」の3つのコンセプトをAND条件で結合し、TitleおよびAbstractを対象に実行する。
 
-> **Unified Search Query:** 
-`("Virtual Reality" OR VR OR HMD OR "Virtual Environment") AND 
-("Body ownership" OR Embodiment OR Avatar OR "Virtual body") AND 
-("Size perception" OR "Body size" OR "Eye height" OR "Perceived size" OR "Spatial scale" OR "Scale perception")`
-> 
+> **Unified Search Query（現行・Rev.6, 2026-07-17 著者確定。再検索は実施待ち）:**
+`("Virtual Reality" OR "VR" OR "HMD" OR "head-mounted display" OR "head mounted display"
+ OR "Virtual Environment*" OR "immersive virtual") AND
+("Avatar" OR "Body" OR "Embodiment") AND
+("Size" OR "Scale" OR "Height" OR "Distance")`
+
+> **G1 拡張の理由（Rev.6、スコープは不変）:**
+> - "head-mounted display": VRの装置的定義であり心理学系文献の慣用表現。同義語追加でありスコープ拡大ではない
+> - ハイフン無し表記の併記: DB間のトークン正規化差異への対応
+> - "Virtual Environment*": 再現率優先。非HMD系（CAVE等）の混入は Phase 3b の人手スクリーニングで除外可能
+> - "immersive" 単独は不採用: "immersive learning" 等の非VR文献を大量に拾い precision を損なうため "immersive virtual" に限定
+
+> **履歴:** 初回検索（2025-12〜2026-05 実行）で使われたのは G1 = ("Virtual Reality" OR "VR" OR "HMD")
+> の旧版である（Rev.5 で記録訂正）。G1 の狭さによる既知文献の取りこぼし（例: Being Barbie）が
+> Known-Item Test で確認されたため Rev.6 で拡張した。旧版と Rev.6 の差分ヒットは再検索の第2波
+> として PRISMA に報告する。
 
 ### 3.2 文献選定プロセス (Screening Process)
 
@@ -58,14 +69,17 @@
 - **Phase 1: 重複削除（決定論的・実装済み）**
     - DOI 完全一致 → Zotero Key 完全一致 → 正規化タイトル完全一致の優先順位で検出し、先出レコードを正とする。
 - **Phase 2: 学会ランクスクリーニング（決定論的・実装済み）**
+    - **照合手順（Rev.6）:** ① 著者確認済み **Venue エイリアス表**（`venue_aliases.csv`）を最優先で参照
+      → ② CORE 正規化完全一致 → ③ SJR ISSN/完全一致 → ④ ファジー照合（最後の手段）。
+      エイリアス表は誤照合（例: Presence誌→同名ワークショップ、TAP誌→SAPシンポジウムの
+      正規化同名衝突）の防止が目的であり、**照合漏れによる除外とランク基準による除外を
+      PRISMA 上で区別して記録**する（除外理由コード `via author-verified alias`）。
     - **カンファレンス:** 学会ランク（CORE Ranking）**A* または A** のみ採用
-    - **ジャーナル:** 分野別ランク（SJR等）Q1（上位25%）を原則とし、不足時のみQ2まで採用
-      <!-- TODO(未確定・保留): 上記「不足時のみQ2」は現行実装（pipeline.py = Q1のみ採用）と乖離している。
-           Q2による脱落は 823件/332誌（outputs/sjr_q2_excluded_venues.csv）。上位は臨床系ジャーナル
-           （Phase 3a の Cat3 でどのみち除外される層）だが、IEEE Trans. on Haptics (13件),
-           Computer Animation and Virtual Worlds (15件), Multisensory Research (3件) 等の
-           主題関連誌を含む。証拠を確認のうえ「Q1のみ」に本文を合わせるか、実装をQ2まで
-           広げるかを確定し、この TODO を削除すること。 -->
+    - **ジャーナル:** 分野別ランク（SJR 2025）**Q1（上位25%）のみ採用**（2026-07-17 確定, Rev.4）。
+      Q2以下の除外により主題関連誌の一部（IEEE Trans. on Haptics, Cognitive Processing,
+      Multisensory Research 等、計826件/332誌）が対象外となることは認識のうえでの決定であり、
+      その影響は Threats to Validity 節で報告する（証拠: `outputs/sjr_q2_excluded_venues.csv`、
+      Known-Item での実例: Gulliver's virtual travels = Cognitive Processing Q2 脱落）。
 - **Phase 3a: 決定論的キーワード除外（実装済み・`pipeline.py`）**
     - Title + Abstract に対する正規表現マッチング（大文字小文字区別なし・単語境界 `\b` 適用）。マッチした文献を除外する。全パターンと追加理由は下表の通り（適格性基準 PICOS との対応を明記）。
 

@@ -1,23 +1,23 @@
 ========================================================================
   PRISMA 3-Phase Screening Pipeline
-  Input : C:\Users\raior\SurveyProtcol2\SurveyProtcol\SurveyScleaning\ResearchVR2.csv
-  CORE  : C:\Users\raior\SurveyProtcol2\SurveyProtcol\SurveyScleaning\CORE.csv
+  Input : ResearchVR3.csv
+  CORE  : C:\Users\is0690vr\SurveyPlot\SurveyProtocol\CORE.csv
 ========================================================================
 
 ========================================================================
   PHASE 1: DEDUPLICATION
 ========================================================================
 
-  Input records          :   14,385
+  Input records          :   14,682
   Title column           : 'Title'
   DOI column             : 'DOI'
   Key column             : 'Key'
 
-  Removed by DOI match   :    1,628
+  Removed by DOI match   :    1,824
   Removed by Key match   :        0
   Removed by Title match :      315
-  Total removed          :    1,943
-  Records after dedup    :   12,442
+  Total removed          :    2,139
+  Records after dedup    :   12,543
 
   Output -> step1_dedup.csv
 
@@ -25,16 +25,16 @@
   PHASE 2: CORE A/A* + SJR Q1 SCREENING
 ========================================================================
 
-  Input records   :   12,442
+  Input records   :   12,543
   Venue column    : 'Publication Title'
   CORE entries    :    1,955
   SJR entries     :   50,326
 
   --- CORE Rank Distribution ---
-    CORE A*              :    825
-    CORE A               :    121
-    CORE B               :  2,185
-    CORE C               :    257
+    CORE A*              :    850
+    CORE A               :    123
+    CORE B               :  2,187
+    CORE C               :    262
     CORE Unranked        :     20
     CORE Journal Published:     47
     CORE Australasian C  :      2
@@ -57,19 +57,19 @@
     CORE journal published:      9
 
   --- SJR Quartile Distribution ---
-    SJR  Q1              :  1,912
-    SJR  Q2              :    823
+    SJR  Q1              :  1,936
+    SJR  Q2              :    826
     SJR  Q3              :    347
     SJR  Q4              :    265
     SJR  -               :    295
 
-  INCLUDED total         :    2,858
-    CORE A/A*            :      946
-    SJR Q1               :    1,912
-  EXCLUDED total         :    9,584
-    CORE low rank (B/C)  :    2,728
-    SJR Q2/Q3/Q4         :    1,730
-    Unmatched            :    5,126
+  INCLUDED total         :    2,909
+    CORE A/A*            :      973
+    SJR Q1               :    1,936
+  EXCLUDED total         :    9,634
+    CORE low rank (B/C)  :    2,735
+    SJR Q2/Q3/Q4         :    1,733
+    Unmatched            :    5,166
 
   --- Sample Unmatched Venues (first 30) ---
     2017 IEEE 3rd workshop on everyday virtual reality (WEVR)
@@ -102,7 +102,7 @@
     2019 5th experiment international conference (exp.at'19)
     2016 IEEE symposium on 3D user interfaces (3DUI)
     2025 international conference on intelligent computing and virtual & augmented reality simulations (ICVARS)
-    ... and 5096 more
+    ... and 5136 more
 
   Included output -> step2_rank_included.csv
   Excluded output -> step2_rank_excluded.csv
@@ -111,28 +111,28 @@
   PHASE 3: KEYWORD EXCLUSION
 ========================================================================
 
-  Input records   :    2,858
+  Input records   :    2,909
   Title column    : 'Title'
   Abstract column : 'Abstract Note'
 
-  Included        :    1,784  (62.4 %)
-  Excluded        :    1,074  (37.6 %)
+  Included        :    1,827  (62.8 %)
+  Excluded        :    1,082  (37.2 %)
 
   --- By Category ---
-       307  Cat1 [Not VR / Out of Scope]
+       313  Cat1 [Not VR / Out of Scope]
         71  Cat2 [Tech / Non-Empirical]
-       763  Cat3 [Clinical / Medical]
+       765  Cat3 [Clinical / Medical]
 
   --- By Keyword (top hits) ---
   +-- Cat1 [Not VR / Out of Scope]
   |     162  \baugmented reality\b
-  |     137  \bar\b
-  |      60  \bmixed reality\b
-  |      33  \bmr\b
+  |     138  \bar\b
+  |      61  \bmixed reality\b
+  |      35  \bmr\b
   |      22  \bsmartphone\b
-  |      12  \btablet(?:\s+computer)?\b
+  |      13  \btablet(?:\s+computer)?\b
+  |       6  \b360[- ]?(?:degree[s]?\s+)?video\b
   |       5  \bflat[- ]screen\b
-  |       5  \b360[- ]?(?:degree[s]?\s+)?video\b
   |       4  \bcomputer monitor\b
   |       3  \bdesktop monitor\b
   |       3  \bmobile phone\b
@@ -157,10 +157,10 @@
   |       1  \btechnical\s+report\b
   |
   +-- Cat3 [Clinical / Medical]
-  |     538  \bpatient[s]?\b
-  |     285  \brehabilitation\b
+  |     539  \bpatient[s]?\b
+  |     287  \brehabilitation\b
   |      89  \bsurgery\b
-  |      77  \bclinical\s+(?:trial|study|outcome|setting|population)\b
+  |      78  \bclinical\s+(?:trial|study|outcome|setting|population)\b
   |      42  \bphysical\s+therapy\b
   |      26  \bschizophrenia\b
   |      22  \bstroke\s+(?:patient|rehabilitation|survivor|recovery)\b
@@ -168,8 +168,8 @@
   |      18  \bchronic\s+pain\b
   |      17  \bcognitive\s+(?:behavioural|behavioral)\s+therapy\b
   |      17  \bautism\s+spectrum\b
+  |      17  \bpain\s+management\b
   |      16  \bdementia\b
-  |      16  \bpain\s+management\b
   |      15  \bsurgical\s+(?:training|simulation|procedure|planning)\b
   |      11  \bminimally\s+invasive\b
   |       9  \bphobia\b
@@ -206,10 +206,10 @@
   PIPELINE SUMMARY
 ========================================================================
 
-  Original records   :   14,385
-  After dedup (P1)   :   12,442  (-1,943)
-  After CORE  (P2)   :    2,858  (-9,584)
-  After keywords (P3):    1,784  (-1,074)
+  Original records   :   14,682
+  After dedup (P1)   :   12,543  (-2,139)
+  After CORE  (P2)   :    2,909  (-9,634)
+  After keywords (P3):    1,827  (-1,082)
 
   Output files:
     step1_dedup.csv

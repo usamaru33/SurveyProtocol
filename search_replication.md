@@ -26,6 +26,28 @@ DB別ヒット数と DB別生データは Zotero から復元できる。
 **Option A で埋まらないもの:** verbatim 検索式・使用フィルタ(Zotero には保存されない)。
 著者の手元記録(検索メモ・DBアカウントの検索履歴・ブラウザ履歴)を先に確認し、無ければ Option B へ。
 
+## Supplementary source: Frontiers in Virtual Reality のカバレッジ確保(Rev.6)
+
+Known-Item Test により、同誌掲載の必須文献3件が現行4DBの検索で捕捉されないことが確認された
+(タイトルが検索式に完全適合するのに不在 → 索引欠落が原因。同誌は SJR Q1 のため、
+捕捉できれば Phase 2 も通過する)。以下の順で対応する:
+
+1. **Scopus の索引状況を確認**: Scopus の「ソース(Sources)」検索で
+   "Frontiers in Virtual Reality" を引き、収載有無とカバレッジ開始年を記録する。
+   - **収載されている場合**: Rev.6 クエリでの Scopus 再検索に自然に含まれるため追加作業不要。
+     ただし収載開始年より前の巻号は下記 2 の対象。
+   - **収載されていない/一部期間のみの場合**: 下記 2 を実施。
+2. **誌内検索(journal hand-search)を supplementary source として実施**:
+   - Frontiers 公式サイトの誌内検索で Rev.6 クエリ(サイトの構文に翻訳)を実行。
+     実行文字列・実行日・ヒット数を search_strings.md に追記する。
+   - ヒットを Zotero の専用コレクション(例: `frvir_supplementary`)に取り込み、
+     CSV を `raw/frvir_supplementary_YYYYMMDD.csv` として保存。
+   - 統合時は他DBと同じ Phase 1 重複削除を通す。
+3. **PRISMA 2020 での報告**: この流入は "Records identified from: Databases" ではなく
+   **"Identification of studies via other methods" 側(Websites/Organisations/Citation searching
+   の行)**で報告する。フロー図の右カラムに `Frontiers in VR journal hand-search (n = X)` を明記し、
+   本文の検索戦略節に「索引カバレッジ欠落への対応」として1段落で理由を書く。
+
 ## Option B: 再検索(verbatim 検索式の確定が必要な場合のみ)
 
 以下は再検索を行う場合の手順。目的: (1) DB別 verbatim 検索式・実行日・ヒット数の確定記録、(2) DB別生データの保全。

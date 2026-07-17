@@ -7,44 +7,64 @@
 > - **実行日** → CSV の `Date Added` より、取り込みは **2025-12-25(1,276件)と 2026-05-15(13,109件)の2回** と確定。これが検索実行日の上限近似(要著者確認: 2波の経緯 — 予備検索+本検索?)
 > - **verbatim 検索式・使用フィルタ** → Zotero には保存されない情報のため、**依然として未記録**。著者の手元記録(検索メモ・ブラウザ履歴・DBアカウントの検索履歴)を確認し、無ければこの項目のみ再実行で確定する
 
-## 統合クエリ(概念形、rule.md §3.1 より)
+## 実行された統合クエリ(全DB共通、2026-07-17 著者確認により確定)
 
 ```
-("Virtual Reality" OR VR OR HMD OR "Virtual Environment")
-AND ("Body ownership" OR Embodiment OR Avatar OR "Virtual body")
-AND ("Size perception" OR "Body size" OR "Eye height" OR "Perceived size"
-     OR "Spatial scale" OR "Scale perception")
+("Virtual Reality" OR "VR" OR "HMD")
+AND ("Avatar" OR "Body" OR "Embodiment")
+AND ("Size" OR "Scale" OR "Height" OR "Distance")
 ```
 
-対象フィールド: Title および Abstract(rule.md 記載)。
+対象フィールド: Title および Abstract(rule.md 記載。各DBでのフィールド指定構文は未記録)。
+
+> **注:** rule.md 旧版に記載されていた詳細クエリ("Virtual Environment" や "Body ownership" 等の
+> 複合語を含む)は**計画段階のものであり、実行されていない**(protocol_changelog.md Rev.5)。
+
+## Rev.6 改訂クエリ(2026-07-17 著者確定・再検索は実施待ち)
+
+```
+("Virtual Reality" OR "VR" OR "HMD" OR "head-mounted display"
+ OR "head mounted display" OR "Virtual Environment*" OR "immersive virtual")
+AND ("Avatar" OR "Body" OR "Embodiment")
+AND ("Size" OR "Scale" OR "Height" OR "Distance")
+```
+
+- G1 のみ拡張(理由は protocol_changelog.md Rev.6)。G2/G3 は初回と同一。
+- 再検索を実施したら本表に「(第2波)」行として DB別に verbatim・実行日・ヒット数を追記する。
+- 加えて Frontiers in Virtual Reality の supplementary source
+  (`search_replication.md` 参照)の実行記録もここに追記する。
 
 ## DB別記録表
 
 | DB | Search string (verbatim) | Fields searched | Filters | Date executed | Hits |
 |---|---|---|---|---|---|
-| ACM Digital Library | **要著者確認**(手元記録が無ければ REQUIRES RE-RUN) | Title, Abstract(rule.md 記載。ACM での指定方法は未記録) | **要著者確認** | ≤ 2026-05-15(Zotero取込日) | **7,997** ✅ |
-| IEEE Xplore | **要著者確認**(同上) | Title, Abstract("Document Title"/"Abstract" 指定の有無は未記録) | **要著者確認** | ≤ 2025-12-25(Zotero取込日) ⚠️他DBより約5ヶ月早い | **1,276** ✅ |
-| PubMed | **要著者確認**([tiab] タグ等の実行構文) | Title/Abstract [tiab](推定、未確認) | **要著者確認** | ≤ 2026-05-15(Zotero取込日) | **781** ✅ |
-| Scopus | **要著者確認**(TITLE-ABS() / TITLE-ABS-KEY() の別) | Title, Abstract | **要著者確認** | ≤ 2026-05-15(Zotero取込日) | **4,331** ✅ |
+| ACM Digital Library | 統合クエリ(上記)✅ ※ACM構文への翻訳形は未記録 | Title, Abstract(指定構文は**要著者確認**) | **要著者確認** | ≤ 2026-05-15(Zotero取込日) | **7,997** ✅ |
+| IEEE Xplore(初回) | 統合クエリ(上記)✅ ※Command Search 構文は未記録 | Title, Abstract(指定構文は**要著者確認**) | **要著者確認** | ≤ 2025-12-25(Zotero取込日) | **1,276** ✅ |
+| IEEE Xplore(更新検索) | 統合クエリ(上記)✅ | 同上 | 出版年 2025〜2026 に限定 | 2026-07-17 | **297**(うち初回・他DBと重複しない新規 **101**)✅ |
+| PubMed | 統合クエリ(上記)✅ ※[tiab] タグの付与形は未記録 | Title/Abstract [tiab](推定、**要著者確認**) | **要著者確認** | ≤ 2026-05-15(Zotero取込日) | **781** ✅ |
+| Scopus | 統合クエリ(上記)✅ ※TITLE-ABS() / TITLE-ABS-KEY() の別は**要著者確認** | Title, Abstract | **要著者確認** | ≤ 2026-05-15(Zotero取込日) | **4,331** ✅ |
 | PsycInfo(補完用・条件付き) | **未実行が確定**(2026-07-17: Zotero にコレクション無し)。rule.md の条件「PubMed 検索が不十分な場合の補完」に対し、不実行と判断した理由(PubMed 781件で十分と判断した根拠)を本文に記載すること | — | — | — | 0(未実行) |
 
 ## 確定した PRISMA 上段(2026-07-17、`scripts/raw_db_audit.py` による)
 
-- Records identified: **ACM DL 7,997 / IEEE Xplore 1,276 / PubMed 781 / Scopus 4,331 = 計 14,385**
-- 検証: raw 4ファイルと統合CSV(ResearchVR2.csv)は Zotero Key で **1:1 完全一致**(欠落・混入・コレクション重複所属 0件)
-- DB間重複(DOI/正規化タイトル一致、重複除去報告の内訳用):
+- Records identified: **ACM DL 7,997 / IEEE Xplore 1,276 + 297(更新検索) / PubMed 781 / Scopus 4,331 = 計 14,682**
+- 検証(初回検索分): raw 4ファイルと統合CSV(ResearchVR2.csv, 14,385件)は Zotero Key で **1:1 完全一致**(欠落・混入・コレクション重複所属 0件)
+- IEEE 更新検索(`raw/IEEE_2025-2026.csv`, 297件): 既存とDOI重複 196件 / 真に新規 **101件**。
+  `ResearchVR3.csv`(= ResearchVR2 + 297件)を現行パイプライン入力とし、重複は Phase 1 で除去
+- DB間重複(初回分、DOI/正規化タイトル一致、重複除去報告の内訳用):
   PubMed∩Scopus **606** / Scopus∩IEEE **352** / Scopus∩ACM **142** / PubMed∩IEEE **39** / ACM∩IEEE 0 / ACM∩PubMed 0
 - 詳細: `outputs/raw_db_audit.csv`
 
 ## 未記録項目の明示リスト(2026-07-17 更新)
 
-- **verbatim 検索式・フィルタ**: 4DB すべてで未記録(Zotero には保存されない情報)。著者の手元記録が無ければ、この項目のみ再実行(`search_replication.md` Option B)で確定する。
+- ~~verbatim 検索式~~ → **確定済み**(著者提供、上記統合クエリ)。残るのは**各DBでのフィールド指定構文・フィルタの使用有無**のみ(要著者確認、優先度低)。
 - ~~DB別ヒット数~~ → **確定済み**(上表 ✅)。
 - ~~PsycInfo の実行有無~~ → **未実行が確定**。不実行の判断理由の記載が残タスク。
-- **⚠️ 検索時点の非対称**: IEEE のみ 2025-12-25 実行で、他3DBより約5ヶ月古い。
-  2026年前半の IEEE 文献(IEEE VR 2026 等)が捕捉されていない可能性がある。
-  対応候補: (a) IEEE のみ同一検索式で更新検索し差分を追加(PRISMAに2回目の検索として記載)、
-  (b) カバレッジ期間の非対称を Threats to Validity に明記して許容。
+- ~~検索時点の非対称(IEEE のみ 2025-12 実行)~~ → **解消済み(2026-07-17)**:
+  IEEE のみ出版年 2025〜2026 に限定した更新検索を実行し(297件、新規101件)、
+  `ResearchVR3.csv` に統合。PRISMA には IEEE の検索を2回(2025-12-25 / 2026-07-17)として報告する。
+  なお更新検索の時点で今度は他3DB(2026-05-15)よりIEEEが約2ヶ月新しくなったが、
+  差は軽微であり全DBの検索時点を本文に明記することで対応する。
 
 ## 現存データから分かること(参考値・PRISMA には使用不可)
 

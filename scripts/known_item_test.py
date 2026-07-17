@@ -16,8 +16,10 @@ cf. Kitchenham & Charters 2007)で示すため。段階別の脱落理由を特�
 検索式の欠陥 / Venueホワイトリストの欠陥 / 除外キーワードの過剰を切り分ける。
 
 【入力】
-  - known_items.md            (優先) または known_items.csv — 既知文献リスト
-  - ResearchVR2.csv           step0: 統合生データ 14,385件
+  - 既知文献リスト(--items で指定。省略時は known_items.csv → known_items.md →
+    self_scale_references.csv の順に探す)。列名は柔軟に解決する
+    (DOI_or_URL / ID / Section / Role_in_Survey 等のエイリアス対応)
+  - ResearchVR*.csv           step0: 統合生データ(最新版 = 名前の昇順で最後を自動選択)
   - step1_dedup.csv           step1: 重複削除後 12,442件
   - step2_rank_included.csv   step2: Venueランク通過 2,858件
   - step2_rank_excluded.csv   step2 脱落理由の特定用(Excl_Reason_Phase2)
@@ -70,15 +72,13 @@ from pipeline import (  # noqa: E402
 
 FUZZY_THRESHOLD = 0.90  # Levenshtein 類似度の下限(候補提示用)
 
-# 統合検索クエリ(rule.md §3.1)の3コンセプト群。step0 脱落分析に使用。
+# 実際に実行された統合検索クエリ(search_strings.md / rule.md Rev.5)の3コンセプト群。
+# step0 脱落分析に使用。※旧版はrule.md計画段階のクエリを使っていたが、実行版に訂正済み。
 QUERY_CONCEPT_GROUPS: list[tuple[str, list[str]]] = [
-    ("G1 没入環境", [r"\bvirtual reality\b", r"\bvr\b", r"\bhmd\b",
-                     r"\bvirtual environment[s]?\b"]),
-    ("G2 身体表象", [r"\bbody ownership\b", r"\bembodiment\b", r"\bavatar[s]?\b",
-                     r"\bvirtual bod(?:y|ies)\b"]),
-    ("G3 スケール知覚", [r"\bsize perception\b", r"\bbody size\b", r"\beye height\b",
-                        r"\bperceived size\b", r"\bspatial scale\b",
-                        r"\bscale perception\b"]),
+    ("G1 没入環境", [r"\bvirtual reality\b", r"\bvr\b", r"\bhmd\b"]),
+    ("G2 身体表象", [r"\bavatar[s]?\b", r"\bbod(?:y|ies)\b", r"\bembodiment\b"]),
+    ("G3 スケール知覚", [r"\bsizes?\b", r"\bscales?\b", r"\bheights?\b",
+                        r"\bdistances?\b"]),
 ]
 
 TITLE_STOPWORDS = {
@@ -88,8 +88,16 @@ TITLE_STOPWORDS = {
     "effects", "study", "toward", "towards",
 }
 
+def _latest_merged_name() -> str:
+    """統合生データの最新版(ResearchVR2.csv, ResearchVR3.csv, ... の名前順で最後)。"""
+    cands = sorted(p.name for p in ROOT.glob("ResearchVR*.csv"))
+    if not cands:
+        sys.exit("[ERROR] ResearchVR*.csv が見つかりません")
+    return cands[-1]
+
+
 STEPS = [
-    ("step0", "ResearchVR2.csv", "統合生データ(検索式で拾えたか)"),
+    ("step0", _latest_merged_name(), "統合生データ(検索式で拾えたか)"),
     ("step1", "step1_dedup.csv", "重複削除後"),
     ("step2", "step2_rank_included.csv", "Venueランク通過後"),
     ("step3", "step3_kw_included.csv", "キーワード除外通過後(最終候補)"),
@@ -198,35 +206,89 @@ class Dataset:
         return cands[:limit]
 
 
-def parse_known_items(root: Path) -> list[dict]:
-    """known_items.csv があれば優先、無ければ known_items.md の表をパースする。"""
-    csv_path = root / "known_items.csv"
-    if csv_path.exists():
-        with csv_path.open(encoding="utf-8-sig", newline="", errors="replace") as f:
-            items = [r for r in csv.DictReader(f)]
-    else:
-        md_path = root / "known_items.md"
-        if not md_path.exists():
-            sys.exit(f"[ERROR] {md_path} が見つかりません")
-        items = []
-        header: list[str] | None = None
-        for line in md_path.read_text(encoding="utf-8").splitlines():
-            if not line.strip().startswith("|"):
-                continue
-            cells = [c.strip() for c in line.strip().strip("|").split("|")]
-            if header is None:
-                if cells and cells[0] in ("#", "No", "no"):
-                    header = ["#", "Title", "Authors", "Year", "Venue", "DOI",
-                              "Role", "Rationale"]
-                continue
-            if set("".join(cells)) <= set("-: "):
-                continue  # 区切り行
-            row = dict(zip(header, cells + [""] * (len(header) - len(cells))))
-            items.append(row)
-    valid = [it for it in items
-             if (it.get("Title") or "").strip()
-             and not (it.get("Title") or "").strip().upper().startswith("EXAMPLE:")]
-    return valid
+# 既知文献リストの列名エイリアス(canonical名 → 受理する列名の優先順)
+ITEM_COL_ALIASES: dict[str, list[str]] = {
+    "#": ["#", "ID", "No", "no"],
+    "Title": ["Title", "title"],
+    "Authors": ["Authors", "Author"],
+    "Year": ["Year", "Publication Year"],
+    "Venue": ["Venue", "Publication Title"],
+    "DOI": ["DOI", "DOI_or_URL", "doi"],
+    "Role": ["Role", "Role (Intro/RW/Taxonomy)", "Section"],
+    "Rationale": ["Rationale", "Role_in_Survey"],
+    "VenueType": ["VenueType"],
+    "Priority": ["Priority"],
+    "SearchScope": ["SearchScope", "Scope"],
+}
+
+
+def _canonicalize(row: dict) -> dict:
+    out = {}
+    for canon, aliases in ITEM_COL_ALIASES.items():
+        for a in aliases:
+            if a in row and (row.get(a) or "").strip():
+                out[canon] = row[a].strip()
+                break
+        else:
+            out[canon] = ""
+    # DOI_or_URL 等に URL が入っている場合、文字列中の DOI(10.xxxx/...)を抽出
+    if out["DOI"] and not out["DOI"].startswith("10."):
+        m = re.search(r"\b10\.\d{4,9}/\S+", out["DOI"])
+        out["DOI"] = m.group(0) if m else out["DOI"]
+    return out
+
+
+def parse_known_items(root: Path, items_path: Path | None = None) -> list[dict]:
+    """既知文献リストを読む。--items 指定 > known_items.csv > known_items.md >
+    self_scale_references.csv の順。列名はエイリアス解決する。"""
+    if items_path is None:
+        for cand in ("known_items.csv", "known_items.md",
+                     "self_scale_references.csv"):
+            p = root / cand
+            if p.exists():
+                if cand == "known_items.md":
+                    # md はテンプレートのみ(有効行なし)の場合があるため中身で判断
+                    md_items = _parse_md_table(p)
+                    if md_items:
+                        return md_items
+                    continue
+                items_path = p
+                break
+        else:
+            sys.exit("[ERROR] 既知文献リストが見つかりません(--items で指定可)")
+    if items_path is None:
+        return []
+    if items_path.suffix.lower() == ".md":
+        return _parse_md_table(items_path)
+    with items_path.open(encoding="utf-8-sig", newline="", errors="replace") as f:
+        items = [_canonicalize(r) for r in csv.DictReader(f)]
+    print(f"[INFO] 既知文献リスト: {items_path.name}")
+    return _valid_only(items)
+
+
+def _parse_md_table(md_path: Path) -> list[dict]:
+    items = []
+    header: list[str] | None = None
+    for line in md_path.read_text(encoding="utf-8").splitlines():
+        if not line.strip().startswith("|"):
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if header is None:
+            if cells and cells[0] in ("#", "No", "no", "ID"):
+                header = ["#", "Title", "Authors", "Year", "Venue", "DOI",
+                          "Role", "Rationale"]
+            continue
+        if set("".join(cells)) <= set("-: "):
+            continue  # 区切り行
+        row = dict(zip(header, cells + [""] * (len(header) - len(cells))))
+        items.append(_canonicalize(row))
+    return _valid_only(items)
+
+
+def _valid_only(items: list[dict]) -> list[dict]:
+    return [it for it in items
+            if (it.get("Title") or "").strip()
+            and not (it.get("Title") or "").strip().upper().startswith("EXAMPLE:")]
 
 
 # ---------------------------------------------------------------------------
@@ -275,7 +337,12 @@ def title_candidate_terms(title: str) -> list[str]:
 # ---------------------------------------------------------------------------
 
 def main() -> None:
-    items = parse_known_items(ROOT)
+    import argparse
+    ap = argparse.ArgumentParser(description="Known-Item Test")
+    ap.add_argument("--items", type=Path, default=None,
+                    help="既知文献リストのパス(省略時は自動探索)")
+    args = ap.parse_args()
+    items = parse_known_items(ROOT, args.items)
     outdir = ROOT / "outputs"
     outdir.mkdir(exist_ok=True)
     out_csv = outdir / "known_item_test.csv"
@@ -290,7 +357,18 @@ def main() -> None:
             encoding="utf-8")
         return
 
-    print(f"[INFO] Known items: {len(items)} 件(目標 15〜25 件、最低 10 件推奨)")
+    # SearchScope='background'(書籍・非VRの理論/心理研究)は検索で拾えなくて正常なため、
+    # recall の分母から除外する(存在チェック自体は行わず、レポートに件数のみ記す)
+    background = [it for it in items
+                  if (it.get("SearchScope") or "").lower() == "background"]
+    items = [it for it in items
+             if (it.get("SearchScope") or "").lower() != "background"]
+    if background:
+        print(f"[INFO] SearchScope=background の {len(background)} 件は recall 計算から除外"
+              "(手動追加すべき背景文献): "
+              + "; ".join((it.get("Title") or "")[:40] for it in background))
+
+    print(f"[INFO] Known items(in-scope): {len(items)} 件(目標 15〜25 件、最低 10 件推奨)")
     if len(items) < 10:
         print("[WARN] 10 件未満です。quasi-gold standard としては不足(Kitchenham 推奨最低 10 件)。")
 
@@ -313,7 +391,8 @@ def main() -> None:
             "DOI": doi,
             "Year": it.get("Year", "").strip(),
             "Venue_expected": it.get("Venue", "").strip(),
-            "Role": it.get("Role", it.get("Role (Intro/RW/Taxonomy)", "")).strip(),
+            "Role": it.get("Role", "").strip(),
+            "VenueType": it.get("VenueType", "").strip(),
         }
         drop_stage, drop_reason = "", ""
         matched_row_step0 = None
@@ -361,7 +440,7 @@ def main() -> None:
 
     # ---- outputs/known_item_test.csv ----
     fieldnames = ["#", "Title", "DOI", "Year", "Venue_expected", "Role",
-                  "source_db_guess", "step0_source_dbs"]
+                  "VenueType", "source_db_guess", "step0_source_dbs"]
     for key, _, _ in STEPS:
         fieldnames += [f"{key}_survived", f"{key}_match_method",
                        f"{key}_fuzzy_candidates"]
@@ -437,8 +516,13 @@ def write_analysis_md(out_md: Path, results: list[dict], n: int, datasets) -> No
             f"### {r['Title']}",
             "",
             f"- DOI: `{r['DOI'] or '(なし)'}` / 想定Venue: {r['Venue_expected']}",
-            "- タイトルに対する検索クエリ・コンセプト群の命中状況:",
         ]
+        vt = (r.get("VenueType") or "").lower()
+        if vt and vt not in ("conference", "journal"):
+            lines.append(
+                f"- **注: VenueType = {r['VenueType']}。書籍・章などは対象DBの検索範囲外の"
+                "可能性が高く、検索式の欠陥とは限らない(背景文献として手動追加が妥当)。**")
+        lines.append("- タイトルに対する検索クエリ・コンセプト群の命中状況:")
         for g, h in matched.items():
             lines.append(f"  - {g}: ✅ {', '.join(f'`{p}`' for p in h)}")
         for g in missing:
@@ -492,10 +576,9 @@ def write_analysis_md(out_md: Path, results: list[dict], n: int, datasets) -> No
                              "`outputs/unmatched_venues_top50.csv` も参照。")
         if "SJR 'Q2'" in r["drop_reason"]:
             lines.append(
-                "- **注記: SJR Q2 による除外。rule.md は「Q1原則・不足時のみQ2まで採用」"
-                "だが、実装(pipeline.py)は Q1 のみ採用しており、この乖離が脱落の直接原因。**"
-                " Q2 採用に切り替えるなら pipeline.py の `quartile == \"Q1\"` 判定と"
-                " README/rule.md の整合を取ること。")
+                "- 注記: SJR Q2 による除外。採用基準は「Q1のみ」で確定済み"
+                "(protocol_changelog.md Rev.4)であり、この脱落は**基準どおりの動作**。"
+                " Threats to Validity 節で報告する事例として記録する。")
         elif "未照合" in r["drop_reason"]:
             lines.append(
                 "- 注記: ランク不足ではなく**照合漏れ**。類似Venueが提示されている場合は"
