@@ -285,3 +285,52 @@
   3. **著者**: Rev.6 クエリで全DB再検索(第2波)+ Frontiers in VR の Scopus 索引確認
   4. 第2波統合 + 正規化改修(著者決定後)+ エイリアス確定 → 公式再実行(Rev.7)
      → known_item_test で recall 再測定(目標 step0 ≥ 80%)
+
+### 2026-07-21 — 検索方法論5方針のデータ検証(Rev.7 判定・分析のみ、step ファイル不変更)
+- **`methodology_decision_Rev7.md` 新規作成** — 暫定5方針を raw/*.csv・known_item_test.csv から
+  決定論的に検証(LLM不使用)。scratchpad の分析スクリプトで A〜D を算出:
+- **A. Known-item venue 内訳**: in-scope 13件 = VR/CG/HCI **9件(69%)** / 心理・神経系 **4件(31%)**
+  (#4 PLoS ONE, #5 PLoS ONE, #6 PNAS, #14 Cognitive Processing)。心理接合点 seminal の
+  **Botvinick&Cohen 1998・Lenggenhager 2007 は known-item にも raw 4DB にも不在** → background 追加を著者提案。
+- **B. DB限界寄与**: **Scopus 無しで step0 消失する known-item 4件**(#5/#6/#10/#14、うち #10 は Scopus 単独=唯一源)。
+  **PubMed の known-item 固有寄与は 0**(全 PubMed known-item は Scopus にも在る)。corpus固有推定:
+  ACM 7,305 / Scopus 3,247 / IEEE 924 / **PubMed 175(22.4%)**。ペア重複 PubMed∩Scopus 606。
+- **C. MeSH**: PubMed `Manual Tags` に MeSH 95%(743/781)格納=post-hoc 利用可。ただし
+  **step0 欠落4件は MeSH で 0件も救えない**(3件 Frontiers VR=PubMed 非収載、1件 Being Barbie=raw 不在)。
+- **D. フィルタ層**: 4DB は Zotero 同一スキーマ(枠組み実装可)だが中身が非対称 —
+  **ACM Abstract 4.3%(342/7,997)**、usable Keyword は **PubMed(MeSH)のみ**(ACM Manual Tags は item-type 混入、
+  Scopus 1.2%)、Automatic Tags 全DB 0%。Title のみ全DB 100%(唯一の共通分母)。
+- **判定**: 方針1 支持(条件付き・PubMed の根拠弱い)/ 方針2 修正(一律TAK不可、共通分母=Title)/
+  方針3 支持(要 degrade 設計)/ 方針4 修正・格下げ(MeSH 恩恵0、要ライブ差分)/ 方針5 支持(現 step0=69.2% 未達)。
+- **副次発見**: 脱落主因は検索でも DB でもなく **Venue ホワイトリスト(step2 で 13件中 6件脱落)**。
+  Zhou et al. の「学際取りこぼし」は消えず step2 へ移動しただけ、と Threats に明記して補強。
+- `protocol_changelog.md` に **Rev.7** を記録。
+- **次回やること(著者確認・優先度順)**:
+  1. **著者**: PubMed corpus固有 175件の主題適合率サンプル(PubMed 独立正当化の可否)
+  2. **著者**: PubMed で `"Virtual Reality"[Mesh]` OR 追加のライブ差分(MeSH corpus 便益=判断保留の解消)
+  3. **著者**: ACM Abstract(4.3%)・Scopus Keywords(1.2%)の再エクスポート可否(方針2/3 の前提)
+  4. **著者**: background known-item 追加(Botvinick&Cohen 1998, Lenggenhager 2007 等)+ known_items.md 正式化
+  5. Rev.6 第2波再検索後に step0 recall 再測定(現 69.2% は第1波のみ)
+
+### 2026-07-21 (2) — Rev.7 確定方針への是正タスク実行(4件、外部通信/step ファイル変更なし)
+- **著者が Rev.7 方針を確定**: Scopus/PubMed 維持(PubMed は175件適合率で裏付け)、scope は
+  一律TAK放棄→**TA基準**(Scopus Keyword 回収で TA+K 格上げ可)、フィルタ層は**利用可能フィールドのみ+degradeフラグ**、
+  **MeSH は検索分岐に使わずフィルタ層内の任意recallブースタ+PRISMA-S報告に格下げ**、Known-Item Test 維持(目標 step0≥80%)。
+- **Task1 エクスポート欠陥是正**: `search_replication.md` に「Rev.7 エクスポート欠陥の是正」節追加
+  (ACM Abstract 4.3% → Zotero/ACM DL 再エクスポート優先・不可時 fallback、Scopus Keyword 1.2% → Author/Index Keywords 込み再エクスポート)。
+  `scripts/enrich_abstracts.py` 新規(Crossref→S2 で DOI ベース Abstract 補完、**外部API=著者実行・コードのみ整備**)。
+  `search_strings.md` に第2波の verbatim フィールド構文の必須記録ルール(Scopus=TITLE-ABS/PubMed=[tiab]/ACM=Title:Abstract:/IEEE=Document Title:Abstract:)。
+- **Task2 PubMed固有175件**: `scripts/pubmed_unique_audit.py` 新規・**実行**。他DB(ACM/IEEE/Scopus/IEEE更新)に
+  DOI・正規化タイトルとも不一致の **175件**を `outputs/pubmed_unique_175.csv` に出力(seed=42 無作為30件に judge_relevance 空欄+MeSH・Abstract抜粋)。適合率推定手順は docstring(判定は著者・LLM不使用)。
+- **Task3 gold set 一本化**: 正式セット=`self_scale_references.csv` に確定、`known_items.md` 冒頭に注記。
+  心理接合点の古典 2件を **background** 追加(#19 Botvinick&Cohen 1998 / #20 Lenggenhager 2007、非VR・recall分母外=検索とスノーボーリングの境界)。in-scope 15〜25件拡充は著者タスクとして明記。
+- **Task4 Venue脱落6件のスノーボーリング**: `scripts/venue_dropped_audit.py` 新規・**実行** →
+  `outputs/venue_dropped_known_items.csv`(分類実測: **unmatched 3(#7/#8/#13)/ below_rank 2(#3 Presence, #10 ICAT-EGVE)/ criterion 1(#14 Gulliver Q2)**)。
+  `snowballing_protocol.md` 新規(シード選定・前後方探索2ホップ・PICOS採否・PRISMA右カラム "citation searching" 計上、drop_category別の扱い)。
+- `methodology_decision_Rev7.md` に確定事項と成果物対応表を追記。`protocol_changelog.md` に「Rev.7 実行分」追記。
+- **次回やること(著者、優先度順)**:
+  1. `outputs/pubmed_unique_175.csv` の30件を judge_relevance 判定 → 適合率算出 → PubMed 独立正当化の可否を確定
+  2. ACM Abstract / Scopus Keyword を再エクスポート(不可なら enrich_abstracts.py を著者実行)→ 充足率再測定
+  3. `snowballing_protocol.md` に従い脱落6件を回収 → `outputs/snowballing_log.csv` 記録 → PRISMA 右カラム確定
+  4. Rev.6 第2波再検索 + verbatim フィールド構文記録 → 公式再実行 → step0 recall 再測定(目標≥80%)
+  5. 上記確定後に rule.md 本文へ反映(scope=TA、MeSH 格下げ、Threats に venue フィルタ取りこぼし)

@@ -34,6 +34,19 @@ AND ("Size" OR "Scale" OR "Height" OR "Distance")
 - 加えて Frontiers in Virtual Reality の supplementary source
   (`search_replication.md` 参照)の実行記録もここに追記する。
 
+> **【Rev.7 運用ルール(必須)】第2波再検索では「Fields searched」を verbatim で必ず記録する。**
+> 各DBで実際にどのフィールド構文を使ったかが、フィルタ層(方針3)で「正規化して揃える対象 scope」の
+> 基準になる。実効 scope は Rev.7 で **TA(Title-Abstract)を基準**に確定しているため、以下を厳守:
+> - **Scopus**: `TITLE-ABS(...)` を使う(`TITLE-ABS-KEY` は索引語まで拾い scope が広がる)。
+>   どちらを実行したか画面のクエリ文字列をそのまま貼る。Keyword を回収して TA+K に格上げする場合のみ
+>   `TITLE-ABS-KEY` を検討し、その旨を明記。
+> - **PubMed**: `[tiab]` を使う(`[tw]`/`[all fields]` は不可)。MeSH は検索分岐に使わない
+>   (Rev.7 で MeSH はフィルタ層内の任意 recall ブースタ+PRISMA-S 報告項目に格下げ)。
+> - **ACM**: `Title:` / `Abstract:` を明示(`AllField:` は全文検索で過剰ヒット)。
+> - **IEEE**: `"Document Title":` / `"Abstract":`(`"All Metadata"` は不可)。
+> 記録先は本表の「Fields searched」列。現在「要著者確認」のままの初回分も、著者の検索履歴から
+> 判明したら遡って埋める(判明しなければ「記録なし」と明記し Threats で言及)。
+
 ## DB別記録表
 
 | DB | Search string (verbatim) | Fields searched | Filters | Date executed | Hits |

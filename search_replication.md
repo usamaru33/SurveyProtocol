@@ -48,6 +48,55 @@ Known-Item Test により、同誌掲載の必須文献3件が現行4DBの検索
    の行)**で報告する。フロー図の右カラムに `Frontiers in VR journal hand-search (n = X)` を明記し、
    本文の検索戦略節に「索引カバレッジ欠落への対応」として1段落で理由を書く。
 
+## Rev.7 エクスポート欠陥の是正(再検索不要・Zotero 再エクスポートで対応)
+
+> `methodology_decision_Rev7.md` §D が実測した3つのエクスポート欠陥を潰す。
+> **いずれも再検索ではなく、既存 Zotero コレクションからの再エクスポート/列選択で解決する**
+> (件数は変わらないので PRISMA 上段への影響なし)。フィルタ層(方針3)を TA / TA+K で
+> 動かすための前提整備である。
+
+### 欠陥1: ACM の Abstract 欠落(現 4.3% = 342/7,997)
+
+原因の切り分け → 対応の順に:
+
+1. **まず再エクスポートで取れるか確認する。** Zotero の ACM コレクションを開き、数件の
+   アイテムで「Abstract」フィールドが Zotero 上に存在するかを見る。
+   - **Zotero に Abstract が入っている場合** = CSV エクスポート設定の問題。
+     エクスポート時に「Abstract Note」列が含まれる形式(CSV フル/RIS/BibTeX の abstract)で
+     出し直す。`raw/acm_zotero_YYYYMMDD.csv` として保存し、充足率を再測定する。
+   - **Zotero 自体に Abstract が無い場合** = ACM DL の取り込み時に Abstract が付かなかった。
+     ACM DL 側から再取得する:検索結果 → SelectAll → Export Citations で
+     **「Include Abstract」相当のオプションを有効にした BibTeX/CSV** を出し、Zotero に再取り込み。
+     ACM の Zotero Translator 経由取り込みでも Abstract が入ることが多い。
+2. **再取得が不可能な場合のフォールバック**: `scripts/enrich_abstracts.py` を著者が実行し、
+   DOI をキーに Crossref → Semantic Scholar から Abstract を補完する
+   (外部 API 通信のため Claude は実行しない。コード・手順は同スクリプトの docstring 参照)。
+   補完した件数とソースを本文・PRISMA に明記する(再現性のため)。
+3. **完了条件**: ACM の `Abstract Note` 充足率を 4.3% から実務的水準(理想 ≥ 95%)へ。
+   達成できない残余は「ACM の一部は Title のみで正規化フィルタを適用(degrade)」と PRISMA-S に記載。
+
+### 欠陥2: Scopus の Keyword 欠落(現 1.2% = 51/4,331)
+
+`methodology_decision_Rev7.md` の方針: 実効 scope は当面 **TA(Title-Abstract)**。
+Scopus の Author/Index Keywords が回収できた場合に限り **TA+K へ格上げ可**。
+
+- Zotero の Scopus コレクションからの再エクスポートでは Keyword が付かない可能性が高いため、
+  **Scopus 本体から再エクスポートする**:検索結果 → Export → CSV で
+  **「Citation information + Abstract & keywords」を選択**(`search_replication.md` §4 と同じ設定)。
+  これで **Author Keywords** と **Indexed Keywords** の両列が入る。
+- `raw/scopus_zotero_YYYYMMDD.csv`(または `raw/Scopus_kw_YYYYMMDD.csv`)として保存し、
+  Keyword 列充足率を再測定する。
+- **判断**: 充足率が高ければフィルタ層の scope を TA+K に格上げし、その旨を Rev.8 として記録。
+  Keyword が Scopus でしか揃わないなら、K は「Scopus/PubMed のみ有効・他DBは degrade」で報告する
+  (ACM/IEEE の Keyword 列は使えないため、K の全DB統一は依然不可)。
+
+### 欠陥3: verbatim フィールド指定構文の未記録
+
+各DBで実際に **どのフィールドに検索をかけたか**(Scopus: `TITLE-ABS` か `TITLE-ABS-KEY` か /
+PubMed: `[tiab]` か `[tw]` か / ACM: `Title:`/`Abstract:` の指定 / IEEE: `"Document Title":`/`"Abstract":`)は
+`search_strings.md` の「Fields searched」欄で **「要著者確認」のまま**である。これは実効 scope の
+**非対称の源泉**であり、フィルタ層で何を「正規化して揃える」のかの基準になる。→ §運用ルール参照。
+
 ## Option B: 再検索(verbatim 検索式の確定が必要な場合のみ)
 
 以下は再検索を行う場合の手順。目的: (1) DB別 verbatim 検索式・実行日・ヒット数の確定記録、(2) DB別生データの保全。

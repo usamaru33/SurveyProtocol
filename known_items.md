@@ -1,5 +1,15 @@
 # Known-Item Set — 検索戦略の妥当性検証用 既知文献リスト
 
+> **【Rev.7 確定・正式 gold set の所在】** 現在アクティブな quasi-gold standard は
+> **`self_scale_references.csv`(SearchScope 列)**である。`known_item_test.py` は
+> `known_items.csv` → `known_items.md`(**下表は有効行0のテンプレート**)→ `self_scale_references.csv`
+> の順で探索するため、下表が空である限り自動的に `self_scale_references.csv` が使われる。
+> in-scope 15件(#3〜#14, #18 + Rev.7 追加分)/ background(非VR理論・心理接合点の古典、
+> recall 分母外)という構成。**このファイルの表は当面「拡充用の下書き」**であり、
+> 二重管理を避けるため gold set の本体は `self_scale_references.csv` に一本化する
+> (`methodology_decision_Rev7.md` §A・§著者確認#7)。in-scope を 15〜25件へ増やす際は
+> `self_scale_references.csv` に SearchScope=in-scope 行を追加すること。
+
 ## これは何か
 
 検索式・スクリーニング基準の妥当性を検証するための **quasi-gold standard**(Kitchenham 推奨: 最低10件、本プロトコルでは **15〜25件** を目標)。
