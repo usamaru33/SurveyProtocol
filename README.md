@@ -114,11 +114,25 @@ SurveyProtocol/
 ├── step3_kw_excluded.csv        # Phase 3 出力: キーワード除外（1,082件）
 │
 ├── pipeline_log.txt             # パイプライン実行ログ（詳細・最新値はここ）
-├── rule.md                      # 研究プロトコル・方針文書（Rev.2）
-├── protocol_changelog.md        # プロトコル変更履歴
-├── search_strings.md            # DB別検索式の記録（PRISMA Item #7）
-└── README.md                    # このファイル
+│
+├── known_items.md               # Known-Item Test 入力テンプレ（known_item_test.py が読む）
+├── known_item_analysis.md       # ★自動生成: 脱落分析（known_item_test.py が書く）
+├── README.md                    # このファイル
+└── docs/                        # プロトコル文書（2026-07-21 集約）
+    ├── rule.md                  # 研究プロトコル・方針文書
+    ├── protocol_changelog.md    # プロトコル変更履歴（〜Rev.7）
+    ├── PROGRESS_LOG.md          # 進捗ログ（セッションログ）
+    ├── methodology_decision_Rev7.md  # 検索方法論のデータ検証・確定
+    ├── search_strings.md        # DB別検索式の記録（PRISMA Item #7）
+    ├── search_replication.md    # 検索記録の復元・再実行手順
+    ├── snowballing_protocol.md  # 引用探索による補完手続き
+    └── normalization_design.md  # Venue正規化の設計案
 ```
+
+> **注（2026-07-21 のファイル整理）:** 手書きのプロトコル文書は `docs/` に集約した。
+> `README.md`（入口）と、`known_item_test.py` が直接読み書きする `known_items.md` /
+> `known_item_analysis.md` はスクリプト結合のためルートに据え置き。
+> **データ・コードのパスは未変更**（`raw/` `outputs/` `scripts/` `step*.csv` `pipeline.py` はそのまま）。
 
 ---
 

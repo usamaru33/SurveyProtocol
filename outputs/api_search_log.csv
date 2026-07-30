@@ -1,0 +1,2 @@
+﻿executed_at,db,search_string_verbatim,fields_or_scope,filters,hits_total,hits_fetched,out_file
+2026-07-30T14:45:46,Scopus(第2波),"TITLE-ABS((""Virtual Reality"" OR ""VR"" OR ""HMD"" OR ""head-mounted display"" OR ""head mounted display"" OR ""Virtual Environment*"" OR ""immersive virtual"") AND (""Avatar"" OR ""Body"" OR ""Embodiment"") AND (""Size"" OR ""Scale"" OR ""Height"" OR ""Distance""))",TITLE-ABS,view=COMPLETE,2542,2542,C:\Users\is0690vr\SurveyPlot\SurveyProtocol\raw\scopus_wave2_20260730.ris
