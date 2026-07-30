@@ -334,3 +334,127 @@
   3. `snowballing_protocol.md` に従い脱落6件を回収 → `outputs/snowballing_log.csv` 記録 → PRISMA 右カラム確定
   4. Rev.6 第2波再検索 + verbatim フィールド構文記録 → 公式再実行 → step0 recall 再測定(目標≥80%)
   5. 上記確定後に rule.md 本文へ反映(scope=TA、MeSH 格下げ、Threats に venue フィルタ取りこぼし)
+
+### 2026-07-22 — Rev.8: DB構成を3DBに最終確定(ACM/IEEE/Scopus、PubMed不使用)
+- **著者が Rev.8 を確定**: PubMed を不使用に確定(理由: 医学・治療目的の文献はスコープ外・
+  主題適合性が低い。Rev.7の corpus固有175件分析は決定理由として使わず参考情報に格下げ)。
+  PsycINFO はアクセス制約により従来どおり不使用、正当化を Scopus カバレッジ + Known-Item Test で補強。
+- **Task1**: `protocol_changelog.md` に **Rev.8** を記録。`methodology_decision_Rev7.md` に
+  「Rev.8 追記」節を新設(DB選定最終構成表、**PsycINFO不使用の正当化ドラフト**(Threats to Validity 転用可、
+  #5/#6/#14 の Scopus 捕捉+#10 Scopus単独性を実証根拠に使用)、Rev.7分析(PubMed前提)の
+  「参考情報」への位置づけ変更)。`search_strings.md`/`search_replication.md` の PubMed(§3)・
+  PsycInfo(§5)手順を「Rev.8で不使用確定」と明記(削除せず経緯として保存)。
+- **Task2(エクスポート欠陥是正)**: **Rev.7で整備済みのため追加作業なし**
+  (`search_replication.md` §Rev.7是正 + `scripts/enrich_abstracts.py` は ACM/Scopus 向けで
+  DB非依存、そのまま有効)。Keyword格上げの判断は「Rev.9候補」と呼称変更(Rev.8は既にDB構成確定に使用済みのため)。
+- **Task3**: `known_items.md` に Rev.8 追記(background古典2件を PsycINFO 不使用の
+  正当化・残余リスク点検と接続する境界文献として位置づけ)。gold set一本化・in-scope拡充メモは
+  Rev.7 で対応済み。
+- **Task4**: `outputs/venue_dropped_known_items.csv` / `snowballing_protocol.md` は
+  **Rev.7で整備済みのため追加作業なし**。`snowballing_protocol.md` に Rev.8 追記
+  (スノーボーリングが PsycINFO不使用の残余リスクを部分緩和する役割を明記)。
+- `scripts/pubmed_unique_audit.py` の docstring に Rev.8 位置づけ追記(参考記録化・優先度格下げ、削除なし)。
+- known_item_test.py 再実行で健全性確認(recall 69.23% 不変)。
+- **次回やること(著者、優先度順)**:
+  1. ACM Abstract / Scopus Keyword を再エクスポート(不可なら enrich_abstracts.py を著者実行)→ 充足率再測定
+  2. `snowballing_protocol.md` に従い脱落6件を回収 → `outputs/snowballing_log.csv` 記録 → PRISMA 右カラム確定
+  3. Rev.6 第2波再検索を **3DB(ACM/IEEE/Scopus)のみ**で実施 + verbatim フィールド構文記録
+     → 公式再実行(PubMed除外した統合データで再構築)→ step0 recall 再測定(目標≥80%)
+  4. 上記確定後に rule.md 本文へ反映(DB構成=3DB、scope=TA、Threats に PsycINFO正当化+venue取りこぼし)
+  5. (優先度低・参考記録)`outputs/pubmed_unique_175.csv` の30件 judge_relevance 判定は
+     PubMed不使用確定により意思決定には不要。実施は任意
+
+### 2026-07-22 (2) — Rev.6第2波再検索(IEEE+Scopus)の自動化ツール整備
+- **背景**: `docs-system/`(Semantic Scholar連携のNext.jsアプリ、作りかけ)を参考に、
+  「APIを駆使して自動で再検索できるツール」を要望。ACM Digital Library には一般利用可能な
+  検索APIが無いため、**IEEE Xplore + Scopus の自動化に絞る**ことを著者確認のうえ決定
+  (ACMは引き続き手動エクスポート)。
+- **`scripts/api_search_common.py` 新規**: Rev.6 の3コンセプト群(`CONCEPT_GROUPS_REV6`)から
+  IEEE Command Search 構文(`"Document Title":`/`"Abstract":`)と Scopus `TITLE-ABS(...)` 構文を
+  **単一定義から機械生成**するビルダー(`build_ieee_querytext`/`build_scopus_query`)を実装。
+  手書き2DB分の表記不一致(Rev.7/8で問題化した「verbatim フィールド構文の不一致」)を構造的に防ぐ。
+  加えて礼儀正しいHTTP再試行(`polite_get`)、RIS出力(`write_ris`)、実行ログ追記
+  (`append_hit_log` → `outputs/api_search_log.csv`)を共通部品として実装。
+- **`scripts/db_search_ieee.py` 新規**: IEEE Xplore Metadata API 検索(要 `IEEE_API_KEY`)。
+  ページング・`--count-only`・年フィルタ対応。出力 `raw/ieee_wave2_YYYYMMDD.ris`。
+- **`scripts/db_search_scopus.py` 新規**: Scopus Search API 検索(要 `SCOPUS_API_KEY`、
+  任意で `SCOPUS_INSTTOKEN`)。5,000件超で cursor モードに自動切替。Abstract欠落率が
+  高い場合は entitlement 不足の警告を表示。出力 `raw/scopus_wave2_YYYYMMDD.ris`。
+- **設計判断: 出力はRIS(Zotero直接インポート用)**。既存運用(`search_replication.md` Option A)が
+  Zotero経由のCSVエクスポートを前提にしているため、生CSVを直接 raw/ に置く方式(スキーマの
+  厳密一致を要求され脆い)は採らず、RIS→Zotero取り込み→既存の再エクスポート手順に接続する形にした。
+- **健全性確認**: 3スクリプトの構文チェック(ast.parse)、クエリビルダーの出力確認、
+  RIS書き出しの整形確認、APIキー未設定時に**ネットワークに触れず**エラー終了することを確認、
+  `known_item_test.py` 再実行で既存パイプラインへの影響が無いことを確認(recall 69.23% 不変)。
+  **外部API通信を伴う本実行はしていない**(著者実行前提、方針どおり)。
+- `docs/search_replication.md` の Option B に自動化スクリプトへの導線を追記(ACMは手動継続と明記)。
+- **次回やること(著者、優先度順)**:
+  1. IEEE_API_KEY(developer.ieee.org)・SCOPUS_API_KEY(dev.elsevier.com)を取得
+  2. 各スクリプトを `--count-only`→少数件→本実行の順で試験(フィールド名のAPIドリフトを確認)
+  3. 出力 .ris を Zotero に専用コレクション(ieee_wave2/scopus_wave2)で取り込み→CSVエクスポート
+  4. `docs/search_strings.md` に verbatim クエリ・実行日・ヒット数を転記(`outputs/api_search_log.csv`が下書き)
+  5. ACM は手動エクスポートを実施し、3DB分が揃ってから統合・パイプライン再実行
+
+### 2026-07-22 (3) / 2026-07-27 — APIキー投入・接続テスト・Scopus scope実測
+- **セキュリティ整備**: `.gitignore` に `.env`/`.env.*` を追加(`!.env.example`で例外)。
+  実キーは `.env`(git管理外、追跡ファイルへの漏洩なしを `git check-ignore`/`git grep` で確認済み)、
+  変数名テンプレートは `.env.example`(コミット可)に分離。`scripts/api_search_common.py` に
+  `load_dotenv()` を追加し、`db_search_ieee.py`/`db_search_scopus.py` が自動読み込みするよう配線。
+- **接続テスト(--count-only、RIS出力なし・低リスク)**:
+  - **IEEE Xplore: 403 `ERR_403_DEVELOPER_INACTIVE`**。新キーに更新後も同一エラー
+    → キー固有ではなく developer.ieee.org の**アカウント自体が未有効化**。著者確認待ち
+    (コード側の問題ではない)。
+  - **Scopus: 成功**。`TITLE-ABS`(Rev.7/8 TA方針)= **2,533件**。
+- **重要な発見: Scopus scope の実測証拠**。`TITLE-ABS-KEY` でも実行し **4,727件**。
+  旧初回検索の記録値(Rev.3、4,331件)は G1拡張後の TITLE-ABS(2,533)より多く矛盾する一方、
+  TITLE-ABS-KEY(4,727)とは整合 → **旧検索は実際には TITLE-ABS-KEY だった可能性が高い**
+  (search_strings.md の「要著者確認」に対する初の実測証拠)。
+  **著者決定: TA基準は維持**(scope方針は変更しない)。ただし「TA基準は旧検索実質より-46%狭い」
+  ことを Threats to Validity に明記し、Keyword経由でのみ捕捉されていた文献の残余リスクは
+  スノーボーリングで緩和する対象とすることを `methodology_decision_Rev7.md` §Rev.8補足(2026-07-27)、
+  `protocol_changelog.md`、`search_strings.md` に記録。
+- Semantic Scholar API キーも `.env` に投入済み(`scripts/enrich_abstracts.py` で使用予定、
+  未実行 — ACM Abstract 補完はまだ実施していない)。
+- **次回やること(著者、優先度順)**:
+  1. developer.ieee.org でアカウント有効化状況を確認(承認待ち/メール認証等)
+  2. IEEE有効化後、`--count-only`→本実行(RIS出力)の順で試験
+  3. Scopus は scope=TITLE-ABS(既定)で本実行(RIS出力)→ Zotero取り込み
+  4. `scripts/enrich_abstracts.py` を実行して ACM Abstract 補完を試す(S2キー投入済み)
+  5. rule.md 本文の Threats to Validity に Scopus scope の狭化(-46%)を明記
+
+### 2026-07-30 — IEEE設定見直し(未解決)/ Scopus本実行 / ACM補完試験 / スノーボーリング自動化
+- **IEEE**: アカウント設定を著者が見直したが、新キーでも同一の
+  `ERR_403_DEVELOPER_INACTIVE` が継続。コード側の問題ではなく developer.ieee.org
+  側の設定(サブスクリプション/メール認証等)の可能性。**未解決、著者確認継続**。
+- **Scopus本実行(Task1)**: `scripts/db_search_scopus.py --use-default-query` を本実行し
+  `raw/scopus_wave2_20260730.ris` を生成。**2,542件**(7/27の count-only 2,533件から+9、
+  3日分の自然な索引増加と推定)。**Abstract充足率100%**、Keyword充足あり(旧raw/Scopus.csvの
+  1.2%から大幅改善)、DOI充足率88.5%。`outputs/api_search_log.csv` に実行記録済み。
+  次: Zoteroへ専用コレクション取り込み→CSVエクスポート。
+- **ACM Abstract補完 少数件試験(Task2)**: `scripts/enrich_abstracts.py` に
+  `SEMANTIC_SCHOLAR_API_KEY`(.envの実変数名)の読み込み漏れ・`load_dotenv()`未呼び出しの
+  バグを発見・修正(旧コードは `S2_API_KEY` のみを見ており .env の値を拾えていなかった。
+  後方互換で両方の変数名を受理するよう修正)。ACM Abstract欠落 **7,655件**(全件DOIあり)から
+  20件を無作為抽出して試験 → **11/20(55%)成功、全件 Semantic Scholar 経由**
+  (Crossref経由は0件)。個別のDOIでCrossref直接確認し、**これはバグではなく該当ACM論文に
+  Crossref側のAbstractメタデータが元々存在しない**ことを確認(コード正常動作)。
+  試験用一時ファイルは削除済み。**本実行(7,655件)は未実施**(著者判断待ち)。
+- **スノーボーリング自動化(Task3)**: `scripts/snowball_search.py` 新規作成。
+  Semantic Scholar API で前方(citations)・後方(references)引用探索を自動化
+  (`docs-system/lib/semantic-scholar.ts` の getCitations/getReferences と同じAPIを使用)。
+  既定シードは `outputs/venue_dropped_known_items.csv`(#)と `self_scale_references.csv`(ID)を
+  結合してDOIを取得(6件、動作確認済み)。既存コーパス(raw/*.csv・raw/*.ris・
+  step3_kw_included.csv、計13,069キー)との重複判定、CORE/SJRランキング参考情報の自動付与を実装。
+  **PICOS採否・関連性判断は自動化しない**(picos_decision/reason列は著者記入、既存方針どおり)。
+  ネットワークを使わない範囲(シード読み込み・既存キー読み込み・pipeline.pyインポート・
+  argparse)は動作確認済み。**実際のAPI呼び出しは未実施**(著者実行前提)。
+- **セキュリティ**: `.env` は今回も追跡対象外を確認。キーの値を出力・ログに残していない。
+- **次回やること(著者、優先度順)**:
+  1. developer.ieee.org でアカウント設定を再確認(サブスクリプション/メール認証等)。
+     解決しない場合はIEEEサポートへの問い合わせも検討
+  2. `raw/scopus_wave2_20260730.ris` を Zotero に取り込み(専用コレクション)→CSVエクスポート
+     → `docs/search_strings.md` に実行記録を転記
+  3. ACM Abstract本実行の可否判断(7,655件、55%成功率想定、時間がかかる長時間ジョブ)
+  4. `scripts/snowball_search.py` を実行し `outputs/snowballing_log.csv` を生成
+     → picos_decision/reason列を著者が記入
+  5. IEEE解決後、`db_search_ieee.py` の本実行→3DB分が揃ってから統合・パイプライン再実行

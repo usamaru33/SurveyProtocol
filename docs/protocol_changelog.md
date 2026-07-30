@@ -6,6 +6,68 @@
 
 ---
 
+## 2026-07-27 — Rev.8 補足: Scopus scope の実測とTA基準の再確認
+
+`scripts/db_search_scopus.py`(Scopus Search API 自動検索ツール)の `--count-only` 実測により、
+Rev.7以来「要著者確認」だった Scopus のフィールドscope(TITLE-ABS か TITLE-ABS-KEY か)に
+高確度の証拠が得られた: 同一G1拡張クエリで `TITLE-ABS` = 2,533件、`TITLE-ABS-KEY` = 4,727件。
+旧初回検索の記録値(4,331件)は拡張後 TITLE-ABS より多く TITLE-ABS-KEY と整合するため、
+**旧検索は実際には TITLE-ABS-KEY で実行されていた可能性が高い**と判断(完全な証明ではない)。
+
+**決定(著者確認):** Rev.7/8 の TA基準(TITLE-ABS)は変更しない。ただし
+「TA基準は旧初回検索より実質的に狭い(同クエリで-46%)」ことを Threats to Validity に明記し、
+索引語経由でのみ捕捉されていた文献の残余リスクはスノーボーリングで緩和する対象とする。
+詳細は `methodology_decision_Rev7.md` §Rev.8「2026-07-27補足」、`search_strings.md` の
+Scopus行を参照。影響範囲: 数値・実装は未変更(方針の再確認のみ)。
+
+---
+
+## 2026-07-22 — Rev.8: DB構成と検索scopeの最終確定(3DB体制)
+
+> 詳細・PsycINFO正当化ドラフトは `methodology_decision_Rev7.md` §Rev.8 追記を参照。
+> 著者確定事項であり、以後この方針で実装を進める(新規の方針議論はしない)。
+
+### 確定: DB構成を4DBから3DBへ(ACM Digital Library + IEEE Xplore + Scopus)
+
+- **PubMed は不使用に確定。** 理由: 医学・治療目的の文献は本サーベイのスコープ外であり、
+  当該DBは主題適合性が低いため選定しない。Rev.7 の分析(known-item 固有寄与0・corpus固有175件)は
+  参考情報として保存するが、不使用の決定はこの分析結果とは独立に行う
+  (「Scopus で代替できるから外す」ではなく「主題的にそもそも選定基準を満たさない」が理由)。
+- **PsycINFO はアクセス制約により利用不可(既存の事実、Rev.5時点で確定済み)。**
+  Scopus が PsycINFO 収録誌の相当部分を索引しているため、心理学系文献の捕捉は Scopus に依拠する。
+  この妥当性は Known-Item Test で実証済み: 心理系 #5(PLoS ONE)/ #6(PNAS)/ #14(Cognitive Processing)は
+  いずれも Scopus で捕捉、#10 は **Scopus が唯一の捕捉源**(`outputs/known_item_test.csv` 実測、
+  Rev.7 §B と同一データ)。残余リスク(Scopus固有では拾えない心理系文献)は
+  `snowballing_protocol.md` のスノーボーリングで緩和する。
+
+### 確定: 実効scope・フィルタ層・検証方針(Rev.7からの継続)
+
+- 実効scope は **Title-Abstract(TA)を基準**。Scopus の Keyword が再取得できれば TA+K に格上げ可。
+- フィルタ層は「レコードが持つ利用可能フィールドのみで判定+degradeフラグ」方式。PRISMA-S に明記。
+- Known-Item Test 維持。目標 step0 ≥ 80%。現 69.2%(4DBデータでの測定値)は Rev.6 再検索後に再測定。
+  ※3DB体制での再測定は、PubMed経由でのみ捕捉されていた known-item が無いこと(Rev.7 §B: PubMed固有寄与0)
+  から、**recall には影響しない見込み**(要 Rev.6 再検索後の実測で確認)。
+- Venue脱落分・学際文献はスノーボーリングで回収、PRISMA右カラムで報告(方針変更なし)。
+
+### 既存文書への反映(削除ではなく無効化の記録)
+
+- `search_strings.md` / `search_replication.md` の PubMed / PsycInfo 関連手順を
+  「Rev.8 により不使用に確定」と明記(記述自体は経緯として残す)。
+- `methodology_decision_Rev7.md` に Rev.8 追記セクションを新設。DB選定の最終構成・理由、
+  PsycINFO 正当化ドラフト(Threats to Validity 転用可)、Rev.7 の PubMed 分析を
+  「Rev.8 で3DBに確定したため参考情報」と注記。
+
+### 影響範囲
+
+- **実データ・step ファイルは未変更。** raw/PubMed.csv 等は経緯保存のため削除しない。
+  PubMed を除いた3DB体制でのパイプライン再実行(統合データの再構築)は、
+  Rev.6 第2波再検索・エクスポート欠陥是正(ACM Abstract / Scopus Keyword)と合わせて
+  次の公式再実行時に反映する(本 Rev.8 は方針確定であり、再実行そのものは別タスク)。
+- `outputs/pubmed_unique_175.csv` の30件 judge_relevance 判定タスクは、PubMed不使用確定により
+  **優先度を格下げ**(参考記録として保持するが、DB選定の根拠には使わない)。
+
+---
+
 ## 2026-07-21 — Rev.7: 検索方法論5方針のデータ検証と確定
 
 > 詳細・一次証拠は `methodology_decision_Rev7.md`(A〜D の全数値)を参照。

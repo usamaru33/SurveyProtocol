@@ -40,12 +40,24 @@ AND ("Size" OR "Scale" OR "Height" OR "Distance")
 > - **Scopus**: `TITLE-ABS(...)` を使う(`TITLE-ABS-KEY` は索引語まで拾い scope が広がる)。
 >   どちらを実行したか画面のクエリ文字列をそのまま貼る。Keyword を回収して TA+K に格上げする場合のみ
 >   `TITLE-ABS-KEY` を検討し、その旨を明記。
-> - **PubMed**: `[tiab]` を使う(`[tw]`/`[all fields]` は不可)。MeSH は検索分岐に使わない
->   (Rev.7 で MeSH はフィルタ層内の任意 recall ブースタ+PRISMA-S 報告項目に格下げ)。
+> - ~~**PubMed**: `[tiab]` を使う~~ **→ Rev.8で不使用確定のため対象外**(MeSH関連の記述も同様に無効)。
 > - **ACM**: `Title:` / `Abstract:` を明示(`AllField:` は全文検索で過剰ヒット)。
 > - **IEEE**: `"Document Title":` / `"Abstract":`(`"All Metadata"` は不可)。
 > 記録先は本表の「Fields searched」列。現在「要著者確認」のままの初回分も、著者の検索履歴から
 > 判明したら遡って埋める(判明しなければ「記録なし」と明記し Threats で言及)。
+
+> **【Rev.8 確定(2026-07-22)】DB構成を3DB(ACM/IEEE/Scopus)に確定。PubMed は不使用。**
+> 理由・詳細は `protocol_changelog.md` Rev.8、正当化ドラフトは `methodology_decision_Rev7.md` §Rev.8追記を参照。
+> 下表の PubMed / PsycInfo 行は**経緯として保存**し削除しない(初回検索は実施済みの事実であり、
+> PRISMA の "records identified" には含めないが、Rev.7 分析の裏付けデータとして raw/PubMed.csv も残す)。
+>
+> **【2026-07-27 実測】Scopus scope の「要著者確認」に高確度の実測証拠。** Scopus Search API で
+> 同一クエリ骨格を scope 別に実行した結果: `TITLE-ABS`(Rev.7/8のTA方針どおり)= **2,533件**、
+> `TITLE-ABS-KEY` = **4,727件**。旧記録(Rev.3時点、旧G1クエリ)の **4,331件** は、G1拡張後の
+> TITLE-ABS(2,533)より少なく矛盾するが、TITLE-ABS-KEY(4,727、旧G1ならさらに少ない適正値になる)
+> とは整合する。**旧検索は実際には TITLE-ABS-KEY で実行されていた可能性が高い**という結論。
+> 著者確認のうえ **TA基準を維持する方針を再確定**(scopeは変更しない)。詳細・数値の全体は
+> `methodology_decision_Rev7.md` §Rev.8追記(2026-07-27補足)を参照。
 
 ## DB別記録表
 
@@ -54,9 +66,9 @@ AND ("Size" OR "Scale" OR "Height" OR "Distance")
 | ACM Digital Library | 統合クエリ(上記)✅ ※ACM構文への翻訳形は未記録 | Title, Abstract(指定構文は**要著者確認**) | **要著者確認** | ≤ 2026-05-15(Zotero取込日) | **7,997** ✅ |
 | IEEE Xplore(初回) | 統合クエリ(上記)✅ ※Command Search 構文は未記録 | Title, Abstract(指定構文は**要著者確認**) | **要著者確認** | ≤ 2025-12-25(Zotero取込日) | **1,276** ✅ |
 | IEEE Xplore(更新検索) | 統合クエリ(上記)✅ | 同上 | 出版年 2025〜2026 に限定 | 2026-07-17 | **297**(うち初回・他DBと重複しない新規 **101**)✅ |
-| PubMed | 統合クエリ(上記)✅ ※[tiab] タグの付与形は未記録 | Title/Abstract [tiab](推定、**要著者確認**) | **要著者確認** | ≤ 2026-05-15(Zotero取込日) | **781** ✅ |
-| Scopus | 統合クエリ(上記)✅ ※TITLE-ABS() / TITLE-ABS-KEY() の別は**要著者確認** | Title, Abstract | **要著者確認** | ≤ 2026-05-15(Zotero取込日) | **4,331** ✅ |
-| PsycInfo(補完用・条件付き) | **未実行が確定**(2026-07-17: Zotero にコレクション無し)。rule.md の条件「PubMed 検索が不十分な場合の補完」に対し、不実行と判断した理由(PubMed 781件で十分と判断した根拠)を本文に記載すること | — | — | — | 0(未実行) |
+| ~~PubMed~~ **(Rev.8: 不使用に確定)** | 統合クエリ(上記)✅ ※[tiab] タグの付与形は未記録 | Title/Abstract [tiab](推定、**要著者確認**) | **要著者確認** | ≤ 2026-05-15(Zotero取込日) | 781(初回検索は実施済み。**PRISMA報告からは除外**。主題適合性がスコープ外のため不採用) |
+| Scopus | 統合クエリ(上記)✅ ※TITLE-ABS() / TITLE-ABS-KEY() の別は**要著者確認 → 下記2026-07-27実測で高確度判明** | Title, Abstract(**実際は TITLE-ABS-KEY だった可能性が高い、下記参照**) | **要著者確認** | ≤ 2026-05-15(Zotero取込日) | **4,331** ✅ |
+| ~~PsycInfo~~ **(Rev.8: 不使用を再確認)** | **未実行が確定**(2026-07-17: Zotero にコレクション無し、アクセス制約のため実行不可)。Rev.8で「Scopus が PsycINFO 収録誌の相当部分を索引しており心理系文献の捕捉は Scopus に依拠する」ことを Known-Item Test で実証(`methodology_decision_Rev7.md` §Rev.8)。不実行の正当化は同ドラフトを本文に転用 | — | — | — | 0(未実行) |
 
 ## 確定した PRISMA 上段(2026-07-17、`scripts/raw_db_audit.py` による)
 

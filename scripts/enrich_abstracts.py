@@ -64,6 +64,10 @@ except ImportError:
 _HERE = Path(__file__).resolve().parent
 ROOT = _HERE.parent
 
+from api_search_common import load_dotenv  # noqa: E402
+
+load_dotenv()  # SurveyProtocol/.env があれば読み込む(未 export の変数のみ補完)
+
 CROSSREF = "https://api.crossref.org/works/"
 S2 = "https://api.semanticscholar.org/graph/v1/paper/DOI:{doi}?fields=abstract"
 SLEEP = 0.5
@@ -135,7 +139,7 @@ def main() -> None:
     mailto = os.environ.get("ENRICH_MAILTO", "")
     if not mailto:
         print("[WARN] ENRICH_MAILTO 未設定。Crossref polite pool を使えず制限が厳しくなります。")
-    s2_key = os.environ.get("S2_API_KEY")
+    s2_key = os.environ.get("SEMANTIC_SCHOLAR_API_KEY") or os.environ.get("S2_API_KEY")
 
     with args.inp.open(encoding="utf-8-sig", newline="", errors="replace") as f:
         reader = csv.DictReader(f)

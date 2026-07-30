@@ -1,5 +1,11 @@
 # Search Replication Protocol — 検索記録の復元・再実行の手順書
 
+> **【Rev.8 確定(2026-07-22)】DB構成は3DB(ACM/IEEE/Scopus)。PubMed は不使用、
+> PsycInfo はアクセス制約により従来どおり不使用。** 以下の PubMed(§3)・PsycInfo(§5)の
+> 手順は**経緯として保存**し削除しない(初回検索は実施済みの事実であり監査の裏付けデータとして残す)。
+> 第2波再検索(Option B)は **ACM / IEEE / Scopus の3DBのみ**を対象に実施する。
+> 詳細は `protocol_changelog.md` Rev.8、正当化は `methodology_decision_Rev7.md` §Rev.8追記を参照。
+
 > PRISMA 上段("Records identified from each database (n=)")を報告可能にするための手順。
 > **検索結果は Zotero で管理されており、取得元DBごとにコレクション分けされている**ため、
 > まず Option A(Zotero からの復元・再検索不要)を実施し、
@@ -86,14 +92,15 @@ Scopus の Author/Index Keywords が回収できた場合に限り **TA+K へ格
   これで **Author Keywords** と **Indexed Keywords** の両列が入る。
 - `raw/scopus_zotero_YYYYMMDD.csv`(または `raw/Scopus_kw_YYYYMMDD.csv`)として保存し、
   Keyword 列充足率を再測定する。
-- **判断**: 充足率が高ければフィルタ層の scope を TA+K に格上げし、その旨を Rev.8 として記録。
-  Keyword が Scopus でしか揃わないなら、K は「Scopus/PubMed のみ有効・他DBは degrade」で報告する
-  (ACM/IEEE の Keyword 列は使えないため、K の全DB統一は依然不可)。
+- **判断**: 充足率が高ければフィルタ層の scope を TA+K に格上げし、その旨を次改訂(Rev.9候補)として記録。
+  Keyword が Scopus でしか揃わないなら、K は「Scopus のみ有効・ACM/IEEE は degrade」で報告する
+  (Rev.8 で3DB体制に確定。ACM/IEEE の Keyword 列は使えないため、K の全DB統一は依然不可)。
 
 ### 欠陥3: verbatim フィールド指定構文の未記録
 
 各DBで実際に **どのフィールドに検索をかけたか**(Scopus: `TITLE-ABS` か `TITLE-ABS-KEY` か /
-PubMed: `[tiab]` か `[tw]` か / ACM: `Title:`/`Abstract:` の指定 / IEEE: `"Document Title":`/`"Abstract":`)は
+ACM: `Title:`/`Abstract:` の指定 / IEEE: `"Document Title":`/`"Abstract":`。~~PubMed: `[tiab]` か `[tw]` か~~
+は Rev.8 不使用確定により対象外)は
 `search_strings.md` の「Fields searched」欄で **「要著者確認」のまま**である。これは実効 scope の
 **非対称の源泉**であり、フィルタ層で何を「正規化して揃える」のかの基準になる。→ §運用ルール参照。
 
@@ -101,6 +108,23 @@ PubMed: `[tiab]` か `[tw]` か / ACM: `Title:`/`Abstract:` の指定 / IEEE: `"
 
 以下は再検索を行う場合の手順。目的: (1) DB別 verbatim 検索式・実行日・ヒット数の確定記録、(2) DB別生データの保全。
 再実行後は `search_strings.md` の表を全て埋め、DB別エクスポートファイルを `raw/` に保存すること。
+
+> **【2026-07-22 追記】IEEE / Scopus は API 経由で自動化できる。** ACM Digital Library には
+> 一般利用可能な検索APIが無いため、ACM は引き続き本節の手順で手動エクスポートする。
+> IEEE Xplore Metadata API・Scopus Search API を使う場合は、以下のスクリプトが
+> Rev.6 拡張クエリ(G1コンセプト群)を各DBのフィールド指定構文に機械的に変換し、
+> ページング・RIS出力・実行記録まで行う(**外部API通信のため著者が実行**、Claude は実行しない):
+>
+> - `scripts/api_search_common.py` — 共通部品(クエリビルダー・HTTP再試行・RIS出力・実行ログ)
+> - `scripts/db_search_ieee.py` — IEEE Xplore Metadata API(要 `IEEE_API_KEY`、developer.ieee.org で無料登録)
+> - `scripts/db_search_scopus.py` — Scopus Search API(要 `SCOPUS_API_KEY`、dev.elsevier.com で登録。
+>   Abstract/Keyword まで取るには機関アクセスまたは `SCOPUS_INSTTOKEN` が要る場合が多い)
+>
+> 出力は `raw/{ieee,scopus}_wave2_YYYYMMDD.ris`(Zotero に直接インポート可)。
+> インポート後は本ページ §Option A の手順どおり専用コレクションからCSVエクスポートし、
+> `search_strings.md` の DB別記録表に実行記録(`outputs/api_search_log.csv`)を転記する。
+> 詳細・注意点は各スクリプトの docstring を参照(フィールド名がAPIバージョンで変わりうるため、
+> 少数件での試験実行を必ず挟むこと)。
 
 > **注意:** 再検索すると DB 更新により件数は 2025-12/2026-05 実行時と必ずズレる。
 > 既存パイプライン(14,385件系列)の数値を置き換えるか、「検索式確認のための監査再実行」として
@@ -136,7 +160,11 @@ PubMed: `[tiab]` か `[tw]` か / ACM: `Title:`/`Abstract:` の指定 / IEEE: `"
 - 文字コード: UTF-8(BOM付きの場合あり — 取り込み時は `utf-8-sig` で読む)。
 - ID列: DOI(`10.1109/...`)+ IEEE Document Number。
 
-### 3. PubMed (pubmed.ncbi.nlm.nih.gov)
+### 3. PubMed (pubmed.ncbi.nlm.nih.gov) — **Rev.8 により不使用に確定**
+
+> 医学・治療目的の文献が中心で本サーベイのスコープ外・主題適合性が低いため不採用
+> (`protocol_changelog.md` Rev.8)。以下は初回検索(2026-05-15 実施済み)の手順記録として保存。
+> **第2波以降の再検索対象からは除外する。**
 
 - 検索ボックスに `[tiab]` タグ付きで入力:
   例 `("virtual reality"[tiab] OR "VR"[tiab] OR ...) AND (...) AND (...)`。
@@ -153,10 +181,12 @@ PubMed: `[tiab]` か `[tw]` か / ACM: `Title:`/`Abstract:` の指定 / IEEE: `"
 - 文字コード: UTF-8。
 - ID列: EID(`2-s2.0-...`)+ DOI。**Scopus は ACM/IEEE 文献も索引しているため、DOI による重複が必ず発生する**(下記参照)。
 
-### 5. PsycInfo(条件付き)
+### 5. PsycInfo — **不使用(アクセス制約、Rev.5で確定・Rev.8で再確認)**
 
-- rule.md の規定: PubMed での検索が不十分な場合の補完。再実行時に PubMed のヒット内容を確認してから
-  実行要否を判断し、**実行しない場合も「実行しない判断とその理由」を search_strings.md に記録**する。
+- アクセス制約により実行不可。旧 rule.md の規定「PubMed での検索が不十分な場合の補完」は
+  PubMed 自体が Rev.8 で不使用のため無効。
+- 不使用の正当化(Scopus による代替カバレッジ + Known-Item Test での実証)は
+  `methodology_decision_Rev7.md` §Rev.8追記の正当化ドラフトを本文・Threats to Validity に転用する。
 
 ## 重複ID列の扱い(統合時)
 

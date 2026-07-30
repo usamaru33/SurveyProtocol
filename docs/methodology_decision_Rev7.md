@@ -247,9 +247,115 @@ Rev.7 で心理接合点の古典 2件を background として追加(#19 Botvini
 `outputs/venue_dropped_known_items.csv` の分類実測: **unmatched 3件(#7/#8/#13)/ below_rank 2件
 (#3 Presence, #10 ICAT-EGVE)/ criterion 1件(#14 Gulliver, SJR Q2 基準どおり)**。
 
+## Rev.8 追記(2026-07-22): DB構成の最終確定と PsycINFO 正当化
+
+著者確定。以後この方針で実装を進める(新規の方針議論はしない)。詳細版は
+`protocol_changelog.md` Rev.8 を参照。ここでは PRISMA / Threats to Validity への
+転用を見据え、**判断の根拠を一箇所にまとめる**。
+
+### DB選定の最終構成
+
+| DB | 採否 | 理由 |
+|---|---|---|
+| ACM Digital Library | 採用 | HCI・VR研究の中核会場 |
+| IEEE Xplore | 採用 | HCI・VR研究の中核会場 |
+| Scopus | 採用 | 学際的カバレッジ。心理系文献の実質的な捕捉源(下記) |
+| **PubMed** | **不採用(Rev.8で確定)** | 医学・治療目的の文献が中心で本サーベイのスコープ外。
+主題適合性が低いため選定基準を満たさない |
+| PsycINFO | 不採用(既存の事実、Rev.5で確定済み) | アクセス制約により利用不可 |
+
+**PubMed 不採用の位置づけについて(重要な区別):** Rev.7 の分析(§B: PubMed の known-item
+固有寄与は0、corpus固有175件)は、**この決定の根拠として使っていない**。もし
+「Scopus で代替できるから外す」という論法にすると、175件の主題適合率次第で決定が
+揺らぎ得る脆弱な正当化になる。実際の決定理由は独立している:
+PubMed は主題(医学・治療)が本サーベイのスコープと整合しないため、そもそも
+選定基準(主題適合性)を満たさない。Rev.7 の分析結果は「参考情報」として本文脚注に
+残すに留め、決定の主論拠には用いない(§下の「Rev.7分析の位置づけ」参照)。
+
+### PsycINFO 不使用の正当化ドラフト(Threats to Validity 転用可)
+
+> 本レビューは PsycINFO(APA PsycInfo)へのアクセス制約により、当該データベースでの
+> 検索を実施していない。この欠落による心理学系文献の見落としリスクを、以下の根拠に
+> より許容範囲と判断した。
+>
+> 第一に、Scopus は PsycINFO 収録誌の相当部分を索引しており、心理学分野の主要誌
+> (PLoS ONE, PNAS, Cognitive Processing 等)は Scopus 経由で捕捉可能である。
+> 第二に、この妥当性は事後的に quasi-gold standard(Known-Item Test, Kitchenham &
+> Charters 2007)で実証されている: 本レビューが必須と判断した心理学系の代表文献
+> 3件(#5 van der Hoort et al. 2013, PLoS ONE; #6 Banakou et al. 2013, PNAS;
+> #14 Serino et al. 2020, Cognitive Processing)はいずれも Scopus によって捕捉され、
+> このうち1件(#10 Kim & Interrante 2017, ICAT-EGVE)は **Scopus のみが捕捉した
+> 唯一の情報源**であった(`outputs/known_item_test.csv` の `step0_source_dbs` 列、
+> ACM・IEEE には不在)。第三に、Scopus 単独では捕捉しきれない残余の心理学系文献
+> (特に PsycINFO 固有収録誌)については、引用探索(snowballing、`snowballing_protocol.md`)
+> による前方・後方探索で補完し、PRISMA 2020 フロー図の "Identification via other
+> methods" 側で透明に報告する。
+>
+> **限界の自認:** この設計は Scopus のカバレッジに強く依存しており、PsycINFO
+> 固有(Scopus 非索引)の心理学系文献を体系的に見落とす可能性は残る。この残余
+> リスクの定量評価(Scopus と PsycINFO の重複率など)は本レビューの範囲外であり、
+> スノーボーリングによる部分的緩和に留まる。
+
+### Rev.7 分析(PubMed 4DB前提)の位置づけ
+
+本文書の §A〜D および上段の判定表は **Rev.7 時点(4DB前提)の分析**であり、
+Rev.8 で3DB体制に確定した現在は**参考情報**として保存する(削除はしない)。
+具体的には:
+
+- §B「Scopus/PubMed の限界寄与」の数値(PubMed corpus固有175件、known-item固有寄与0)は、
+  **PubMed不使用の決定理由ではない**(上記のとおり決定は独立)。ただし
+  「Scopus が心理系 known-item を全て捕捉していた」という同じデータが、
+  **PsycINFO正当化の実証根拠として転用**されている(§上記ドラフト参照)。
+- §C(MeSH)の議論は PubMed 不使用に伴い**本サーベイでは無効**(適用対象DBが無い)。
+  今後の rule.md 改訂で MeSH 関連の記述は削除してよい。
+- §D(フィルタ層)・方針2(TA基準)・方針3(degradeフラグ)・方針5(Known-Item Test)は
+  **DB数によらず妥当**であり Rev.8 でもそのまま継続。
+
+### 著者確認事項の更新(Rev.7 からの差分)
+
+- `outputs/pubmed_unique_175.csv` の30件 judge_relevance 判定: **優先度を格下げ**
+  (PubMed不使用が確定したため、DB選定の意思決定には不要。実施する場合も
+  「参考記録」の位置づけ)。
+- 心理接合点 background 文献(#19 Botvinick & Cohen 1998、#20 Lenggenhager 2007)は、
+  PsycINFO正当化ドラフトの「スノーボーリングで残余リスクを緩和する」主張と接続する
+  境界文献としても機能する(`self_scale_references.csv` に追加済み、`known_items.md` 参照)。
+
+### 2026-07-27 補足: Scopus scope の実測(TITLE-ABS vs TITLE-ABS-KEY)
+
+`scripts/db_search_scopus.py`(Rev.6第2波再検索の自動化ツール、Scopus Search API 経由)による
+`--count-only` 実測で、§D で「要著者確認」のままだった Scopus のフィールドscope(TITLE-ABS か
+TITLE-ABS-KEY か)に高確度の証拠が得られた。
+
+| クエリ | scope | 件数 | 備考 |
+|---|---|---|---|
+| 旧クエリ(初回検索、G1未拡張) | 不明(要確認だった) | **4,331** | Rev.3時点の記録値(`search_strings.md`) |
+| Rev.6 G1拡張クエリ | `TITLE-ABS`(Rev.7/8のTA方針) | **2,533** | 実測(2026-07-27) |
+| Rev.6 G1拡張クエリ | `TITLE-ABS-KEY` | **4,727** | 実測(2026-07-27) |
+
+**解釈:** G1拡張は語のOR追加のみであり、件数は同scope内で単調増加するはずである
+(集合として真に拡大するため減ることはない)。にもかかわらず拡張後の `TITLE-ABS`(2,533)が
+旧クエリの記録値(4,331)を大きく下回る一方、拡張後の `TITLE-ABS-KEY`(4,727)は
+旧クエリの記録値をやや上回り整合する。**旧初回検索は実際には `TITLE-ABS-KEY` で
+実行されていた可能性が高い**という結論になる(完全な証明ではない — 2026-05-15時点との間の
+Scopus索引自体の増分という別要因も理論上あるが、影響は小さいと考えられる)。
+
+**決定(著者確認・2026-07-27):** この実測を踏まえても **TA基準(TITLE-ABS)を維持**する
+(Rev.7/8の方針を変更しない)。ただし以下を Threats to Validity に明記する:
+- 初回検索(旧4,331件)は Keyword を含む広いscopeだった可能性が高く、**今回のTA基準は
+  それよりも狭い**(実測: 同一G1拡張クエリで -46%、2,533 vs 4,727)。
+- したがって「Scopus の recall が初回検索と比べて低下する」ことは**scope方針変更の意図された
+  帰結**であり、検索式やDBカバレッジの欠陥ではない。
+- 索引語(Keyword)経由でのみ捕捉されていた文献が、TA限定では構造的に落ちる可能性がある。
+  この残余は `snowballing_protocol.md` のスノーボーリングで緩和する対象に含める。
+- `search_strings.md` の Scopus 行を更新済み(旧「要著者確認」に本実測を追記)。
+
 ## 判断保留・要データ(現時点で確定しない項目)
 
-- 方針4 の MeSH corpus 便益(→ ライブ差分テスト待ち)。
-- PubMed の独立正当化(→ 175件の適合率サンプル待ち)。
 - Title+Abstract 統一の ACM 適用(→ Abstract 再取得の可否待ち)。
-- Rev.6 拡張クエリ第2波投入後の step0 recall 再測定(→ 再検索実施待ち。現 69.2% は第1波のみの値)。
+- Rev.6 拡張クエリ第2波投入後の step0 recall 再測定(→ 再検索実施待ち。現 69.2% は
+  4DBデータでの測定値。3DB体制での再測定が必要。PubMed経由でのみ捕捉された known-item は
+  無いため recall には影響しない見込みだが、実測で確認する)。
+- PsycINFO 非索引の残余リスクの定量評価(→ 本レビュー範囲外、スノーボーリングで部分緩和)。
+
+> ~~方針4 の MeSH corpus 便益~~ / ~~PubMed の独立正当化~~ → **Rev.8 で対象外に確定**
+> (PubMed 不使用のため判定不要になった。上記「Rev.7分析の位置づけ」参照)。

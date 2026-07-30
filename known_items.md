@@ -4,11 +4,17 @@
 > **`self_scale_references.csv`(SearchScope 列)**である。`known_item_test.py` は
 > `known_items.csv` → `known_items.md`(**下表は有効行0のテンプレート**)→ `self_scale_references.csv`
 > の順で探索するため、下表が空である限り自動的に `self_scale_references.csv` が使われる。
-> in-scope 15件(#3〜#14, #18 + Rev.7 追加分)/ background(非VR理論・心理接合点の古典、
+> **in-scope 13件(#3〜#14, #18)/ background 7件**(非VR理論・心理接合点の古典2件を含む、
 > recall 分母外)という構成。**このファイルの表は当面「拡充用の下書き」**であり、
 > 二重管理を避けるため gold set の本体は `self_scale_references.csv` に一本化する
 > (`methodology_decision_Rev7.md` §A・§著者確認#7)。in-scope を 15〜25件へ増やす際は
 > `self_scale_references.csv` に SearchScope=in-scope 行を追加すること。
+>
+> **【Rev.8 追記】background の心理接合点古典(#19 Botvinick & Cohen 1998, #20 Lenggenhager et al. 2007)は
+> PsycINFO 不使用の正当化とも接続する境界文献。** DB構成を3DB(ACM/IEEE/Scopus)に確定し
+> PsycINFO 不採用が確定した今、これらは「PsycINFO が本来カバーするはずの心理系古典に、
+> 3DB検索+スノーボーリングでどこまで到達できるか」を点検する到達目標としても機能する
+> (`snowballing_protocol.md` §1.3、`methodology_decision_Rev7.md` §Rev.8追記の正当化ドラフト参照)。
 
 ## これは何か
 
