@@ -64,21 +64,51 @@
 
 1. **Phase 3b: Title/Abstract 人手二重スクリーニング** — 評価者2名・独立・Cohen's κ 報告・不一致協議。**未実施**。
    - （旧計画の LLM 要旨判定は 2026-07-16 のプロトコル改訂 Rev.2 で廃止。protocol_changelog.md 参照）
-1.5. **検索の再実行（PRISMA上段の再構築）** — DB別 verbatim 検索式・実行日・ヒット数が未記録のため、
-   `search_replication.md` の手順で全DB再検索が必要。DB別生データを `raw/` に保全すること。
-2. **引用数の補完** — Semantic Scholar API で DOI → citationCount を取得し CSV に列追加（README末尾にコード例あり）。足切りシミュレーションの実質化に必須。
-3. **AI判定の目視検証** — 無作為抽出サンプルの著者チェック（rule.md 記載の信頼性担保手続き）。
+   - **要決定:** Phase 4 の評価者3名（下記4）が Phase 3b も担当するのか、Phase 3b は従来どおり2名なのかが未確定。
+     3名で行うなら Phase 3b の一致度統計も Fleiss' κ に変更が必要（rule.md Rev.2 の記述は2名前提）。
+1.5. **Rev.6 第2波再検索（PRISMA上段の再構築）** — 3DB体制で実施中。**進捗: Scopus 完了**
+   （2026-07-30 API本実行 → Zotero取込 → `raw/scopus_wave2_20260730.csv`、2,542件・新規256件）/
+   **IEEE 未着手**（API が `ERR_403_DEVELOPER_INACTIVE` で停止中＝全体の律速）/ **ACM 未着手**（手動エクスポート）。
+   3DB分が揃い次第、統合してパイプライン公式再実行。手順は `search_replication.md`。
+2. **引用数の補完** — Semantic Scholar API で DOI → citationCount を取得し CSV に列追加。
+   **専用スクリプトは未整備**（`scripts/enrich_abstracts.py` の `polite_get` / `.env` 読み込みを再利用するのが早い）。
+   足切りシミュレーションの実質化に必須だが、採用にはプロトコル改訂が必要（README 付記）。
+3. ~~**AI判定の目視検証**~~ — **廃止**。LLM 判定そのものを Rev.2（2026-07-16）で全面撤廃したため、
+   検証手続きも不要になった。代替は Phase 3b の人手二重スクリーニング（上記1）。
 4. **Phase 4: 全文適格性評価** — PICOS基準（健常成人 / HMD+スケール操作 / 比較条件 / 定量指標 / 実証研究）での全文精査。
+   **評価者3名を確保済み（2026-08-01 確定）: 著者 / Yuta Kataoka / Ryoichi WATANABE。**
+   → **一致度統計の選択が要決定**: Cohen's κ は2評価者用のため3名にはそのまま使えない。
+   Fleiss' κ（3名全員が全件を独立評価）か、ペアワイズ Cohen's κ の平均（分担方式）かを決める必要がある。
+   割当方式（全件×3名 か、2名重複×3ペアの分担か）も未定。
 5. **Taxonomy コーディング** — 採択文献への3軸分類の付与。
 6. **分析・考察** — 年代×Taxonomy変遷、Venue別トレンド、タスク×モダリティのクロス集計、非視覚パラメータ体系化、Social VR・個人差の観点（rule.md §4）。
 7. **PRISMA フロー図の作成**、rule.md 冒頭の「○○件」の確定値への置換。
 
 ## 既知の課題・メモ
 
-- **Abstract欠損が30.8%（550件）** — KWスコアやLLM判定の精度に直結。Crossref/S2 APIでのAbstract補完を検討。
-- **Phase 2 の未判定（Unmatched）5,126件をまとめて除外している** — 2026-07-16 に上位50 Venue（2,152件=42.0%をカバー）を監査した結果、Levenshtein類似度0.85以上で A*/A/Q1 に一致する「表記ゆれ脱落」は **0件**（`outputs/unmatched_venues_top50.csv`）。上位は VRCAI/VRIC 系 proceedings・CHI Extended Abstracts・Venue名空欄(233件) が中心。残り58%のロングテールは未監査。
-- **rule.md と実装の乖離（SJR Q2）— 判断待ち:** Q2による脱落は **823件/332誌**（`outputs/sjr_q2_excluded_venues.csv`）。上位は臨床系＋LNCSだが、IEEE Trans. on Haptics(13)・Computer Animation and Virtual Worlds(15)・Multisensory Research(3)・QJEP(6)・Neuropsychologia(5) 等の主題関連誌を含む。rule.md 該当箇所に TODO 埋め込み済み。決定後 protocol_changelog.md に Rev.3 として記録する。CORE 側は「A*/A のみ」で rule.md を実装に合わせて確定済み（Rev.2）。
+- **Abstract欠損** — 最終候補での欠損は 30.8%（550件、旧データ）。**コーパス全体では ACM 由来の欠落が 7,655件**（全件DOIあり）。
+  補完手段は `scripts/enrich_abstracts.py`（Crossref→S2）。2026-07-30 の20件試験で **11/20（55%）成功・全て S2 経由**、
+  Crossref 経由は0件（該当ACM論文に Crossref 側の Abstract が元々無い。仕様であって不具合ではない）。本実行は未実施。
+  なお第2波 Scopus（`raw/scopus_wave2_20260730.csv`）は **Abstract 充足率 100%** で、この問題は ACM に固有。
+- **Phase 2 の未判定（Unmatched）をまとめて除外している** — 現行値は **5,166件**（ResearchVR3。監査当時は 5,126件）。
+  2026-07-16 に上位50 Venue（2,152件=42.0%をカバー）を監査した結果、Levenshtein類似度0.85以上で A*/A/Q1 に一致する「表記ゆれ脱落」は **0件**（`outputs/unmatched_venues_top50.csv`）。上位は VRCAI/VRIC 系 proceedings・CHI Extended Abstracts・Venue名空欄(233件) が中心。残り58%のロングテールは未監査。
+- ~~**rule.md と実装の乖離（SJR Q2）— 判断待ち**~~ → **解決済み（Rev.4, 2026-07-17）: SJR は Q1 のみ採用に確定。**
+  Q2 による脱落 **826件/332誌**（`outputs/sjr_q2_excluded_venues.csv`）は Threats to Validity で報告する。
+  上位は臨床系＋LNCSだが、IEEE Trans. on Haptics(13)・Computer Animation and Virtual Worlds(15)・
+  Multisensory Research(3)・QJEP(6)・Neuropsychologia(5) 等の主題関連誌を含むため、報告時に具体名を挙げること。
+  CORE 側は「A*/A のみ」で確定済み（Rev.2）。
 - **KW=1点の残存層480件（2023年以降）** — VR環境KWのみヒット。Phase 4 で要注意層。
+- **公式 step ファイルは凍結中（重要）** — 現行の `step*.csv` / `pipeline_log.txt` は **2026-07-17 15:06 の実行結果**であり、
+  同日 16:27 に追加した **Step 0 エイリアス表（`venue_aliases.csv`）を通していない**（ログに alias 統計行が無いことで確認可能）。
+  エイリアス適用後の scratchpad 試験値は **2,917 → 1,831件**。公式再実行は第2波再検索の完了後にまとめて行う。
+- **Venue照合の順序問題（未修正）** — Step A の CORE ファジー照合（≥0.82）が Step B の SJR 完全一致より先に走るため、
+  ジャーナルが CORE の類似会議名に誤マッチしうる。最大の実例は **PACM HCI 82件**。
+  正規化の同名衝突は 899キー・採否反転 426件（データ出現74キー、`venue_aliases.csv` に MANUAL 行として自動追記済み）。
+  恒久対策は `normalization_design.md` の6案（推奨: 案6順序修正 + 案1種別マーカー + 案3短キーガード + 案4サニティチェック）で、**公式再実行時に適用**。
+- **Known-Item recall が目標未達** — step0 **69.2%**（9/13、目標 ≥80%）→ step2 **23.1%**（3/13）。
+  step0 の脱落4件は検索式・DBカバレッジ（Rev.6 の G1拡張で対処）、**step2 の脱落6件は Venue フィルタ**が主因で、
+  回収手段はスノーボーリング（`outputs/venue_dropped_known_items.csv`）。第2波再検索後に再測定する。
+- **Venue suspect 照合の目視確認が未了** — 優先度P1 = 91ユニーク/240件（`outputs/venue_suspect_matches.csv`）。著者タスク。
 - Windows での実行は `python -X utf8` を付けること（文字化け防止）。
 
 ---
@@ -458,3 +488,88 @@
   4. `scripts/snowball_search.py` を実行し `outputs/snowballing_log.csv` を生成
      → picos_decision/reason列を著者が記入
   5. IEEE解決後、`db_search_ieee.py` の本実行→3DB分が揃ってから統合・パイプライン再実行
+
+### 2026-07-31 — Scopus第2波のZotero取込CSV追加 / README全面見直し(§8スノーボーリング新設) / PR #2
+- **Scopus第2波データの取り込み完了(前回タスク2)**: 著者が `raw/scopus_wave2_20260730.ris` を
+  Zotero の専用コレクションに取り込み、CSV エクスポートして `raw/` へ配置（当初 `additional.csv`、2026-08-01 に
+  `raw/scopus_wave2_20260730.csv` へ改名）。
+  実測: **2,542件 / Abstract充足率 100% / DOI 88.6% / Keyword充足あり**(旧 raw/Scopus.csv の 1.2% から大幅改善)。
+  **Zotero往復の無損失性を検証**: RIS と CSV のキー集合(DOI優先・正規化タイトル代替、
+  `known_item_test.py` と同一基準)が**完全一致**(共通2,519 / CSVのみ0 / RISのみ0)。
+  2,542レコード中ユニーク2,519件(Scopus内部重複23件は Phase 1 で吸収)。
+  **第1波5CSVに存在しない純粋な新規は 256件**。
+- **README に §8「スノーボーリング(引用探索)」を新設**: `scripts/snowball_search.py` の実装を文書化
+  (なぜ必要か=Venue脱落6件の回収 / 処理フロー / シード選定 / 重複判定の基準 / ランク付与 /
+  出力11列 / 通信の作法)。旧§8〜10は9〜11へ繰り下げ(他文書からの章番号参照が無いことを grep で確認)。
+- **README全面見直し(実装・実行ログ・docs/ との突き合わせ、+368/-75行)**。事実誤りの修正:
+  - §3 DB一覧: 5DB → **Rev.8 の3DB体制**(PubMed/PsycInfo は不使用理由つき打消し表記)
+  - §3 検索クエリ: 掲載されていた詳細クエリは**計画段階のもので未実行**(Rev.5)。
+    実行された第1波クエリ + Rev.6第2波クエリに差し替え
+  - §3 方針: **LLM不使用(Rev.2)**・人手2名 + Cohen's κ を明記
+  - §5 冒頭: 入力 ResearchVR2.csv → **ResearchVR3.csv + venue_aliases.csv**
+  - §5 Phase 2: 照合ロジックを実装の実行順(**Step 0 エイリアス → Step A CORE 4段 → Step B SJR 2段**)に修正
+  - §5 Phase 3: キーワード別件数を pipeline_log.txt の現行値へ(`\bar\b` 137→138、
+    mixed reality 60→61、patients 538→539 等)。「その他」も実数を集計
+  - §7 の文字化け(`フェイルセ0000…ーフ`)・脱字(「0件のは」)、§10 の古いコマンド例(`--input ResearchVR2.csv`、
+    `-X utf8` 欠落)、テーブルを壊していた正規表現内のパイプを修正
+- **README に未記載だった重要事項を追加**:
+  - §5 Phase 2 の**既知の順序問題**(CORE fuzzy が SJR exact より先に走る。最大の実例 PACM HCI 82件)と、
+    **現行 step ファイルは 7/17 15:06 実行で 16:27 追加のエイリアス表を通していない**こと
+    (pipeline_log.txt に alias 統計行が無いことで確認可能。適用後の試験値 2,917→1,831)
+  - §6 に **Known-Item Test の段階別 recall**(step0 69.2% → step2 23.1%、step0で4件・step2で6件脱落)
+  - §3 に **Scopus scope の狭化**(TITLE-ABS 2,533 vs TITLE-ABS-KEY 4,727)
+  - §4 に `.env` / `venue_aliases.csv` / gold set の探索順(実体は `self_scale_references.csv`)
+  - §10 に第2波API検索・Abstract補完・Known-Item Test の手順(CLIフラグを argparse 定義と照合)
+  - 冒頭に「step ファイルは Rev.6 以前で凍結中」「docs/ と食い違う場合は docs/ 側が正」
+- **PR #2 作成 → マージ済み**(ブランチ `docs/readme-audit-snowball`、2コミット)。
+  データ・コードは無変更(パイプライン・stepファイル・スクリプトはいずれも触っていない)。
+- ~~**保留**: `raw/additional.csv` の改名~~ → **2026-08-01 に著者承認、`raw/scopus_wave2_20260730.csv` へ改名済み**
+  (`git mv` で履歴を保持。README §4 の参照も更新)。
+- **次回やること(優先度順)**:
+  1. **`docs/search_strings.md` の DB別記録表に「Scopus(第2波)」行を追記**(PRISMA Item #7 の穴埋め)。
+     verbatim・実行日・2,542件は `outputs/api_search_log.csv` に下書きあり。**ネットワーク不要・即着手可**
+  2. developer.ieee.org のアカウント有効化を確認(**全体の律速**)。解決しない場合は
+     IEEEサポート問い合わせ、または**IEEEも手動エクスポートに切り替える**判断
+  3. `scripts/snowball_search.py` を実行 → `outputs/snowballing_log.csv` 生成
+     → picos_decision/reason を著者記入(未実行。ファイル未生成を確認済み)
+  4. ACM 第2波の手動エクスポート(ACMに検索APIが無いため)→ Zotero → CSV
+  5. ACM Abstract 補完の本実行可否判断(7,655件、成功率55%想定の長時間ジョブ)
+  6. 3DB分が揃ったら: 正規化改修(normalization_design.md 案6+1+3+4)を適用 → **公式再実行(Rev.7)**
+     → known_item_test 再測定(目標 step0 ≥ 80%)→ PRISMA 数値確定 → rule.md 本文へ Rev.8 反映
+
+### 2026-08-01 — additional.csv の改名 / Phase 4 評価者3名の確定(Rev.9)
+- **`raw/additional.csv` → `raw/scopus_wave2_20260730.csv` へ改名**(著者承認)。`git mv` で履歴保持。
+  README §4 の参照も更新。第2波の ACM/IEEE 分が加わったときに取得元・波が判別できるようにするため。
+- **Phase 4 の評価者を3名に確定: 著者 / Yuta Kataoka / Ryoichi WATANABE**(`protocol_changelog.md` Rev.9)。
+  - **要決定(著者)**: `rule.md` Rev.2 が前提にしている **Cohen's κ は2評価者専用**で3名には使えない。
+    **(a) Fleiss' κ**(全件×3名・多数決+協議、報告は素直だが工数3倍) か
+    **(b) ペアワイズ Cohen's κ の平均**(各文献2名の分担方式、工数は2倍だが割当記録が必須) かを選ぶ必要がある。
+  - **要決定(著者)**: Phase 3b(Title/Abstract 二重スクリーニング)も同じ3名で行うのか、従来どおり2名か。
+    3名にするなら Phase 3b の一致度統計も同様に変更。
+  - Rev番号は暫定。検索scope変更(TA→TAK)を先に確定するなら本項を Rev.10 に繰り下げる。
+- **著者報告: ACM/IEEE の第2波手動再検索を実施 → ACM 81件 / IEEE 379件**。
+  第1波(ACM 7,997 / IEEE 1,276)からの下げ幅は **ACM -99% / IEEE -70%**。
+  Rev.6 は G1 を*拡張*した改訂なので、減少分はすべて scope の絞り込みで説明する必要がある。
+  Scopus の -41%(TAK→TA、実測済み)と比べても **ACM の -99% は外れ値**。
+  - **分析(scratchpad、リポジトリ未変更)**: in-scope known-item 13件のうち、
+    **タイトルだけで3概念群が成立するのは2件のみ(#7 ACM / #11 IEEE)、残り11件は Abstract のヒットに依存**。
+    ACM は Abstract 欠落 7,655件(充足率4.3%)なので、`Abstract:` 句が空振りして
+    **実質タイトル検索に退化している疑い**がある(81件という数字と整合)。
+    ※判定は完全一致フレーズでの近似のため、語形変化を吸収するDBでは Abstract依存件数はやや過大。
+  - **切り分け手順を著者に提示済み**: ①クエリが3群それぞれ `(Title OR Abstract)` で囲まれているかの確認
+    (全群をタイトルのみに要求していると2桁減る)、②ACM で `Title:(G1)` のみ / `Abstract:(G1)` のみ /
+    フルクエリ の3本を投げて Abstract 索引の生死を判定。
+  - **判断は Known-Item Test で行う方針**: 81件/379件をエクスポートして `raw/` に置き、
+    ACM の #7/#8/#13・IEEE の #11 が捕捉できるか測る。**#7/#11 はタイトルのみで通るため、
+    #8/#13 が落ちていれば Abstract 経路が死んでいる証拠**。
+    その結果で TA 維持か TAK 移行かを決め、scope を変える場合はプロトコル改訂として記録する。
+    現 recall が step0 69.2%(目標≥80%)で未達のため、広げる方向には合理性がある。
+- **次回やること(優先度順)**:
+  1. Phase 4 の一致度統計 (a)Fleiss' κ / (b)ペアワイズCohen's κ と、割当方式を著者が決定
+     → `rule.md` 本文へ反映(Rev.8 の未反映分とまとめて)
+  2. ACM/IEEE 第2波の結果をエクスポート → `raw/` へ配置 → Known-Item Test で TA/TAK を判定
+  3. `docs/search_strings.md` に第2波の記録を転記(Scopus 分は `outputs/api_search_log.csv` に下書きあり。
+     ACM/IEEE 分は verbatim クエリ・実行日・ヒット数を著者から受領)
+  4. developer.ieee.org のアカウント有効化(手動検索が通っているため優先度は下がったが、
+     API が使えれば再現性の記録が楽になる)
+  5. `scripts/snowball_search.py` の実行 → `outputs/snowballing_log.csv` の picos_decision 記入
