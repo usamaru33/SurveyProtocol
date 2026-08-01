@@ -141,7 +141,7 @@ SurveyProtocol/
 ├── raw/                         # ZoteroのDB別コレクションエクスポート（PRISMA上段の根拠）
 │   ├── acm.csv / ieee.csv / IEEE_2025-2026.csv / PubMed.csv / Scopus.csv  # 初回検索（第1波）
 │   ├── scopus_wave2_20260730.ris   # Rev.6第2波 Scopus API 生出力（2,542件）
-│   └── additional.csv              # ★上記RISのZotero取込→CSVエクスポート（2,542件, Abstract 100%）
+│   └── scopus_wave2_20260730.csv   # ★上記RISのZotero取込→CSVエクスポート（2,542件, Abstract 100%）
 ├── CORE.csv                     # CORE学会ランキング（1,955エントリ）
 ├── scimagojr 2025.csv           # SJRジャーナルランキング（50,326エントリ）
 │
