@@ -1,0 +1,2 @@
+﻿file,db,records,unique_keys,dup_in_file,doi_filled,abstract_filled,since_2021_pct,truncation_suspected,expect_note
+acm2.csv,ACM,9630,9630,0,9194,9401,48.1,N,"期待 9,630 と一致"

@@ -70,6 +70,64 @@ AND ("Size" OR "Scale" OR "Height" OR "Distance")
 | Scopus | 統合クエリ(上記)✅ ※TITLE-ABS() / TITLE-ABS-KEY() の別は**要著者確認 → 下記2026-07-27実測で高確度判明** | Title, Abstract(**実際は TITLE-ABS-KEY だった可能性が高い、下記参照**) | **要著者確認** | ≤ 2026-05-15(Zotero取込日) | **4,331** ✅ |
 | ~~PsycInfo~~ **(Rev.8: 不使用を再確認)** | **未実行が確定**(2026-07-17: Zotero にコレクション無し、アクセス制約のため実行不可)。Rev.8で「Scopus が PsycINFO 収録誌の相当部分を索引しており心理系文献の捕捉は Scopus に依拠する」ことを Known-Item Test で実証(`methodology_decision_Rev7.md` §Rev.8)。不実行の正当化は同ドラフトを本文に転用 | — | — | — | 0(未実行) |
 
+## 第2波(Rev.6 改訂クエリ)の実行記録
+
+| DB | Search string (verbatim) | Fields searched | Filters | Date executed | Hits |
+|---|---|---|---|---|---|
+| Scopus(第2波) | `TITLE-ABS(("Virtual Reality" OR "VR" OR "HMD" OR "head-mounted display" OR "head mounted display" OR "Virtual Environment*" OR "immersive virtual") AND ("Avatar" OR "Body" OR "Embodiment") AND ("Size" OR "Scale" OR "Height" OR "Distance"))` | TITLE-ABS | なし(view=COMPLETE) | 2026-07-30 | **2,542** ✅ |
+| ACM DL(第2波・title検索) | Rev.6 改訂クエリを `Title:` 指定で実行 | Title のみ | 出版年でスライス(下表) | 2026-08-02〜03 | **6,012**(UI表示) / 取得 6,013 |
+| ACM DL(第2波・abstract検索) | Rev.6 改訂クエリを `Abstract:` 指定で実行 | Abstract のみ | 出版年でスライス(下表) | 2026-08-02〜03 | **8,328**(UI表示) / 取得 8,331 |
+| IEEE Xplore(第2波) | — | `"Document Title":` / `"Abstract":` | — | 未実施 | 379(UI表示のみ、エクスポート待ち) |
+
+> **ACM は Title 検索と Abstract 検索の和集合**(Rev.9 時点の決定、`search_replication.md` §1)。
+> **代償: フィールド横断の一致(例: G1 はタイトル・G2 は要旨にのみ出現)を取りこぼす。**
+> PRISMA-S / Threats to Validity に逸脱として明記すること。
+>
+> 取得件数が UI 表示をわずかに上回るのは、エクスポートが数日にまたがったことによる索引の自然増。
+> 不足ではないため許容する。**和集合のユニークは 9,630件**(`raw/acm_wave2_20260803.csv`)。
+
+### ACM 第2波のスライス内訳(エクスポート上限1,000件への対応)
+
+ACM DL のエクスポートは**1,000件で打ち切られる**(2026-08-02 実測)。打ち切りは警告なしに起きるため、
+出版年でスライスし、1スライスが1,000件未満になるよう分割した。
+**元の .bib スライスは `.gitignore` 済み**(Zotero 取り込み後の CSV に集約済み・`scripts/merge_bib.py` で再生成可)なので、
+内訳の記録は本表を正とする。
+
+| 系列 | ファイル | 年範囲 | 件数 |
+|---|---|---|---|
+| title | acm (1) | 2025-2026 | 448 |
+| title | acm (2) | 2024-2026 | 629 |
+| title | acm (3) | 2024-2025 | 576 |
+| title | acm (4) | 2022-2023 | 818 |
+| title | acm (5) | 2020-2022 | 685 |
+| title | acm (6) | 2017-2019 | 965 |
+| title | acm (7) | 2010-2016 | 808 |
+| title | acm (8) | 2000-2009 | 875 |
+| title | acm (9) | 1989-1999 | 209 |
+| | **title 計** | **1989-2026** | **6,013**(ユニーク) |
+| abstract | acm (10) | 2026 | 591 |
+| abstract | acm (11) | 2025-2026 | 969 |
+| abstract | acm (12) | 2024-2025 | 928 |
+| abstract | acm (13) | 2023 | 742 |
+| abstract | acm (14) | 2022 | 565 |
+| abstract | acm (15) | 2021-2022 | 516 |
+| abstract | acm (17) | 2016-2018 | 1,000 ★打ち切り |
+| abstract | acm (18) | 2010-2015 | 795 |
+| abstract | acm (20) | 2005-2009 | 554 |
+| abstract | acm (21) | 2019-2021 | 1,000 ★打ち切り |
+| abstract | acm (22) | 2017-2018 | 818(★(17)の取り直し) |
+| abstract | acm (25) | 2016 | 280(★(17)の取り直し) |
+| abstract | acm (26) | 2019 | 533(★(21)の取り直し) |
+| abstract | acm (27) | 1973-2004 | 505 |
+| abstract | acm (30) | 2020-2021 | 533(★(21)の取り直し) |
+| | **abstract 計** | **1973-2026** | **8,331**(ユニーク) |
+
+- ★打ち切りの2本は取り直し版で上書きされているが、他ファイルに含まれない固有レコードを
+  持つため保持している(削除するとレコードが減る)。
+- 取り直しによる回収実績: 2016 +25 / 2017 +35 / 2018 +38 / 2019 +41 / 2020 +25。
+- **1991〜2001年で abstract 検索が title 検索を下回る**のは、当時の ACM 論文に要旨メタデータが
+  無いためであり取りこぼしではない(2002年以降は一貫して abstract > title)。
+
 ## 確定した PRISMA 上段(2026-07-17、`scripts/raw_db_audit.py` による)
 
 - Records identified: **ACM DL 7,997 / IEEE Xplore 1,276 + 297(更新検索) / PubMed 781 / Scopus 4,331 = 計 14,682**

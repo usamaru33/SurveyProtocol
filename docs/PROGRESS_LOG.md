@@ -62,23 +62,53 @@
 
 ## まだやっていないこと（rule.md のプロトコルとの差分）
 
-1. **Phase 3b: Title/Abstract 人手二重スクリーニング** — 評価者2名・独立・Cohen's κ 報告・不一致協議。**未実施**。
+1. **Phase 3b: Title/Abstract 二重スクリーニング（人手）** — **未実施**。体制は Rev.9 で確定:
+   **評価者3名（著者 / Yuta Kataoka / Ryoichi WATANABE）のペア分担**、各文献を2名が独立評価、
+   **ペアごとの Cohen's κ の平均**を報告。工数は約1,218件/人（1,827件×2÷3）。
+   - 判定シートに**担当ペア列**が必須（κ の算出単位）。不一致はペア協議 → 決着しなければ3人目で多数決。
+   - キーワードスコア（0〜3点）は**読む順序のトリアージにのみ使用可。自動除外はしない**。
    - （旧計画の LLM 要旨判定は 2026-07-16 のプロトコル改訂 Rev.2 で廃止。protocol_changelog.md 参照）
-1.5. **検索の再実行（PRISMA上段の再構築）** — DB別 verbatim 検索式・実行日・ヒット数が未記録のため、
-   `search_replication.md` の手順で全DB再検索が必要。DB別生データを `raw/` に保全すること。
-2. **引用数の補完** — Semantic Scholar API で DOI → citationCount を取得し CSV に列追加（README末尾にコード例あり）。足切りシミュレーションの実質化に必須。
-3. **AI判定の目視検証** — 無作為抽出サンプルの著者チェック（rule.md 記載の信頼性担保手続き）。
+1.5. **Rev.6 第2波再検索（PRISMA上段の再構築）** — 3DB体制で実施中。**進捗: Scopus 完了**
+   （2026-07-30 API本実行 → Zotero取込 → `raw/scopus_wave2_20260730.csv`、2,542件・新規256件）/
+   **IEEE 未着手**（API が `ERR_403_DEVELOPER_INACTIVE` で停止中＝全体の律速）/ **ACM 未着手**（手動エクスポート）。
+   3DB分が揃い次第、統合してパイプライン公式再実行。手順は `search_replication.md`。
+2. **引用数の補完** — Semantic Scholar API で DOI → citationCount を取得し CSV に列追加。
+   **専用スクリプトは未整備**（`scripts/enrich_abstracts.py` の `polite_get` / `.env` 読み込みを再利用するのが早い）。
+   足切りシミュレーションの実質化に必須だが、採用にはプロトコル改訂が必要（README 付記）。
+3. ~~**AI判定の目視検証**~~ — **廃止**。LLM 判定そのものを Rev.2（2026-07-16）で全面撤廃したため、
+   検証手続きも不要になった。代替は Phase 3b の人手二重スクリーニング（上記1）。
 4. **Phase 4: 全文適格性評価** — PICOS基準（健常成人 / HMD+スケール操作 / 比較条件 / 定量指標 / 実証研究）での全文精査。
+   体制は Phase 3b と同一（3名ペア分担・ペアワイズ κ 平均、Rev.9 で確定・rule.md 反映済み）。
+   **除外文献は除外理由（PICOS のどの基準に抵触したか）を1件ずつ記録**すること（PRISMA 2020 の要求事項）。
 5. **Taxonomy コーディング** — 採択文献への3軸分類の付与。
 6. **分析・考察** — 年代×Taxonomy変遷、Venue別トレンド、タスク×モダリティのクロス集計、非視覚パラメータ体系化、Social VR・個人差の観点（rule.md §4）。
 7. **PRISMA フロー図の作成**、rule.md 冒頭の「○○件」の確定値への置換。
 
 ## 既知の課題・メモ
 
-- **Abstract欠損が30.8%（550件）** — KWスコアやLLM判定の精度に直結。Crossref/S2 APIでのAbstract補完を検討。
-- **Phase 2 の未判定（Unmatched）5,126件をまとめて除外している** — 2026-07-16 に上位50 Venue（2,152件=42.0%をカバー）を監査した結果、Levenshtein類似度0.85以上で A*/A/Q1 に一致する「表記ゆれ脱落」は **0件**（`outputs/unmatched_venues_top50.csv`）。上位は VRCAI/VRIC 系 proceedings・CHI Extended Abstracts・Venue名空欄(233件) が中心。残り58%のロングテールは未監査。
-- **rule.md と実装の乖離（SJR Q2）— 判断待ち:** Q2による脱落は **823件/332誌**（`outputs/sjr_q2_excluded_venues.csv`）。上位は臨床系＋LNCSだが、IEEE Trans. on Haptics(13)・Computer Animation and Virtual Worlds(15)・Multisensory Research(3)・QJEP(6)・Neuropsychologia(5) 等の主題関連誌を含む。rule.md 該当箇所に TODO 埋め込み済み。決定後 protocol_changelog.md に Rev.3 として記録する。CORE 側は「A*/A のみ」で rule.md を実装に合わせて確定済み（Rev.2）。
+- **Abstract欠損** — 最終候補での欠損は 30.8%（550件、旧データ）。**コーパス全体では ACM 由来の欠落が 7,655件**（全件DOIあり）。
+  補完手段は `scripts/enrich_abstracts.py`（Crossref→S2）。2026-07-30 の20件試験で **11/20（55%）成功・全て S2 経由**、
+  Crossref 経由は0件（該当ACM論文に Crossref 側の Abstract が元々無い。仕様であって不具合ではない）。本実行は未実施。
+  なお第2波 Scopus（`raw/scopus_wave2_20260730.csv`）は **Abstract 充足率 100%** で、この問題は ACM に固有。
+- **Phase 2 の未判定（Unmatched）をまとめて除外している** — 現行値は **5,166件**（ResearchVR3。監査当時は 5,126件）。
+  2026-07-16 に上位50 Venue（2,152件=42.0%をカバー）を監査した結果、Levenshtein類似度0.85以上で A*/A/Q1 に一致する「表記ゆれ脱落」は **0件**（`outputs/unmatched_venues_top50.csv`）。上位は VRCAI/VRIC 系 proceedings・CHI Extended Abstracts・Venue名空欄(233件) が中心。残り58%のロングテールは未監査。
+- ~~**rule.md と実装の乖離（SJR Q2）— 判断待ち**~~ → **解決済み（Rev.4, 2026-07-17）: SJR は Q1 のみ採用に確定。**
+  Q2 による脱落 **826件/332誌**（`outputs/sjr_q2_excluded_venues.csv`）は Threats to Validity で報告する。
+  上位は臨床系＋LNCSだが、IEEE Trans. on Haptics(13)・Computer Animation and Virtual Worlds(15)・
+  Multisensory Research(3)・QJEP(6)・Neuropsychologia(5) 等の主題関連誌を含むため、報告時に具体名を挙げること。
+  CORE 側は「A*/A のみ」で確定済み（Rev.2）。
 - **KW=1点の残存層480件（2023年以降）** — VR環境KWのみヒット。Phase 4 で要注意層。
+- **公式 step ファイルは凍結中（重要）** — 現行の `step*.csv` / `pipeline_log.txt` は **2026-07-17 15:06 の実行結果**であり、
+  同日 16:27 に追加した **Step 0 エイリアス表（`venue_aliases.csv`）を通していない**（ログに alias 統計行が無いことで確認可能）。
+  エイリアス適用後の scratchpad 試験値は **2,917 → 1,831件**。公式再実行は第2波再検索の完了後にまとめて行う。
+- **Venue照合の順序問題（未修正）** — Step A の CORE ファジー照合（≥0.82）が Step B の SJR 完全一致より先に走るため、
+  ジャーナルが CORE の類似会議名に誤マッチしうる。最大の実例は **PACM HCI 82件**。
+  正規化の同名衝突は 899キー・採否反転 426件（データ出現74キー、`venue_aliases.csv` に MANUAL 行として自動追記済み）。
+  恒久対策は `normalization_design.md` の6案（推奨: 案6順序修正 + 案1種別マーカー + 案3短キーガード + 案4サニティチェック）で、**公式再実行時に適用**。
+- **Known-Item recall が目標未達** — step0 **69.2%**（9/13、目標 ≥80%）→ step2 **23.1%**（3/13）。
+  step0 の脱落4件は検索式・DBカバレッジ（Rev.6 の G1拡張で対処）、**step2 の脱落6件は Venue フィルタ**が主因で、
+  回収手段はスノーボーリング（`outputs/venue_dropped_known_items.csv`）。第2波再検索後に再測定する。
+- **Venue suspect 照合の目視確認が未了** — 優先度P1 = 91ユニーク/240件（`outputs/venue_suspect_matches.csv`）。著者タスク。
 - Windows での実行は `python -X utf8` を付けること（文字化け防止）。
 
 ---
@@ -458,3 +488,297 @@
   4. `scripts/snowball_search.py` を実行し `outputs/snowballing_log.csv` を生成
      → picos_decision/reason列を著者が記入
   5. IEEE解決後、`db_search_ieee.py` の本実行→3DB分が揃ってから統合・パイプライン再実行
+
+### 2026-07-31 — Scopus第2波のZotero取込CSV追加 / README全面見直し(§8スノーボーリング新設) / PR #2
+- **Scopus第2波データの取り込み完了(前回タスク2)**: 著者が `raw/scopus_wave2_20260730.ris` を
+  Zotero の専用コレクションに取り込み、CSV エクスポートして `raw/` へ配置（当初 `additional.csv`、2026-08-01 に
+  `raw/scopus_wave2_20260730.csv` へ改名）。
+  実測: **2,542件 / Abstract充足率 100% / DOI 88.6% / Keyword充足あり**(旧 raw/Scopus.csv の 1.2% から大幅改善)。
+  **Zotero往復の無損失性を検証**: RIS と CSV のキー集合(DOI優先・正規化タイトル代替、
+  `known_item_test.py` と同一基準)が**完全一致**(共通2,519 / CSVのみ0 / RISのみ0)。
+  2,542レコード中ユニーク2,519件(Scopus内部重複23件は Phase 1 で吸収)。
+  **第1波5CSVに存在しない純粋な新規は 256件**。
+- **README に §8「スノーボーリング(引用探索)」を新設**: `scripts/snowball_search.py` の実装を文書化
+  (なぜ必要か=Venue脱落6件の回収 / 処理フロー / シード選定 / 重複判定の基準 / ランク付与 /
+  出力11列 / 通信の作法)。旧§8〜10は9〜11へ繰り下げ(他文書からの章番号参照が無いことを grep で確認)。
+- **README全面見直し(実装・実行ログ・docs/ との突き合わせ、+368/-75行)**。事実誤りの修正:
+  - §3 DB一覧: 5DB → **Rev.8 の3DB体制**(PubMed/PsycInfo は不使用理由つき打消し表記)
+  - §3 検索クエリ: 掲載されていた詳細クエリは**計画段階のもので未実行**(Rev.5)。
+    実行された第1波クエリ + Rev.6第2波クエリに差し替え
+  - §3 方針: **LLM不使用(Rev.2)**・人手2名 + Cohen's κ を明記
+  - §5 冒頭: 入力 ResearchVR2.csv → **ResearchVR3.csv + venue_aliases.csv**
+  - §5 Phase 2: 照合ロジックを実装の実行順(**Step 0 エイリアス → Step A CORE 4段 → Step B SJR 2段**)に修正
+  - §5 Phase 3: キーワード別件数を pipeline_log.txt の現行値へ(`\bar\b` 137→138、
+    mixed reality 60→61、patients 538→539 等)。「その他」も実数を集計
+  - §7 の文字化け(`フェイルセ0000…ーフ`)・脱字(「0件のは」)、§10 の古いコマンド例(`--input ResearchVR2.csv`、
+    `-X utf8` 欠落)、テーブルを壊していた正規表現内のパイプを修正
+- **README に未記載だった重要事項を追加**:
+  - §5 Phase 2 の**既知の順序問題**(CORE fuzzy が SJR exact より先に走る。最大の実例 PACM HCI 82件)と、
+    **現行 step ファイルは 7/17 15:06 実行で 16:27 追加のエイリアス表を通していない**こと
+    (pipeline_log.txt に alias 統計行が無いことで確認可能。適用後の試験値 2,917→1,831)
+  - §6 に **Known-Item Test の段階別 recall**(step0 69.2% → step2 23.1%、step0で4件・step2で6件脱落)
+  - §3 に **Scopus scope の狭化**(TITLE-ABS 2,533 vs TITLE-ABS-KEY 4,727)
+  - §4 に `.env` / `venue_aliases.csv` / gold set の探索順(実体は `self_scale_references.csv`)
+  - §10 に第2波API検索・Abstract補完・Known-Item Test の手順(CLIフラグを argparse 定義と照合)
+  - 冒頭に「step ファイルは Rev.6 以前で凍結中」「docs/ と食い違う場合は docs/ 側が正」
+- **PR #2 作成 → マージ済み**(ブランチ `docs/readme-audit-snowball`、2コミット)。
+  データ・コードは無変更(パイプライン・stepファイル・スクリプトはいずれも触っていない)。
+- ~~**保留**: `raw/additional.csv` の改名~~ → **2026-08-01 に著者承認、`raw/scopus_wave2_20260730.csv` へ改名済み**
+  (`git mv` で履歴を保持。README §4 の参照も更新)。
+- **次回やること(優先度順)**:
+  1. **`docs/search_strings.md` の DB別記録表に「Scopus(第2波)」行を追記**(PRISMA Item #7 の穴埋め)。
+     verbatim・実行日・2,542件は `outputs/api_search_log.csv` に下書きあり。**ネットワーク不要・即着手可**
+  2. developer.ieee.org のアカウント有効化を確認(**全体の律速**)。解決しない場合は
+     IEEEサポート問い合わせ、または**IEEEも手動エクスポートに切り替える**判断
+  3. `scripts/snowball_search.py` を実行 → `outputs/snowballing_log.csv` 生成
+     → picos_decision/reason を著者記入(未実行。ファイル未生成を確認済み)
+  4. ACM 第2波の手動エクスポート(ACMに検索APIが無いため)→ Zotero → CSV
+  5. ACM Abstract 補完の本実行可否判断(7,655件、成功率55%想定の長時間ジョブ)
+  6. 3DB分が揃ったら: 正規化改修(normalization_design.md 案6+1+3+4)を適用 → **公式再実行(Rev.7)**
+     → known_item_test 再測定(目標 step0 ≥ 80%)→ PRISMA 数値確定 → rule.md 本文へ Rev.8 反映
+
+### 2026-08-01 — additional.csv の改名 / Phase 4 評価者3名の確定(Rev.9)
+- **`raw/additional.csv` → `raw/scopus_wave2_20260730.csv` へ改名**(著者承認)。`git mv` で履歴保持。
+  README §4 の参照も更新。第2波の ACM/IEEE 分が加わったときに取得元・波が判別できるようにするため。
+- **Phase 4 の評価者を3名に確定: 著者 / Yuta Kataoka / Ryoichi WATANABE**(`protocol_changelog.md` Rev.9)。
+  - **要決定(著者)**: `rule.md` Rev.2 が前提にしている **Cohen's κ は2評価者専用**で3名には使えない。
+    **(a) Fleiss' κ**(全件×3名・多数決+協議、報告は素直だが工数3倍) か
+    **(b) ペアワイズ Cohen's κ の平均**(各文献2名の分担方式、工数は2倍だが割当記録が必須) かを選ぶ必要がある。
+  - **要決定(著者)**: Phase 3b(Title/Abstract 二重スクリーニング)も同じ3名で行うのか、従来どおり2名か。
+    3名にするなら Phase 3b の一致度統計も同様に変更。
+  - Rev番号は暫定。検索scope変更(TA→TAK)を先に確定するなら本項を Rev.10 に繰り下げる。
+- **著者報告: ACM/IEEE の第2波手動再検索を実施 → ACM 81件 / IEEE 379件**。
+  第1波(ACM 7,997 / IEEE 1,276)からの下げ幅は **ACM -99% / IEEE -70%**。
+  Rev.6 は G1 を*拡張*した改訂なので、減少分はすべて scope の絞り込みで説明する必要がある。
+  Scopus の -41%(TAK→TA、実測済み)と比べても **ACM の -99% は外れ値**。
+  - **分析(scratchpad、リポジトリ未変更)**: in-scope known-item 13件のうち、
+    **タイトルだけで3概念群が成立するのは2件のみ(#7 ACM / #11 IEEE)、残り11件は Abstract のヒットに依存**。
+    ACM は Abstract 欠落 7,655件(充足率4.3%)なので、`Abstract:` 句が空振りして
+    **実質タイトル検索に退化している疑い**がある(81件という数字と整合)。
+    ※判定は完全一致フレーズでの近似のため、語形変化を吸収するDBでは Abstract依存件数はやや過大。
+  - **切り分け手順を著者に提示済み**: ①クエリが3群それぞれ `(Title OR Abstract)` で囲まれているかの確認
+    (全群をタイトルのみに要求していると2桁減る)、②ACM で `Title:(G1)` のみ / `Abstract:(G1)` のみ /
+    フルクエリ の3本を投げて Abstract 索引の生死を判定。
+  - **判断は Known-Item Test で行う方針**: 81件/379件をエクスポートして `raw/` に置き、
+    ACM の #7/#8/#13・IEEE の #11 が捕捉できるか測る。**#7/#11 はタイトルのみで通るため、
+    #8/#13 が落ちていれば Abstract 経路が死んでいる証拠**。
+    その結果で TA 維持か TAK 移行かを決め、scope を変える場合はプロトコル改訂として記録する。
+    現 recall が step0 69.2%(目標≥80%)で未達のため、広げる方向には合理性がある。
+- **次回やること(優先度順)**:
+  1. Phase 4 の一致度統計 (a)Fleiss' κ / (b)ペアワイズCohen's κ と、割当方式を著者が決定
+     → `rule.md` 本文へ反映(Rev.8 の未反映分とまとめて)
+  2. ACM/IEEE 第2波の結果をエクスポート → `raw/` へ配置 → Known-Item Test で TA/TAK を判定
+  3. `docs/search_strings.md` に第2波の記録を転記(Scopus 分は `outputs/api_search_log.csv` に下書きあり。
+     ACM/IEEE 分は verbatim クエリ・実行日・ヒット数を著者から受領)
+  4. developer.ieee.org のアカウント有効化(手動検索が通っているため優先度は下がったが、
+     API が使えれば再現性の記録が楽になる)
+  5. `scripts/snowball_search.py` の実行 → `outputs/snowballing_log.csv` の picos_decision 記入
+
+### 2026-08-01 (2) — Rev.9 確定(3名ペア分担) / ACM 81件は構文エラーと判明・訂正
+- **評価者体制を確定(Rev.9)**: Phase 3b・Phase 4 とも **評価者3名のペア分担**
+  (著者×Kataoka / 著者×WATANABE / Kataoka×WATANABE)、各文献を2名が独立評価、
+  **ペアごとの Cohen's κ の平均**を報告。Fleiss' κ(全件×3名)は工数1.5倍
+  (5,481判定 vs 3,654判定)に見合わないとして却下。**`rule.md` 本文に反映済み**
+  (Phase 3b を書き換え、Phase 4 に「評価体制」節を新設)。
+  工数目安: 1,827件×2÷3 = **約1,218件/人**(従来の2名全件方式1,827件/人より軽い)。
+- **キーワードスコアの位置づけを明文化**: 著者から「Phase 3b はスコア制で数を減らす話ではなかったか」
+  との確認。調査の結果、**スコア制は `rule.md`・`protocol_changelog.md` のいずれにも存在せず**、
+  該当するのは `simulate_screening.py` の**タスク1B(2026-05-25 の読み取り専用シミュレーション)**で
+  検討のみ・未採用だった。未採用の理由は試算値に表れている: Cat3(スケール知覚KW)ヒット率が
+  **3.4%** しかなく、これは **Abstract 欠損 30.8%** の直撃で、低スコアが内容起因かデータ欠損起因かを
+  区別できないため。2点未満で切ると1,457件(82%)脱落し再現率優先方針と衝突する。
+  → **rule.md に「読む順序のトリアージにのみ使用可・自動除外はしない」と明記**して決着。
+- **【訂正】ACM 81件は scope ではなくクエリ構文のエラーだった**。著者が Title と Abstract を
+  別々に実行したところ **Title 6,012件 / Abstract 8,328件**。前セッションで立てた
+  「ACM の Abstract 索引が薄く `Abstract:` 句が空振りしている疑い」は**外れ**。
+  **ACM DL の検索索引には Abstract が入っている**ことが確定した(8,328件ヒット)。
+  手元エクスポートの Abstract 充足率 4.3% は **Zotero 取り込み側の問題**であって検索の取りこぼしではない。
+  → `enrich_abstracts.py` による補完は「エクスポートのメタデータを埋める」作業であり、
+  検索の網羅性とは別問題であることが明確になった。
+- **残る問題: Title/Abstract を別々に取って和集合にすると、フィールド横断の一致を取りこぼす。**
+  正しい TA 検索は群ごとに `(Title:G OR Abstract:G)` を取り、それを AND する形。
+  和集合は真の TA 集合の**下界**にしかならない。known-item 13件中11件が Abstract 依存で、
+  かつ「G1・G3はタイトル、G2は要旨のみ」(#8)のような横断ケースが典型のため実害がある。
+  → **入れ子にした単一クエリを著者に提示済み**(README §3 の Rev.6 クエリを
+  `(Title:G1 OR Abstract:G1) AND (Title:G2 OR Abstract:G2) AND (Title:G3 OR Abstract:G3)` の形に展開)。
+  これが通ればそれを正式クエリとする。ACM の UI が受け付けない場合は和集合で進めるが、
+  **「ACM DL の検索UI制約により Title/Abstract を分けて実行・統合。フィールド横断の一致は取りこぼしうる」を
+  PRISMA-S の逸脱として明記**する。
+- **次回やること(優先度順)**:
+  1. ACM で入れ子の単一クエリを試す → 通ればそのヒット数を採用、駄目なら和集合＋逸脱記録
+  2. ACM/IEEE 第2波をエクスポート → `raw/` へ配置 → Known-Item Test で recall 実測
+     (ACM #7/#8/#13・IEEE #11 の捕捉を確認。#7/#11 はタイトルのみで通るため #8/#13 が判定の要)
+  3. `docs/search_strings.md` に第2波の記録を転記(Scopus は `outputs/api_search_log.csv` に下書きあり、
+     ACM/IEEE は verbatim クエリ・実行日・ヒット数を著者から受領)
+  4. 判定シートの様式を作成(文献ID・担当ペア・両評価者の判定・除外理由・最終判定・協議メモ)
+  5. 3DB分が揃ったら統合 → 正規化改修 → 公式再実行 → PRISMA 数値確定 → rule.md へ Rev.8 分を反映
+
+### 2026-08-03 — ACM bib の打ち切り検出 / gold set の誤りを2件発見 / 検証ツール2本を新規作成
+- **著者が置いた `raw/acm_title.bib` / `raw/acm_abst.bib` は使用不可と判定し、削除した**。検査結果:
+
+  | 検査項目 | 結果 |
+  |---|---|
+  | エントリ数 | 両ファイルとも **1,000ちょうど**(報告ヒット数は title 6,012 / abstract 8,328) |
+  | 2ファイルの共通レコード | **1,000/1,000**(キー・並び順とも完全一致) |
+  | 実際の差分 | 著者名の発音記号エンコードのみ(`Wünsche` vs `W\"{u}nsche`) |
+  | 収録年 | 88% が2021年以降に偏り |
+
+  → **(1)** 2本は同一エクスポートの文字コード違いで title/abstract の別検索になっていない、
+  **(2)** ACM DL のエクスポート上限1,000件で打ち切られ母集団の12〜17%しか取れていない、
+  **(3)** 打ち切りが新しい年に偏った系統的なもの。この状態で Known-Item Test を回すと
+  「recall が低い」という誤った結論が出るため破棄した。
+- **【前セッションの訂正の追認】ACM の Abstract 索引は健全**。81件は scope ではなく
+  クエリ構文のエラーだった(Abstract 検索単独で 8,328件ヒット)。手元エクスポートの
+  Abstract 充足率 4.3% は Zotero 取り込み側の問題。
+- **著者決定(2026-08-02)**: ACM は**出版年でスライスして手動エクスポート**(ACM DL を
+  検索源とする provenance を保つ)、クエリは **title検索と abstract検索の和集合**、既存bibは削除。
+  和集合はフィールド横断の一致(G1はタイトル・G2は要旨のみ、等)を取りこぼすため
+  **PRISMA-S の逸脱として明記する**ことが条件。
+- **★gold set の誤りを2件発見(要著者判断)** — `export_completeness_audit.py` が
+  DOI一致とタイトル一致を別々に判定したことで露見した。**どちらも現行 recall を過大評価させている**。
+  - **#10 Dwarf or Giant = gold set の DOI 誤記**。gold `10.2312/egve.20171356` に対し
+    コーパスは `10.2312/egve.20171353`。著者(Kim & Interrante)・年(2017)・会議(ICAT-EGVE 2017)・
+    タイトルが完全一致するため**同一論文**。`self_scale_references.csv` の DOI を修正すべき
+    (recall への影響なし。捕捉は正しい)。
+  - **#13 Does Scaling Player Size... = 別論文を捕捉している**。gold は
+    `10.1145/2617917`(2014, ACM TAP 11(3))だが、コーパスに在るのは
+    `10.1145/3424636.3426908`(2020, MIG 2020, Hartman et al.)。**年・会議・著者すべて異なる**。
+    gold の2014年論文は raw/ 全ファイルにも ResearchVR3.csv にも**存在しない**。
+    `known_item_test.py` が**タイトル一致で拾って step0 生存と判定していた偽陽性**。
+  - **影響: 真の step0 recall は 9/13(69.2%) ではなく 8/13(61.5%)**。
+    step2 の脱落理由に記録されている「#13 は MIG 2020 の Venue が未照合」も**別論文についての記述**。
+    → 著者判断が必要: (a) gold の #13 を2020年版に差し替えるのか、
+    (b) 2014年版を正として「検索式が拾えていない」扱いにするのか。
+    後者なら G1/G2/G3 のどれが外れているかの分析が必要。
+  - `known_item_test.py` の照合ロジック自体にも改善余地あり(タイトル一致時に
+    DOI が両方あって食い違う場合は偽陽性として警告すべき)。**未修正**。
+- **`scripts/export_completeness_audit.py` 新規**(ネットワーク不要・読み取り専用)。
+  打ち切り疑い(1,000/2,000件ちょうど等)・ファイル内/間の重複・期待ヒット数との突き合わせ
+  (`--expect`)・**gold set 照合(HIT/SUSPECT/MISS の3値)**・年分布を検査。
+  出力 `outputs/export_completeness.csv`。既存 raw/ での実測が
+  `search_strings.md` 記録の DB間重複(ACM∩Scopus 142 / IEEE∩Scopus 352 / PubMed∩Scopus 606 /
+  IEEE∩PubMed 39)と**完全一致**することを確認済み(キー正規化が既存監査と同一基準である証拠)。
+- **`scripts/merge_raw.py` 新規**。`raw/*.csv` を連結し **`Source_DB` 列を付与**して
+  統合生データを生成(既定 `ResearchVR4.csv`、重複削除は Phase 1 の責務なので行わない)。
+  **PubMed は Rev.8 により既定で除外**(`--include-pubmed` で明示的に包含可)。
+  検証: `--include-pubmed --dry-run` の合計が **17,224件**、第2波Scopusを引くと
+  **14,682件 = ResearchVR3.csv と完全一致**。既存統合データを再現できることを確認した。
+  これにより「ResearchVR3.csv がどう作られたか記録が無い」(Rev.7 で問題化)が解消する。
+  また既存統合CSVに取得元DB列が無く URL/DOI からの推定に頼っていた問題
+  (README §7 タスク2)も、以後は Source_DB 列で解決する。
+- **ドキュメント**: `search_replication.md` §1(ACM)を全面改訂
+  (失敗事例・和集合方式とその代償・年スライス手順・スライス記録表・検証コマンド)、
+  共通ルール4にヒット数と実件数の突き合わせを追加。README に §4.1「データ取り込みの検証」を新設、
+  §5 の既定入力の記述を修正(`DEFAULT_INPUT` は `ResearchVR2.csv` のままで、
+  公式実行は `--input ResearchVR3.csv`)。
+- 回帰確認: `known_item_test.py` 再実行で **recall 69.23% 不変**
+  (差分は第2波Scopus改名に伴う `step0_source_dbs` のラベルのみ)。
+- **次回やること(優先度順)**:
+  1. **gold set #13 の扱いを著者が決定**(2020年版に差し替え / 2014年版を正として未捕捉扱い)。
+     #10 の DOI 誤記(`...1356` → `...1353`)も修正する。recall の公称値が変わるため最優先
+  2. ACM を年スライスで再エクスポート → `raw/acm_wave2_YYYYMMDD.csv`
+     → `export_completeness_audit.py` で警告ゼロを確認
+  3. IEEE(379件、上限内なので分割不要)をエクスポート → `raw/ieee_wave2_YYYYMMDD.csv`
+  4. `merge_raw.py` で `ResearchVR4.csv` 生成 → `known_item_test.py` で step0 recall 実測
+     → **TA 維持か TAK 移行かを判断**
+  5. `docs/search_strings.md` に第2波の verbatim・実行日・ヒット数・スライス内訳を転記
+  6. 和集合方式の逸脱を `protocol_changelog.md` に記録(Rev.10 候補)
+
+### 2026-08-03 (2) — ACM第2波(raw/acm2)のスライス検査 / gold set 2件を修正
+- **著者が ACM 第2波を `raw/acm2/` に格納**(`acm (1).bib` 〜 `acm (19).bib`、計19本)。
+  ファイル名に年・検索種別が入っていないため中身から系列を判別した。
+  **ファイル番号 1-9 = title検索、10-19 = abstract検索**と判明(合計件数が報告値と対応)。
+
+  | 系列 | ファイル | 合計 | 報告ヒット数 | 判定 |
+  |---|---|---|---|---|
+  | A(title) | acm (1)〜(9) | **6,013** | 6,012 | ✅ ほぼ一致・年の抜けなし |
+  | B(abstract) | acm (10)〜(19) | **6,611** | 8,328 | ❌ **1,717件不足** |
+
+- **★系列B に再取得が必要な箇所を特定**:
+  1. **2005〜2009年**: スライス自体が存在しない((19)が1973-2004、(18)が2010-2015で間が空く)。推定約640件
+  2. **2019年・2020年**: スライス自体が存在しない((17)が2016-2018、(15)が2021-2022で間が空く)。推定約940件
+  3. **`acm (17).bib`(2016-2018)が1,000件ちょうどで打ち切り**。年分割して取り直しが必要。推定約110件
+  - 推定合計 **約1,690件**で不足分1,717件とほぼ一致 → **この3つで全て説明がつく**(他に見落としなし)。
+  - 推定根拠は同一年の abstract/title 比 1.15〜1.51(平均約1.35)。系列Aの該当年は
+    2005-2009が472件、2019+2020が694件、2016-2018が820件。
+- **抜けではないもの(確認済み)**: **1974〜1988年が0件なのは正常**((19)の1973-2004スライスが
+  当該範囲をカバーしたうえで該当論文が無い。1973年に1件のみ)。系列Aに1988年以前のスライスが
+  無いが、系列Bの実測から当該範囲はほぼ0件と見込まれる(念のため確認するなら「≤1988」1回で済む)。
+- **`acm (16).bib` は `acm (15).bib` とバイト単位で完全同一**(同じエクスポートの二重保存)。
+  重複削除で吸収されるが紛らわしいので削除推奨。
+- 現状の全19ファイル合算 13,140件 / 重複除去後 **8,856件ユニーク** / Abstract 保持率 **97.6%**。
+
+#### ★gold set 2件を修正(著者承認済み)
+- **#10 Dwarf or Giant**: DOI `10.2312/egve.20171356` → **`10.2312/egve.20171353`**(誤記の訂正)。
+- **#13 Does Scaling Player Size...**: DOI `10.1145/2617917` → **`10.1145/3424636.3426908`**、
+  年 2014→**2020**、掲載 ACM TAP 11(3)→**MIG 2020**、VenueType Journal→**Conference**、
+  著者 Piryankova ら→**Hartman, Delahaye, Decroix, Herbelin, Boulic**。
+- **【前セッションの報告を訂正】真の step0 recall は 61.5% ではなく 69.23% のままで正しい。**
+  前回は「gold の2014年版が実在してコーパスに無い」と解釈したが、ACM第2波の全データで確認した結果
+  **その2014年版は存在しなかった**。DOI `10.1145/2617917` は実在するが
+  「Olfactory Adaptation in Virtual Environments」(ACM TAP 2014)という別論文のもの。
+  「Does Scaling Player Size Skew...」というタイトルの論文は ACM DL 全体で
+  **2020年の MIG 論文ただ1本**であり、コーパスが捕捉していたものが正しい対象だった。
+- **注意(残存する不整合)**: #13 の旧「著者」欄(Piryankova, de la Rosa, Kloos, Bülthoff, Mohler)は
+  Hartman らとは別人で、Piryankova らの *Displays* 2013 論文
+  「Egocentric distance perception in large screen immersive displays」の著者リストと一致する。
+  旧「掲載誌+年」(ACM TAP 11(3), 2014)は Piryankova らの別論文
+  「Can I Recognize My Body's Weight?」(DOI 10.1145/2641568、コーパスに在り)と一致する。
+  つまり旧 #13 は**3論文の情報が混在**していた。Title・Section(IV. 自己スケールの錯誤)・
+  Role_in_Survey(スケーリングが物体サイズ評価に与える歪み)・InterventionModality(Visual-Global)・
+  EvaluationTarget(World-scale)がいずれも Hartman 2020 と整合するため Hartman 2020 に確定したが、
+  **もし意図が Piryankova 論文だった場合は差し替えが必要**(著者確認事項)。
+- 修正後の検証: `export_completeness_audit.py` の gold set 照合が
+  **SUSPECT 0 / HIT 9/13(69.2%)** となり、`known_item_test.py` の値と一致。
+  #10・#13 とも照合方法が TITLE → **DOI** に変わった(偽陽性の解消)。
+- **PR #3(オープン中)の本文を訂正**。初版に書いた「真の recall は 61.5%」を撤回し、
+  gold set の誤りが**発見**から**修正済み**に変わった旨とその根拠に差し替えた。
+  タイトルも「gold set の誤りを2件修正」に更新。撤回した記述は削除せず、
+  なぜ誤ったか(存在しない2014年版を想定していた)を残している。
+- 本セッションのコミット: `bf46ccd`(gold set 修正・recall 訂正の撤回)。
+  作業ツリーは `raw/acm2/`(未追跡・再取得待ちのため未コミット)を除きクリーン。
+- **次回やること(優先度順)**:
+  1. 系列B の3箇所(2005-2009 / 2019 / 2020 / (17)の年分割)を再エクスポート
+  2. `acm (16).bib` を削除
+  3. 全ファイルを Zotero の `acm_wave2` コレクションへ取り込み → CSV → `raw/acm_wave2_YYYYMMDD.csv`
+  4. `export_completeness_audit.py --expect acm_wave2=8328` で警告ゼロを確認
+  5. IEEE(379件)をエクスポート → `merge_raw.py` で `ResearchVR4.csv` → recall 実測 → TA/TAK 判断
+
+### 2026-08-03 (3) — ACM第2波が完成(9,630件)/ スライスbibはignore、内訳は文書に記録
+- **ACM 第2波の取得が完了**。著者が年スライスで再エクスポートし、不足分を3回にわたって補填。
+  最終的に **title 6,013件 / abstract 8,331件 / 和集合ユニーク 9,630件**。
+  UI表示値(6,012 / 8,328)をわずかに上回るが、エクスポートが数日にまたがったことによる
+  索引の自然増であり不足ではない。
+- **補填の経緯(打ち切り・上書き事故を含む)**:
+  - 初回の23本中、系列B(abstract)に **2005-2009 / 2019 / 2020 のスライス欠落**と
+    `acm (17)` の1,000件打ち切りがあり、1,717件不足していた。
+  - 補填の途中で **`acm (19).bib`(1973-2004、505件)が2016年のエクスポートで上書きされ消失**。
+    系列Bの2004年以前が丸ごと欠落したのを件数の突き合わせで検出し、再取得してもらった
+    (8,239 → 7,759 の減少として現れた)。
+  - 取り直しによる回収実績: 2016 +25 / 2017 +35 / 2018 +38 / 2019 +41 / 2020 +25。
+    **打ち切り版をそのまま使っていたら計164件を取りこぼしていた。**
+  - 重複ファイル7本((16)(19)(23)(24)(28) 等)を削除。**削除によるレコード損失はゼロ**を
+    キー集合の比較で確認済み。
+- **`scripts/merge_bib.py` 新規**。年スライスの .bib を**引用キー(=DOI)単位で一意化**して1本に統合する。
+  エントリ本文は一切加工しない。ACM の年スライス運用は今後も繰り返すため再実行可能にした。
+  統合結果 9,630件。事前集計の9,634件との差4件は、**同じ論文が `doi` フィールドの有無違いで
+  2回入っていた**ケースで、引用キーで見れば同一。レコード損失ではないことを検証済み。
+- **Zotero 取り込み → CSV は無損失**: `raw/acm_wave2_20260803.csv` は **9,630件で統合bibと完全一致**、
+  ファイル内重複0、DOI充足 95.5%、Abstract充足 **97.6%**、gold set の ACM 3件は **HIT 3 / SUSPECT 0 / MISS 0**。
+  第2波Scopusに続き2例目の無損失往復。
+- 命名規約に合わせ `raw/acm2.csv` → **`raw/acm_wave2_20260803.csv`** にリネーム。
+  `merge_raw.py` の `Source_DB` 判定が第1波 `acm.csv` と同じ "ACM" に落ちるのを防ぐため
+  (リネーム後は "ACM(wave2)" として正しく分離されることを dry-run で確認)。
+- **著者判断: スライス .bib はコミットせず ignore**。`.gitignore` に `raw/*.bib` と `raw/acm2/` を追加。
+  **その代わり、スライス別の年範囲・件数を `docs/search_strings.md` に表として記録**した
+  (PRISMA Item #7 の根拠は今後この表が正)。あわせて第2波の verbatim・実行日・ヒット数、
+  和集合方式の代償(フィールド横断の取りこぼし)も同ファイルに記載。
+- 統合見込み(`merge_raw.py --dry-run`): ACM 7,997 / ACM(wave2) 9,630 / IEEE 1,276 /
+  IEEE(update) 297 / Scopus 4,331 / Scopus(wave2) 2,542 = **26,073件**(DB間重複含む)。
+- **次回やること(優先度順)**:
+  1. **IEEE 第2波(379件)のエクスポート** — 上限2,000件に収まるので分割不要。
+     `raw/ieee_wave2_YYYYMMDD.csv` に配置。**これが最後の未取得データ**
+  2. `merge_raw.py` で `ResearchVR4.csv` 生成 → `known_item_test.py` で step0 recall 実測
+     → **TA 維持か TAK 移行かを判断**
+  3. 和集合方式の逸脱を `protocol_changelog.md` に記録(Rev.10 候補)
+  4. 正規化改修 → 公式再実行 → PRISMA 数値確定 → rule.md へ Rev.8 分を反映

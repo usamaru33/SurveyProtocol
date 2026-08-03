@@ -4,3 +4,11 @@ __pycache__/
 .env
 .env.*
 !.env.example
+
+# 分割エクスポートの中間物(BibTeX)。
+# ACM DL は1回1,000件が上限のため出版年でスライスして複数回エクスポートするが、
+# それらは Zotero 取り込み後の CSV(raw/*_wave2_*.csv)に集約済みで、
+# scripts/merge_bib.py でいつでも統合し直せる。スライス別の件数・年範囲は
+# docs/search_strings.md の記録表を正とする(PRISMA Item #7 の根拠はそちら)。
+raw/*.bib
+raw/acm2/

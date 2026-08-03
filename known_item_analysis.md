@@ -1,6 +1,6 @@
 # Known-Item 脱落分析レポート
 
-> `scripts/known_item_test.py` による自動生成(2026-07-30)。
+> `scripts/known_item_test.py` による自動生成(2026-08-03)。
 > Known-Item 13 件。判定は全て決定論的(DOI/正規化タイトル一致)。
 > FUZZY 候補は手動確認が必要であり、recall には算入していない。
 
@@ -86,7 +86,8 @@
 ### Does Scaling Player Size Skew One's Ability to Correctly Evaluate Object Sizes in a Virtual Environment?
 
 - 脱落理由: Venue名 'Proceedings - MIG 2020: 13th ACM SIGGRAPH Conference on Motion, Interaction, and Games' が CORE/SJR いずれにも未照合
-- ランキングリスト内に類似Venueなし(CORE lev≥0.75 / SJR lev≥0.85 の範囲で候補ゼロ)。`outputs/unmatched_venues_top50.csv` も参照。
+- ランキングリスト内の最近傍(表記ゆれ調査):
+  - `ACM SIGGRAPH conference on Motion Interaction and Games` [CORE C] (lev=1.000)
 - 注記: ランク不足ではなく**照合漏れ**。類似Venueが提示されている場合は表記ゆれであり、正規化ルールまたはエイリアス表への追加で救済可能。類似Venueなしの場合は当該Venueがランキングリスト自体に未収載(ワークショップ等)であり、除外維持が妥当かを個別判断する。
 
 ### Gulliver's virtual travels: active embodiment in extreme body sizes for modulating our body representations
