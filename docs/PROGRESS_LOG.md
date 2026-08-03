@@ -21,68 +21,115 @@
 | 日付 | 出来事 |
 |---|---|
 | 2026-05-19 | リポジトリ作成・初回コミット（プロトコル文書、生データ、パイプライン一式） |
-| 2026-05-25 | README.md 作成（パイプライン実装ドキュメント）。Phase 1〜3 実行済み・結果確定 |
-| 2026-05-25以降 | `year_distribution.py` / `year_distribution.png` 追加（未コミット） |
+| 2026-05-25 | README.md 作成。Phase 1〜3 実行済み（ResearchVR2.csv, 14,385件 → 1,784件） |
 | 2026-05-27 | 別プロジェクト `../docs-system`（Next.js 文献ブラウザ）を作業 |
-| 2026-07-16 | 約1.5ヶ月ぶりに再開。本ログと Claude Code skills を整備 |
+| 2026-07-16 | 約1.5ヶ月ぶりに再開。本ログと Claude Code skills を整備。**Rev.2: AI判定を全面廃止** |
+| 2026-07-17 | Rev.3〜Rev.6。IEEE更新検索の統合（→ ResearchVR3.csv, 14,682件 → 1,827件）、SJR Q1確定、実行クエリの判明、G1拡張と Venue照合の再設計 |
+| 2026-07-21 | Rev.7 検索方法論の検証。プロトコル文書を `docs/` へ集約 |
+| 2026-07-22 | **Rev.8: DB構成を3DB（ACM/IEEE/Scopus）に確定、PubMed 不使用**。API検索ツール整備 |
+| 2026-07-27 | APIキー投入。Scopus scope の実測（TITLE-ABS 2,533 vs TITLE-ABS-KEY 4,727） |
+| 2026-07-30 | Scopus 第2波を本実行（2,542件）。スノーボーリング自動化 |
+| 2026-07-31 | README 全面見直し。§8 スノーボーリングを新設 |
+| 2026-08-01 | **Rev.9: 評価者3名のペア分担を確定**（Phase 3b / Phase 4） |
+| 2026-08-02〜03 | **ACM 第2波を取得完了（9,630件）**。年スライス方式の確立、gold set の誤り2件を修正 |
 
 ---
 
 ## 完了していること
 
-### 1. 検索・データ収集
-- ACM DL / IEEE Xplore / PubMed / Scopus で統合クエリ検索を実行し、Zotero 経由でエクスポート。
-- 生データ: `ResearchVR2.csv`（**14,385件**）。
+### 1. プロトコル（Rev.9 まで確定）
+- **DB構成: 3DB（ACM DL / IEEE Xplore / Scopus）**。PubMed は Rev.8 で不使用に確定、PsycINFO はアクセス制約で不使用。
+- **判定に AI/LLM は不使用**（Rev.2）。Phase 3a は決定論的キーワード除外、Phase 3b/4 は人手。
+- **Venue 基準: CORE A*/A のみ + SJR Q1 のみ**（Rev.4）。Q2脱落826件は Threats で報告。
+- **検索 scope: TA（Title-Abstract）**（Rev.7/8）。
+- **評価者3名のペア分担 + ペアワイズ Cohen's κ の平均**（Rev.9）。
+- 変更履歴は `docs/protocol_changelog.md`。**`rule.md` 本文は Rev.9 分のみ反映済みで、Rev.8 分は未反映。**
 
-### 2. スクリーニング Phase 1〜3（`pipeline.py` 実行済み）
+### 2. 検索データ
+
+| 波 | DB | 件数 | ファイル |
+|---|---|---|---|
+| 第1波 | ACM DL | 7,997 | `raw/acm.csv` |
+| 第1波 | IEEE Xplore | 1,276 + 297（更新検索） | `raw/ieee.csv` / `raw/IEEE_2025-2026.csv` |
+| 第1波 | Scopus | 4,331 | `raw/Scopus.csv` |
+| 第1波 | ~~PubMed~~ | 781（Rev.8 で不使用） | `raw/PubMed.csv` |
+| **第2波** | **Scopus** | **2,542** | `raw/scopus_wave2_20260730.csv` |
+| **第2波** | **ACM DL** | **9,630** | `raw/acm_wave2_20260803.csv` |
+| 第2波 | IEEE Xplore | 379（**未取得**） | — |
+
+- 第2波は Rev.6 の G1拡張クエリ。ACM は **title検索 6,013 + abstract検索 8,331 の和集合**（`docs/search_strings.md` にスライス内訳）。
+- Zotero 往復の無損失を2例で実測（Scopus 2,542 / ACM 9,630 とも完全一致）。
+
+### 3. スクリーニング Phase 1〜3（**第1波データでの結果。凍結中**）
 
 ```
-14,385 件（生データ）
-  → Phase 1 重複削除（DOI/Key/Title）      : -1,943 → 12,442 件（step1_dedup.csv）
-  → Phase 2 Venueランク（CORE A/A*・SJR Q1）: -9,584 →  2,858 件（step2_rank_included.csv）
-  → Phase 3 キーワード除外（AR/技術論文/臨床）: -1,074 →  1,784 件（step3_kw_included.csv ★最終候補）
+14,682 件（ResearchVR3.csv）
+  → Phase 1 重複削除        : -2,139 → 12,543 件
+  → Phase 2 Venueランク      : -9,634 →  2,909 件
+  → Phase 3 キーワード除外    : -1,082 →  1,827 件（step3_kw_included.csv ★最終候補）
 ```
 
-- 実行ログ: `pipeline_log.txt`（除外キーワードごとの件数内訳あり）
+- **この step ファイルは 2026-07-17 15:06 の実行結果**で、同日追加の Venue エイリアス表を通していない。
+  第2波統合後に正規化改修とあわせて公式再実行する方針。
 
-### 3. 追加分析（`simulate_screening.py`、読み取り専用）
-- **タスク1A（引用数足切り）:** CSVに引用数列が無いため最悪ケースのみ。2023年以降のフェイルセーフで754件残存。→ 引用数の外部取得が必要（未着手）
-- **タスク1B（KWスコア足切り）:** 3カテゴリスコアで 0点=409件 / 1点=1,048件 / 2点=302件 / 3点=25件。Cat3（スケール知覚KW）ヒット率が3.4%と極端に低い（Abstract欠損 550件=30.8% の影響大）
-- **タスク2（DB別集計）:** ACM 654 / IEEE 436 / Scopus系 652 / その他 42。PubMed/PsycInfo表記は0件（Scopus経由で吸収されたと推定）
+### 4. 検証基盤
+- **Known-Item Test**（`scripts/known_item_test.py`）: gold set = `self_scale_references.csv`（in-scope 13件）。
+  現在 step0 **69.23%**（目標 ≥80%）→ step2 23.08%。脱落分析は `known_item_analysis.md` に自動生成。
+- **エクスポート完全性の監査**（`scripts/export_completeness_audit.py`）: 打ち切り検出・重複・
+  期待件数との突き合わせ・gold set 照合（HIT/SUSPECT/MISS）。ACM の1,000件打ち切りを検出した実績あり。
+- **統合生データの生成**（`scripts/merge_raw.py`）: `Source_DB` 列を付与。PubMed は既定で除外。
+- **年スライス .bib の統合**（`scripts/merge_bib.py`）: 引用キー単位で一意化。
+- Venue 監査一式（`venue_match_audit.py` / `normalization_collision_audit.py` / `unmatched_venue_audit.py` /
+  `venue_dropped_audit.py`）と出力 CSV 群。
 
-### 4. 年次分布の可視化（`year_distribution.py`）
-- `year_distribution.png` 生成済み（総計・DB別積み上げ・DB別折れ線）。**未コミット**。
-- 傾向: 2020年以降が急増（2020-22: 442件、2023-24: 430件、2025-26: 324件）。
+### 5. API 検索の自動化
+- `scripts/db_search_scopus.py`（**稼働中**）/ `scripts/db_search_ieee.py`（403 で停止中）/
+  `scripts/api_search_common.py`（クエリ生成・polite_get・RIS出力・.env読み込み）。
+- `scripts/snowball_search.py`（S2 引用探索、**未実行**）、`scripts/enrich_abstracts.py`（Abstract補完、少数件試験のみ）。
 
-### 5. 関連ツール `../docs-system`（Next.js、別リポジトリ相当）
-- Semantic Scholar 検索 → 引用ネットワーク可視化（D3）→ Supabase 保存 + R2 にPDF保存、CORE/SJR ランク付与、という文献ブラウザを実装中。
-- サーベイ本体との接続（1,784件の取り込み等）はまだ。`../DocsSystem` は空フォルダ（廃棄した試作跡）。
+### 6. 関連ツール `../docs-system`（Next.js、別リポジトリ相当）
+- Semantic Scholar 検索 → 引用ネットワーク可視化（D3）→ Supabase + R2。**サーベイ本体とは未接続。**
+  `../DocsSystem` は空フォルダ（廃棄した試作跡）。
 
 ---
 
-## まだやっていないこと（rule.md のプロトコルとの差分）
+## まだやっていないこと（優先度順）
 
-1. **Phase 3b: Title/Abstract 二重スクリーニング（人手）** — **未実施**。体制は Rev.9 で確定:
-   **評価者3名（著者 / Yuta Kataoka / Ryoichi WATANABE）のペア分担**、各文献を2名が独立評価、
-   **ペアごとの Cohen's κ の平均**を報告。工数は約1,218件/人（1,827件×2÷3）。
-   - 判定シートに**担当ペア列**が必須（κ の算出単位）。不一致はペア協議 → 決着しなければ3人目で多数決。
-   - キーワードスコア（0〜3点）は**読む順序のトリアージにのみ使用可。自動除外はしない**。
-   - （旧計画の LLM 要旨判定は 2026-07-16 のプロトコル改訂 Rev.2 で廃止。protocol_changelog.md 参照）
-1.5. **Rev.6 第2波再検索（PRISMA上段の再構築）** — 3DB体制で実施中。**進捗: Scopus 完了**
-   （2026-07-30 API本実行 → Zotero取込 → `raw/scopus_wave2_20260730.csv`、2,542件・新規256件）/
-   **IEEE 未着手**（API が `ERR_403_DEVELOPER_INACTIVE` で停止中＝全体の律速）/ **ACM 未着手**（手動エクスポート）。
-   3DB分が揃い次第、統合してパイプライン公式再実行。手順は `search_replication.md`。
-2. **引用数の補完** — Semantic Scholar API で DOI → citationCount を取得し CSV に列追加。
-   **専用スクリプトは未整備**（`scripts/enrich_abstracts.py` の `polite_get` / `.env` 読み込みを再利用するのが早い）。
-   足切りシミュレーションの実質化に必須だが、採用にはプロトコル改訂が必要（README 付記）。
-3. ~~**AI判定の目視検証**~~ — **廃止**。LLM 判定そのものを Rev.2（2026-07-16）で全面撤廃したため、
-   検証手続きも不要になった。代替は Phase 3b の人手二重スクリーニング（上記1）。
-4. **Phase 4: 全文適格性評価** — PICOS基準（健常成人 / HMD+スケール操作 / 比較条件 / 定量指標 / 実証研究）での全文精査。
-   体制は Phase 3b と同一（3名ペア分担・ペアワイズ κ 平均、Rev.9 で確定・rule.md 反映済み）。
-   **除外文献は除外理由（PICOS のどの基準に抵触したか）を1件ずつ記録**すること（PRISMA 2020 の要求事項）。
-5. **Taxonomy コーディング** — 採択文献への3軸分類の付与。
-6. **分析・考察** — 年代×Taxonomy変遷、Venue別トレンド、タスク×モダリティのクロス集計、非視覚パラメータ体系化、Social VR・個人差の観点（rule.md §4）。
-7. **PRISMA フロー図の作成**、rule.md 冒頭の「○○件」の確定値への置換。
+### A. データ取得 — 残り1件
+1. **IEEE 第2波（379件）のエクスポート** — 上限2,000件に収まるので分割不要。
+   `raw/ieee_wave2_YYYYMMDD.csv` に配置。**これが最後の未取得データ。**
+   （API 経由は `ERR_403_DEVELOPER_INACTIVE` で停止中のため手動エクスポート）
+
+### B. 統合と再実行（IEEE が揃い次第）
+2. `merge_raw.py` で `ResearchVR4.csv` 生成 → `known_item_test.py` で step0 recall 実測
+   → **TA 維持か TAK 移行かの判断**（現 69.23% / 目標 ≥80%）
+3. Venue 正規化の改修（`normalization_design.md` 案6+1+3+4）を `pipeline.py` に適用
+4. **公式再実行** → step ファイル更新 → PRISMA 数値確定
+5. `rule.md` 本文へ Rev.8 分（3DB構成・scope=TA・Threats）を反映
+6. 和集合方式の逸脱を `protocol_changelog.md` に記録（Rev.10 候補）
+
+### C. スクリーニング本体
+7. **Phase 3b: Title/Abstract 二重スクリーニング** — 評価者3名のペア分担、各文献を2名が独立評価、
+   ペアごとの Cohen's κ の平均を報告（Rev.9）。工数は約1,218件/人（1,827件×2÷3、再実行後に変動）。
+   - 判定シート様式（文献ID・**担当ペア**・両評価者の判定・最終判定・協議メモ）が**未作成**
+   - キーワードスコアは読む順序のトリアージにのみ使用可。自動除外はしない
+8. **Phase 4: 全文適格性評価** — PICOS基準。体制は Phase 3b と同一。
+   **除外理由（PICOS のどの基準に抵触したか）を1件ずつ記録**すること
+9. **Taxonomy コーディング** — 採択文献への3軸分類の付与
+10. **分析・考察** — 年代×Taxonomy変遷、Venue別トレンド、タスク×モダリティ、非視覚パラメータ体系化
+11. **PRISMA フロー図の作成**、`rule.md` 冒頭の「○○件」の確定値への置換
+
+### D. 補助タスク（並行可能）
+12. **スノーボーリング実行** — `snowball_search.py` → `outputs/snowballing_log.csv` →
+    `picos_decision` 記入。Venue脱落6件の回収が目的。**未実行**
+13. **Venue suspect の目視確認** — 優先度P1 = 91ユニーク/240件（`outputs/venue_suspect_matches.csv`）
+14. **gold set の in-scope 拡充** — 13件 → 15〜25件。1件が recall を7.7%動かす粒度の粗さを解消する
+15. **ACM Abstract 補完の要否判断** — 検索の網羅性とは別問題と判明したため優先度は低いが、
+    Phase 3b で人が要旨を読む以上は必要（第2波ACMは97.6%充足なので対象は第1波分）
+16. **引用数の補完** — S2 API で citationCount 取得。**専用スクリプトは未整備**。
+    採用にはプロトコル改訂が必要
+17. `known_item_test.py` の照合ロジック改善 — タイトル一致時に DOI が食い違う場合に警告する
+    （gold set #13 の偽陽性を見逃した原因。`export_completeness_audit.py` 側では対応済み）
 
 ## 既知の課題・メモ
 
@@ -109,6 +156,22 @@
   step0 の脱落4件は検索式・DBカバレッジ（Rev.6 の G1拡張で対処）、**step2 の脱落6件は Venue フィルタ**が主因で、
   回収手段はスノーボーリング（`outputs/venue_dropped_known_items.csv`）。第2波再検索後に再測定する。
 - **Venue suspect 照合の目視確認が未了** — 優先度P1 = 91ユニーク/240件（`outputs/venue_suspect_matches.csv`）。著者タスク。
+- **DBエクスポートは黙って打ち切られる（重要な教訓）** — ACM DL は **1,000件**、IEEE Xplore は **2,000件**が上限で、
+  超過分は**警告なしに切り捨てられる**。しかも打ち切りは新しい年に偏るため、そのまま使うと
+  「recall が低い」という誤った結論が出る。対策は出版年でのスライスと、
+  **UI表示ヒット数とエクスポート実件数の突き合わせ**（`scripts/export_completeness_audit.py`）。
+  2026-08-02 の ACM で実際に発生し、取り直しにより計164件を回収した。
+- **ACM は title 検索と abstract 検索の和集合（Rev.9 時点）** — 群ごとに `(Title:G OR Abstract:G)` を
+  入れ子にした単一クエリではないため、**フィールド横断の一致（G1はタイトル・G2は要旨のみ、等）を取りこぼす**。
+  gold set 13件中11件が Abstract のヒットに依存しており、机上の懸念ではない。
+  **PRISMA-S / Threats to Validity に逸脱として明記すること。**
+- **gold set のメタデータ品質** — 2026-08-03 に #10（DOI誤記）と #13（3論文の情報が混在）を発見・修正した。
+  **他の項目にも同種の誤りが残っている可能性がある。** in-scope を拡充する際は
+  DOI・年・掲載誌・著者の整合を確認すること。検出には `export_completeness_audit.py` の
+  SUSPECT 判定（タイトル一致だが DOI 不一致）が使える。
+- **`known_item_test.py` はタイトル一致の偽陽性を検出できない** — DOI が両方にあって食い違う場合でも
+  タイトルが一致すれば「捕捉」と判定する。gold set #13 の誤りを見逃した原因。
+  `export_completeness_audit.py` 側では対応済みだが、**本体は未修正**。
 - Windows での実行は `python -X utf8` を付けること（文字化け防止）。
 
 ---
@@ -782,3 +845,25 @@
      → **TA 維持か TAK 移行かを判断**
   3. 和集合方式の逸脱を `protocol_changelog.md` に記録(Rev.10 候補)
   4. 正規化改修 → 公式再実行 → PRISMA 数値確定 → rule.md へ Rev.8 分を反映
+
+### 2026-08-04 — 進捗ログの常設セクションを現状に更新（PR #3 マージ後）
+- **PR #3 をマージ**（8コミット）。本文に ACM 第2波の節を追記してからマージした。
+- **本ログの常設セクション（タイムライン / 完了していること / まだやっていないこと）を全面刷新**。
+  2026-05-25 時点（ResearchVR2.csv・1,784件）の記述のまま放置されており、
+  Rev.2〜Rev.9 の確定事項も第2波データも反映されていなかった。
+  - **タイムライン**: Rev.2〜Rev.9 と第2波取得までの12行に更新
+  - **完了していること**: 「プロトコル（Rev.9まで確定）/ 検索データ（波・DB別の表）/
+    スクリーニング Phase 1〜3（凍結中である旨を明記）/ 検証基盤 / API検索の自動化 /
+    関連ツール」の6区分に再編
+  - **まだやっていないこと**: 優先度順に A.データ取得（残りIEEEのみ）/ B.統合と再実行 /
+    C.スクリーニング本体 / D.補助タスク の4群・17項目へ再編
+- **既知の課題に4件追加**（今回の作業で得た教訓）:
+  1. **DBエクスポートは黙って打ち切られる**（ACM 1,000 / IEEE 2,000）。打ち切りは新しい年に偏るため
+     recall を誤らせる。対策は年スライスと UI表示件数との突き合わせ
+  2. **ACM の和集合方式はフィールド横断の一致を取りこぼす** → PRISMA-S に逸脱として明記が必要
+  3. **gold set のメタデータ品質** — #10/#13 で誤りが見つかった。他項目にも残存の可能性
+  4. **`known_item_test.py` はタイトル一致の偽陽性を検出できない**（本体は未修正）
+- **現在地の要約**: プロトコルは Rev.9 まで確定。第2波データは Scopus(2,542) と ACM(9,630) が取得済みで、
+  **残るは IEEE の379件のみ**。それが揃えば `ResearchVR4.csv` → recall 実測 → TA/TAK 判断 →
+  正規化改修 → 公式再実行 → PRISMA 数値確定、と一本道で進める。
+- **次回やること**: 上記「まだやっていないこと」§A の1項目（IEEE エクスポート）から。
