@@ -1,0 +1,2 @@
+﻿file,db,records,unique_keys,dup_in_file,doi_filled,abstract_filled,since_2021_pct,truncation_suspected,expect_note
+__tmp_trunc_test.csv,other,1000,944,56,1000,320,57.9,Y,
