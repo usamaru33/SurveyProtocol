@@ -22,6 +22,7 @@
 2. [リサーチクエスチョン (RQ)](#2-リサーチクエスチョン-rq)
 3. [スクリーニング戦略](#3-スクリーニング戦略)
 4. [ファイル構成](#4-ファイル構成)
+   - [データ取り込みの検証](#41-データ取り込みの検証2026-08-03-追加)
 5. [パイプライン詳細](#5-パイプライン詳細)
    - [Phase 1: 重複削除](#phase-1-重複削除-pipeline.py)
    - [Phase 2: 学会ランクスクリーニング](#phase-2-学会ランクスクリーニング-pipeline.py)
@@ -156,6 +157,8 @@ SurveyProtocol/
 │   ├── db_search_scopus.py      # Scopus API 検索（第2波）
 │   ├── snowball_search.py       # ★ スノーボーリング（引用探索）→ §8
 │   ├── enrich_abstracts.py      # Crossref→S2 で Abstract 補完（DOIベース）
+│   ├── export_completeness_audit.py  # ★エクスポートの打ち切り・欠落検出（§4.1）
+│   ├── merge_raw.py             # ★raw/*.csv → 統合生データ生成（Source_DB 付与・PubMed除外）
 │   ├── known_item_test.py       # Known-Item Test（recall測定 → known_item_analysis.md）
 │   └── *_audit.py               # Venue照合・正規化衝突・PubMed固有件数などの監査
 ├── outputs/                     # 上記スクリプトの出力（監査CSV・実行ログ）
@@ -187,6 +190,31 @@ SurveyProtocol/
     └── normalization_design.md  # Venue正規化の設計案（案1〜6、未適用）
 ```
 
+### 4.1 データ取り込みの検証（2026-08-03 追加）
+
+DB からのエクスポートは**上限で黙って打ち切られる**ことがある（ACM=1,000件・IEEE=2,000件を実測）。
+打ち切りは新しい年に偏るため、そのまま Known-Item Test を回すと「recall が低い」という
+**誤った結論**が出る。取り込み時は必ず次の順で検証する。
+
+```bash
+# 1. エクスポートの完全性を検査（ネットワーク不要）
+python -X utf8 scripts/export_completeness_audit.py --expect acm_wave2=14340
+
+# 2. 統合生データを組み立てる（Source_DB 列を付与、PubMed は Rev.8 により既定で除外）
+python -X utf8 scripts/merge_raw.py --dry-run   # 件数の内訳を確認
+python -X utf8 scripts/merge_raw.py             # → ResearchVR4.csv
+```
+
+`export_completeness_audit.py` が見るのは、件数の打ち切り疑い・ファイル内/間の重複・
+期待ヒット数との一致・**gold set の捕捉状況**・年分布。とくに gold set 照合は
+DOI一致とタイトル一致を**別々に**判定し、「タイトルは一致するが DOI が違う」ケースを
+`SUSPECT`（同名別論文を捕捉している疑い）として報告する。これは Known-Item Test の
+recall を過大評価させる要因なので、`SUSPECT` は `HIT` として数えない。
+
+`merge_raw.py` は `raw/*.csv` を連結して `ResearchVR4.csv` を作る。重複削除はしない（Phase 1 の責務）。
+`known_item_test.py` は `ResearchVR*.csv` の名前昇順で最後を step0 に使うため、
+**ファイルを置くだけで検証対象が最新の統合データに切り替わる**。
+
 > **注（gold set の所在）:** `known_item_test.py` は `known_items.csv` → `known_items.md` →
 > `self_scale_references.csv` の順に探索する。`known_items.md` の表は有効行0のテンプレートなので、
 > 実際に使われる gold set は **`self_scale_references.csv`** に一本化されている（Rev.7）。
@@ -206,7 +234,11 @@ SurveyProtocol/
 ## 5. パイプライン詳細
 
 `pipeline.py` は3フェーズを一括実行するメインスクリプト。  
-入力: `ResearchVR3.csv`（既定・現行入力） / `CORE.csv` / `scimagojr 2025.csv` / `venue_aliases.csv`
+入力: 統合生データ / `CORE.csv` / `scimagojr 2025.csv` / `venue_aliases.csv`
+
+> **注:** コード上の既定入力（`pipeline.py:23` の `DEFAULT_INPUT`）は **`ResearchVR2.csv` のまま**だが、
+> 現行の公式実行は **`--input ResearchVR3.csv`** で行われている（`pipeline_log.txt` の Input 行が正）。
+> 既定値の変更は公式再実行のタイミングで行う（step ファイル凍結中のため現在は触らない）。
 
 ### Phase 1: 重複削除 (`pipeline.py`)
 
