@@ -1,7 +1,2 @@
 ﻿file,db,records,unique_keys,dup_in_file,doi_filled,abstract_filled,since_2021_pct,truncation_suspected,expect_note
-acm.csv,ACM,7997,7447,550,7997,342,38.4,N,
-ieee.csv,IEEE,1276,1276,0,1264,1271,48.0,N,
-IEEE_2025-2026.csv,IEEE,297,297,0,296,100,100.0,N,
-PubMed.csv,PubMed,781,781,0,750,778,51.2,N,
-Scopus.csv,Scopus,4331,4308,23,3972,4300,50.6,N,
-scopus_wave2_20260730.csv,Scopus,2542,2519,23,2251,2542,51.1,N,
+acm2.csv,ACM,9630,9630,0,9194,9401,48.1,N,"期待 9,630 と一致"
