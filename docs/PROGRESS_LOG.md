@@ -683,3 +683,57 @@
      → **TA 維持か TAK 移行かを判断**
   5. `docs/search_strings.md` に第2波の verbatim・実行日・ヒット数・スライス内訳を転記
   6. 和集合方式の逸脱を `protocol_changelog.md` に記録(Rev.10 候補)
+
+### 2026-08-03 (2) — ACM第2波(raw/acm2)のスライス検査 / gold set 2件を修正
+- **著者が ACM 第2波を `raw/acm2/` に格納**(`acm (1).bib` 〜 `acm (19).bib`、計19本)。
+  ファイル名に年・検索種別が入っていないため中身から系列を判別した。
+  **ファイル番号 1-9 = title検索、10-19 = abstract検索**と判明(合計件数が報告値と対応)。
+
+  | 系列 | ファイル | 合計 | 報告ヒット数 | 判定 |
+  |---|---|---|---|---|
+  | A(title) | acm (1)〜(9) | **6,013** | 6,012 | ✅ ほぼ一致・年の抜けなし |
+  | B(abstract) | acm (10)〜(19) | **6,611** | 8,328 | ❌ **1,717件不足** |
+
+- **★系列B に再取得が必要な箇所を特定**:
+  1. **2005〜2009年**: スライス自体が存在しない((19)が1973-2004、(18)が2010-2015で間が空く)。推定約640件
+  2. **2019年・2020年**: スライス自体が存在しない((17)が2016-2018、(15)が2021-2022で間が空く)。推定約940件
+  3. **`acm (17).bib`(2016-2018)が1,000件ちょうどで打ち切り**。年分割して取り直しが必要。推定約110件
+  - 推定合計 **約1,690件**で不足分1,717件とほぼ一致 → **この3つで全て説明がつく**(他に見落としなし)。
+  - 推定根拠は同一年の abstract/title 比 1.15〜1.51(平均約1.35)。系列Aの該当年は
+    2005-2009が472件、2019+2020が694件、2016-2018が820件。
+- **抜けではないもの(確認済み)**: **1974〜1988年が0件なのは正常**((19)の1973-2004スライスが
+  当該範囲をカバーしたうえで該当論文が無い。1973年に1件のみ)。系列Aに1988年以前のスライスが
+  無いが、系列Bの実測から当該範囲はほぼ0件と見込まれる(念のため確認するなら「≤1988」1回で済む)。
+- **`acm (16).bib` は `acm (15).bib` とバイト単位で完全同一**(同じエクスポートの二重保存)。
+  重複削除で吸収されるが紛らわしいので削除推奨。
+- 現状の全19ファイル合算 13,140件 / 重複除去後 **8,856件ユニーク** / Abstract 保持率 **97.6%**。
+
+#### ★gold set 2件を修正(著者承認済み)
+- **#10 Dwarf or Giant**: DOI `10.2312/egve.20171356` → **`10.2312/egve.20171353`**(誤記の訂正)。
+- **#13 Does Scaling Player Size...**: DOI `10.1145/2617917` → **`10.1145/3424636.3426908`**、
+  年 2014→**2020**、掲載 ACM TAP 11(3)→**MIG 2020**、VenueType Journal→**Conference**、
+  著者 Piryankova ら→**Hartman, Delahaye, Decroix, Herbelin, Boulic**。
+- **【前セッションの報告を訂正】真の step0 recall は 61.5% ではなく 69.23% のままで正しい。**
+  前回は「gold の2014年版が実在してコーパスに無い」と解釈したが、ACM第2波の全データで確認した結果
+  **その2014年版は存在しなかった**。DOI `10.1145/2617917` は実在するが
+  「Olfactory Adaptation in Virtual Environments」(ACM TAP 2014)という別論文のもの。
+  「Does Scaling Player Size Skew...」というタイトルの論文は ACM DL 全体で
+  **2020年の MIG 論文ただ1本**であり、コーパスが捕捉していたものが正しい対象だった。
+- **注意(残存する不整合)**: #13 の旧「著者」欄(Piryankova, de la Rosa, Kloos, Bülthoff, Mohler)は
+  Hartman らとは別人で、Piryankova らの *Displays* 2013 論文
+  「Egocentric distance perception in large screen immersive displays」の著者リストと一致する。
+  旧「掲載誌+年」(ACM TAP 11(3), 2014)は Piryankova らの別論文
+  「Can I Recognize My Body's Weight?」(DOI 10.1145/2641568、コーパスに在り)と一致する。
+  つまり旧 #13 は**3論文の情報が混在**していた。Title・Section(IV. 自己スケールの錯誤)・
+  Role_in_Survey(スケーリングが物体サイズ評価に与える歪み)・InterventionModality(Visual-Global)・
+  EvaluationTarget(World-scale)がいずれも Hartman 2020 と整合するため Hartman 2020 に確定したが、
+  **もし意図が Piryankova 論文だった場合は差し替えが必要**(著者確認事項)。
+- 修正後の検証: `export_completeness_audit.py` の gold set 照合が
+  **SUSPECT 0 / HIT 9/13(69.2%)** となり、`known_item_test.py` の値と一致。
+  #10・#13 とも照合方法が TITLE → **DOI** に変わった(偽陽性の解消)。
+- **次回やること(優先度順)**:
+  1. 系列B の3箇所(2005-2009 / 2019 / 2020 / (17)の年分割)を再エクスポート
+  2. `acm (16).bib` を削除
+  3. 全ファイルを Zotero の `acm_wave2` コレクションへ取り込み → CSV → `raw/acm_wave2_YYYYMMDD.csv`
+  4. `export_completeness_audit.py --expect acm_wave2=8328` で警告ゼロを確認
+  5. IEEE(379件)をエクスポート → `merge_raw.py` で `ResearchVR4.csv` → recall 実測 → TA/TAK 判断
