@@ -34,6 +34,8 @@
    - [キーワードスコア分析](#タスク-1b-キーワードスコアによる足切りシミュレーション)
    - [取得元データベース集計](#タスク-2-取得元データベース集計)
 8. [スノーボーリング（引用探索）](#8-スノーボーリング引用探索)
+   - [Venueランクは採否に使わない](#85-venueランクの付与--採否には使わない)
+   - [PRISMA 上の扱い](#87-prisma-上の扱い)
 9. [分類体系 (Taxonomy)](#9-分類体系-taxonomy)
 10. [実行方法](#10-実行方法)
 11. [期待される知見と貢献](#11-期待される知見と貢献)
@@ -159,6 +161,7 @@ SurveyProtocol/
 │   ├── enrich_abstracts.py      # Crossref→S2 で Abstract 補完（DOIベース）
 │   ├── export_completeness_audit.py  # ★エクスポートの打ち切り・欠落検出（§4.1）
 │   ├── merge_raw.py             # ★raw/*.csv → 統合生データ生成（Source_DB 付与・PubMed除外）
+│   ├── merge_bib.py             # 年スライスの .bib を引用キー単位で一意化して統合
 │   ├── known_item_test.py       # Known-Item Test（recall測定 → known_item_analysis.md）
 │   └── *_audit.py               # Venue照合・正規化衝突・PubMed固有件数などの監査
 ├── outputs/                     # 上記スクリプトの出力（監査CSV・実行ログ）
@@ -565,10 +568,11 @@ URL列のドメイン、DOIプレフィックス、Publisher列を優先順位�
 
 ## 8. スノーボーリング（引用探索）
 
-`scripts/snowball_search.py` — Semantic Scholar Graph API による前方・後方引用探索の自動化。
+`scripts/snowball_search.py` — Semantic Scholar Graph API + Crossref による前方・後方引用探索の自動化。
 手続きの定義は `docs/snowballing_protocol.md`、本節はその**実装**の説明。
 
-> ⚠️ **外部APIに通信するため著者が実行する**（LLM不使用・自動判定なしの方針は維持）。
+> ⚠️ **外部APIに通信する**（Semantic Scholar / Crossref）。既定では著者が実行する。
+> 2026-08-06 に著者の明示的な指示により初回実行済み。
 > スクリプトが行うのは「取得」と「機械的に分かる情報の付与」までで、**PICOS採否は著者が判断する**。
 
 ### 8.1 なぜ必要か
@@ -586,8 +590,9 @@ Scopus scope を TA に統一したこと（旧検索の実質 TITLE-ABS-KEY よ
   │
   ├─ ① paperId 解決 ───────── DOI があれば paper/DOI:{doi}、無ければタイトル検索でフォールバック
   │
-  ├─ ② 双方向探索 ─────────── backward: /paper/{id}/references → citedPaper（引いている文献）
-  │                            forward : /paper/{id}/citations  → citingPaper（引いている側の文献）
+  ├─ ② 双方向探索
+  │     backward: S2 /references → 非開示なら Crossref の reference にフォールバック
+  │     forward : S2 /citations  → offset ページングで取り切る（既定は無制限）
   │
   ├─ ③ 既存コーパスとの重複判定 → in_db_already 列 (Y/N)
   │
@@ -597,6 +602,31 @@ Scopus scope を TA に統一したこと（旧検索の実質 TITLE-ABS-KEY よ
      picos_decision / reason 列は空欄 ← 著者が記入
 ```
 
+#### 実装上の重要な2点（2026-08-06 の初回実行で判明・修正済み）
+
+**(a) 後方探索は S2 だけでは成立しない。**
+Semantic Scholar は**出版社が参考文献を非開示にしている**論文があり（`elided by the publisher`）、
+`data: None` が返って後方探索が丸ごと空になる。初回実行ではシード6件中**4件**（ACM 3・MIT Press 1）が該当した。
+現在は **Crossref の reference リストにフォールバック**する（`ref_source` 列に経路を記録）。
+
+| シード | S2 | Crossref |
+|---|---|---|
+| #3 Sense of Embodiment | 非開示 | 65件 |
+| #7 Distortion in Perceived Size | 非開示 | 16件 |
+| #8 Eye height and avatars | 非開示 | 24件 |
+| #14 Gulliver's travels | データなし | 53件 |
+| #13 Scaling Player Size | 15件 | — |
+| #10 Dwarf or Giant | 非開示 | **未登録（取得不可）** |
+
+Eurographics の DOI（`10.2312/...`）は Crossref に無いため、**#10 の後方探索だけは取得できない**。
+Limitations に記載し、必要なら手作業で補完する。
+
+**(b) 前方探索はページングしないと黙って切り捨てられる。**
+S2 は1リクエスト最大1,000件・`offset+limit ≤ 10,000` の制約がある。
+旧実装は `limit=200` 固定でページングしておらず、被引用の多い論文が切り捨てられていた
+（実例: シード #3 は被引用 **1,497件**なのに 200件しか取れていなかった）。
+現在は offset ページングで取り切り、`--limit-per-seed` の既定は **0（無制限）**。
+
 ### 8.3 シード選定
 
 既定シードは **Venueフィルタで脱落した known-item 6件**。
@@ -605,7 +635,7 @@ Scopus scope を TA に統一したこと（旧検索の実質 TITLE-ABS-KEY よ
 
 `--seeds-csv` で任意のCSVに差し替え可能（`Title`/`DOI` 列。列名は `#`/`ID`/`seed_id`、
 `DOI`/`DOI_or_URL` 等のエイリアス解決あり）。2ホップ目に著者が選んだ候補を再投入する用途を想定。
-ホップ数は `docs/snowballing_protocol.md` §2.3 のとおり **2ホップまで**。
+ホップ数は `docs/snowballing_protocol.md` §2.3 のとおり **2ホップまで**。**現在は1ホップのみ実施済み。**
 
 ### 8.4 重複判定の基準
 
@@ -621,11 +651,22 @@ Scopus scope を TA に統一したこと（旧検索の実質 TITLE-ABS-KEY よ
 `scripts/known_item_test.py` と**同一基準**（正規化は小文字化 → 非英数字を空白へ → 空白圧縮）。
 DOI は `https://doi.org/` `dx.doi.org/` `doi:` の接頭辞を剥がしてから比較する。
 
-### 8.5 Venueランクの付与
+> **限界:** 発見側に DOI が無いレコード（初回実行で **135件**）はタイトル一致でしか判定できず、
+> 表記ゆれがあると既出を見逃す。手作業での照合が必要（`docs/snowballing_protocol.md` §4.4）。
+
+### 8.5 Venueランクの付与 — 採否には使わない
 
 `pipeline.py` の `normalize_venue` / `load_core` / `load_sjr` を**そのまま import** して、
-CORE → SJR → `未照合` の順で `venue_rank_note` 列に記録する。Phase 2 基準を通るかの**目安**であり、
-ここでフィルタは一切しない（Venue基準の取りこぼしを回収するのが目的なので、同じ基準で切ってしまうと本末転倒）。
+CORE → SJR → `未照合` の順で `venue_rank_note` 列に記録する。
+
+**これは読む順序のトリアージ用の参考情報であり、採否の基準にはしない。**
+スノーボーリングの目的が「Venue フィルタが落とした文献の回収」である以上、
+回収したものに同じフィルタを掛け直せば同じ理由で再び落ちる。
+実際、シード #10（ICAT-EGVE）・#13（MIG）は低ランク会場で脱落した文献であり、
+Venue フィルタを適用すると**シード自身すら通らない**。
+
+初回実行の新規1,403件のうち Phase 2 基準を満たすのは 579件、**満たさないのが 824件**。
+**この824件こそが回収対象**である。
 
 ### 8.6 出力
 
@@ -637,15 +678,32 @@ CORE → SJR → `未照合` の順で `venue_rank_note` 列に記録する。Ph
 | `direction` | `backward` / `forward` |
 | `found_title` / `found_doi` / `found_year` / `found_venue` | 発見された文献 |
 | `in_db_already` | `Y`=既存コーパスに既出 / `N`=新規候補 |
-| `venue_rank_note` | `CORE A*` / `SJR Q1` / `未照合` 等（参考） |
+| `venue_rank_note` | `CORE A*` / `SJR Q1` / `未照合` 等（**参考。採否に使わない**） |
+| `ref_source` | `S2` / `Crossref` / `取得不可`（後方探索の取得経路。PRISMA-S 用） |
 | `picos_decision` | **空欄** ← 著者が include/exclude を記入 |
 | `reason` | **空欄** ← 著者が理由を記入 |
 
-**PRISMA計上上の注意:** `in_db_already=Y` の行は既に DB検索で捕捉済みなので、
-PRISMA フロー図右カラム（"records identified via other methods" / citation searching）に
-**二重計上しない**（`docs/snowballing_protocol.md` §4）。
+### 8.7 PRISMA 上の扱い
 
-### 8.7 通信の作法
+スノーボーリングで得た文献は PRISMA 2020 の**右カラム**（Identification of studies via other methods）を通り、
+**Phase 4 の適格性評価で左カラムと合流**する。フロー図と各段階の定義は
+`docs/snowballing_protocol.md` §4（Mermaid 図あり）を正とする。
+
+初回実行（2026-08-06、1ホップ）の実測値:
+
+| 段階 | 件数 |
+|---|---|
+| Seed set | 6 |
+| Records identified via citation searching（一意化後） | 1,801 |
+| うち既存コーパスと重複 → **右カラムに計上しない** | 398 |
+| **New records via citation searching** | **1,403** |
+| うち DOI 欠落（手作業で同定が必要） | 135 |
+| Screened / Assessed | 未実施 |
+
+**右カラムには Phase 2（Venue フィルタ）を適用しない**（§8.5 の理由）。
+Title/Abstract 判定は Phase 3b と**同一基準**で行う。
+
+### 8.8 通信の作法
 
 `scripts/api_search_common.py` の共通部品を使う。
 
@@ -653,6 +711,7 @@ PRISMA フロー図右カラム（"records identified via other methods" / citat
 - `load_dotenv()` — `.env`（git管理外）から `SEMANTIC_SCHOLAR_API_KEY` を読む。
   既に export 済みの環境変数は上書きしない。後方互換で `S2_API_KEY` も受理する
 - APIキー無しでも動作するが、共有プールの rate limit が厳しくなる（キーはメール登録のみで発行可）
+- Crossref は `ENRICH_MAILTO` を設定すると polite pool を使える（未設定でも動作する）
 
 ---
 
@@ -778,18 +837,24 @@ DOI をキーに Crossref → Semantic Scholar の順で補完する。
 
 ### スノーボーリング（引用探索）
 
-> 外部APIに通信する。著者が実行すること（§8参照）。
+> 外部APIに通信する（Semantic Scholar / Crossref）。§8 参照。
 
 ```bash
-# 既定シード（Venue脱落6件）で前方・後方の両方向
+# 既定シード（Venue脱落6件）で前方・後方の両方向。取得上限は既定で無制限
 python -X utf8 scripts/snowball_search.py
 
-# 片方向のみ / 取得上限の変更
+# Crossref の polite pool を使う場合（後方探索のフォールバックで使用）
+ENRICH_MAILTO="you@example.com" python -X utf8 scripts/snowball_search.py
+
+# 片方向のみ / 取得上限を明示
 python -X utf8 scripts/snowball_search.py --directions backward --limit-per-seed 100
 
 # 2ホップ目（著者が選んだ候補を再投入）
 python -X utf8 scripts/snowball_search.py --seeds-csv outputs/snowballing_hop2_seeds.csv
 ```
+
+> ⚠️ 出力は**追記モード**。同じ条件で再実行すると行が二重に増えるので、
+> やり直す場合は `outputs/snowballing_log.csv` を削除してから実行すること。
 
 ---
 
