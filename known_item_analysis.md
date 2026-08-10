@@ -1,6 +1,6 @@
 # Known-Item 脱落分析レポート
 
-> `scripts/known_item_test.py` による自動生成(2026-08-03)。
+> `scripts/known_item_test.py` による自動生成(2026-08-10)。
 > Known-Item 13 件。判定は全て決定論的(DOI/正規化タイトル一致)。
 > FUZZY 候補は手動確認が必要であり、recall には算入していない。
 

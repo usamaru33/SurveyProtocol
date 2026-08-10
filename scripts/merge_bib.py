@@ -43,7 +43,14 @@ from pathlib import Path
 _HERE = Path(__file__).resolve().parent
 ROOT = _HERE.parent
 
-ENTRY_START = re.compile(r"^@\w+\{", re.M)
+#
+# エントリの開始位置。DB によって区切り方が違うので両方を受ける:
+#   ACM DL   : エントリ間が改行で区切られる       → "\n@INPROCEEDINGS{"
+#   IEEE Xplore: 改行なしで直結される             → "...month={Oct},}@INPROCEEDINGS{"
+# 行頭アンカー(^)だけだと IEEE は1ファイル1件しか取れず、**警告なしに取りこぼす**。
+# 誤検出を防ぐため「直前の非空白文字が } であるか、行頭/文頭であること」を条件にする
+# (要旨中に "@article{" のような文字列があっても、その直前が } や改行でなければ拾わない)。
+ENTRY_START = re.compile(r"(?:(?<=\})|(?<=\n)|(?<=\A))[ \t\r\n]*@\w+\{")
 KEY_RE = re.compile(r"^@(\w+)\{([^,]+),")
 
 
@@ -54,7 +61,8 @@ def slice_num(p: Path) -> tuple:
 
 
 def split_entries(text: str) -> list[str]:
-    idx = [m.start() for m in ENTRY_START.finditer(text)]
+    # マッチ開始位置には先行する空白が含まれうるので、実際の '@' の位置に揃える
+    idx = [text.index("@", m.start()) for m in ENTRY_START.finditer(text)]
     return [text[s: idx[i + 1] if i + 1 < len(idx) else len(text)].rstrip() + "\n"
             for i, s in enumerate(idx)]
 
