@@ -4,8 +4,9 @@
 snowball_search.py — Semantic Scholar API によるスノーボーリング(引用探索)の自動化
 ================================================================================
 
-⚠️ 本スクリプトは **外部 API に通信する**。方針(既存の制約)により Claude は
-   実行しない。**著者が手元環境で実行する**こと。ここではコードと手順のみ整備する。
+⚠️ 本スクリプトは **外部 API に通信する**(Semantic Scholar / Crossref)。
+   既定では著者が手元環境で実行する。2026-08-06 に著者の明示的な指示により
+   初回実行を行った(実行記録は `docs/PROGRESS_LOG.md`)。
 
 【背景 / なぜ】
 `docs/snowballing_protocol.md` は前方・後方引用探索の手順を定義しているが、
@@ -40,7 +41,7 @@ Graph API を Python から叩き、シード論文の被引用・引用文献�
   outputs/snowballing_log.csv  — 累積ログ(実行のたびに追記、既存行は保持)。
   列は docs/snowballing_protocol.md §4 の推奨列に、venue_rank_note の自動付与を加えたもの:
   seed_id, seed_title, direction, found_title, found_doi, found_year, found_venue,
-  in_db_already, venue_rank_note, picos_decision(空欄・著者記入), reason(空欄・著者記入)
+  in_db_already, venue_rank_note, ref_source, picos_decision(空欄・著者記入), reason(空欄・著者記入)
 
 【注意】
 - Semantic Scholar API はDOIが無い論文も paperId で管理される。本スクリプトは
@@ -50,6 +51,19 @@ Graph API を Python から叩き、シード論文の被引用・引用文献�
   (取得方法は `enrich_abstracts.py` と同じ、developer登録は不要でメール登録のみで発行される)。
 - 既存コーパスとの重複判定は DOI 優先・無ければ正規化タイトルで行う(`known_item_test.py` と同一基準)。
   raw/*.ris(wave2の未取込データ)も簡易パースして重複判定に含める。
+
+【後方探索の制約(2026-08-06 実測)】
+- **S2 は出版社が参考文献を非開示にしている論文がある**("elided by the publisher")。
+  シード6件中 **4件**(ACM 3件・MIT Press 1件)がこれに該当し、`data: None` が返って
+  後方探索が丸ごと空になっていた。**Crossref の reference リストにフォールバック**して回避する。
+- Crossref にも無い場合(例: Eurographics の 10.2312 系は Crossref に未登録)は
+  `ref_source=取得不可` として警告する。その方向は手作業での補完が必要。
+
+【前方探索のページング(2026-08-06 修正)】
+- S2 は1リクエスト最大1,000件・`offset+limit ≤ 10,000` の制約がある。
+  旧実装は `limit=200` 固定でページングしておらず、**被引用の多い論文が黙って切り捨てられていた**
+  (実例: Kilteni et al. 2012 は被引用1,497件だが200件しか取れていなかった)。
+  現在は offset ページングで取り切り、API 上限に達した場合は `ref_source` に明示する。
 """
 
 from __future__ import annotations
@@ -71,6 +85,7 @@ from pipeline import load_core, load_sjr, normalize_venue  # noqa: E402
 load_dotenv()
 
 BASE_URL = "https://api.semanticscholar.org/graph/v1"
+CROSSREF_URL = "https://api.crossref.org/works"
 PAPER_FIELDS = "title,abstract,year,venue,externalIds"
 REF_CIT_FIELDS = f"title,year,venue,externalIds"
 MAX_HOPS_WARN = 2  # snowballing_protocol.md §2.3: 2ホップまで(超えたら警告のみ、強制はしない)
@@ -250,20 +265,80 @@ def resolve_paper_id(title: str, doi: str) -> tuple[str, dict] | tuple[None, Non
     return None, None
 
 
-def fetch_references(paper_id: str, limit: int = 200) -> list[dict]:
-    resp = polite_get(f"{BASE_URL}/paper/{paper_id}/references",
-                       params={"fields": REF_CIT_FIELDS, "limit": limit}, headers=_headers())
-    if resp is None or resp.status_code != 200:
-        return []
-    return [e.get("citedPaper", {}) for e in (resp.json().get("data") or [])]
+def _paged(endpoint: str, paper_id: str, item_key: str, limit_total: int) -> tuple[list[dict], bool]:
+    """citations / references を offset ページングで取り切る。戻り値: (レコード, 打ち切られたか)。
+
+    Semantic Scholar は1回のリクエストで最大1,000件、かつ offset+limit ≤ 10,000 の制約がある。
+    ページングしないと被引用の多い論文が黙って切り捨てられる(実例: Kilteni et al. 2012 は
+    被引用1,497件だが、旧実装の limit=200 では 200件しか取れていなかった)。
+    """
+    out: list[dict] = []
+    offset = 0
+    hard_cap = 10000
+    while True:
+        want = 1000 if limit_total <= 0 else min(1000, limit_total - len(out))
+        if want <= 0:
+            return out, True
+        if offset + want > hard_cap:
+            want = hard_cap - offset
+            if want <= 0:
+                return out, True
+        resp = polite_get(f"{BASE_URL}/paper/{paper_id}/{endpoint}",
+                          params={"fields": REF_CIT_FIELDS, "limit": want, "offset": offset},
+                          headers=_headers())
+        if resp is None or resp.status_code != 200:
+            return out, False
+        data = resp.json().get("data")
+        if data is None:          # publisher による非開示(references で発生する)
+            return out, False
+        out.extend(e.get(item_key, {}) for e in data)
+        if len(data) < want:
+            return out, False
+        offset += want
 
 
-def fetch_citations(paper_id: str, limit: int = 200) -> list[dict]:
-    resp = polite_get(f"{BASE_URL}/paper/{paper_id}/citations",
-                       params={"fields": REF_CIT_FIELDS, "limit": limit}, headers=_headers())
+def _crossref_references(doi: str) -> list[dict]:
+    """Crossref の reference リストを S2 と同じ形に整形して返す(後方探索の代替経路)。
+
+    ACM/MIT Press 等は S2 に参考文献を開示していない("elided by the publisher")ため、
+    後方探索が丸ごと空になる。Crossref には出版社が登録した参考文献が入っていることが多く、
+    そちらを代替として使う。
+    """
+    resp = polite_get(CROSSREF_URL + "/" + doi, params={"mailto": os.environ.get("ENRICH_MAILTO", "")})
     if resp is None or resp.status_code != 200:
         return []
-    return [e.get("citingPaper", {}) for e in (resp.json().get("data") or [])]
+    out = []
+    for ref in (resp.json().get("message", {}).get("reference") or []):
+        title = (ref.get("article-title") or ref.get("volume-title")
+                 or (ref.get("unstructured") or "")[:200])
+        rdoi = ref.get("DOI") or ""
+        if not title and not rdoi:
+            continue
+        out.append({
+            "title": title,
+            "year": ref.get("year") or "",
+            "venue": ref.get("journal-title") or "",
+            "externalIds": {"DOI": rdoi} if rdoi else {},
+        })
+    return out
+
+
+def fetch_references(paper_id: str, doi: str, limit: int = 0) -> tuple[list[dict], str]:
+    """後方探索。S2 が publisher 非開示なら Crossref にフォールバックする。"""
+    recs, _ = _paged("references", paper_id, "citedPaper", limit)
+    if recs:
+        return recs, "S2"
+    if doi:
+        cr = _crossref_references(doi)
+        if cr:
+            return cr, "Crossref"
+    return [], "取得不可"
+
+
+def fetch_citations(paper_id: str, limit: int = 0) -> tuple[list[dict], str]:
+    """前方探索。ページングで取り切る。"""
+    recs, capped = _paged("citations", paper_id, "citingPaper", limit)
+    return recs, ("S2(上限で打ち切り)" if capped else "S2")
 
 
 # ---------------------------------------------------------------------------
@@ -276,7 +351,8 @@ def main() -> None:
                     help="シードCSV(Title/DOI列)。省略時は venue_dropped_known_items.csv を既定使用")
     ap.add_argument("--directions", type=str, default="backward,forward",
                     help="backward(参考文献) / forward(被引用) / 両方はカンマ区切り(既定)")
-    ap.add_argument("--limit-per-seed", type=int, default=200)
+    ap.add_argument("--limit-per-seed", type=int, default=0,
+                    help="1シードあたりの取得上限(0=無制限。API側の offset 上限10,000まで)")
     args = ap.parse_args()
 
     directions = [d.strip() for d in args.directions.split(",") if d.strip()]
@@ -305,9 +381,14 @@ def main() -> None:
             continue
 
         for direction in directions:
-            found = fetch_references(paper_id, args.limit_per_seed) if direction == "backward" \
-                else fetch_citations(paper_id, args.limit_per_seed)
-            print(f"    {direction}: {len(found)} 件")
+            if direction == "backward":
+                found, src = fetch_references(paper_id, seed["doi"], args.limit_per_seed)
+            else:
+                found, src = fetch_citations(paper_id, args.limit_per_seed)
+            print(f"    {direction}: {len(found)} 件  (出典: {src})")
+            if src == "取得不可":
+                print("        [WARN] S2 は publisher 非開示、Crossref にも参考文献なし。"
+                      "この方向は手作業での補完が必要")
 
             for f in found:
                 f_title = f.get("title") or ""
@@ -338,6 +419,7 @@ def main() -> None:
                     "found_venue": venue,
                     "in_db_already": in_db,
                     "venue_rank_note": note,
+                    "ref_source": src,
                     "picos_decision": "",  # 著者記入
                     "reason": "",          # 著者記入
                 })
@@ -345,7 +427,7 @@ def main() -> None:
     out_path = ROOT / "outputs" / "snowballing_log.csv"
     is_new = not out_path.exists()
     fieldnames = ["seed_id", "seed_title", "direction", "found_title", "found_doi",
-                  "found_year", "found_venue", "in_db_already", "venue_rank_note",
+                  "found_year", "found_venue", "in_db_already", "venue_rank_note", "ref_source",
                   "picos_decision", "reason"]
     with out_path.open("a", encoding="utf-8-sig", newline="") as f:
         w = csv.DictWriter(f, fieldnames=fieldnames)

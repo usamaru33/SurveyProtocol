@@ -76,18 +76,97 @@
 
 ## 4. 記録と PRISMA 報告
 
-- 発見・採否を `outputs/snowballing_log.csv` に記録する(列の推奨):
-  `seed_# , direction(backward/forward), found_title, found_doi, in_db_already(Y/N),
-   picos_decision(include/exclude), venue_rank_note, reason`。
-- **PRISMA 2020 フロー図**:
-  - DB検索の統合(14,682 → …)とは**別カラム**("Identification of studies via other methods")。
-  - "Records identified via citation searching (n = X)" にスノーボーリング新規発見数、
-    "Studies included via other methods (n = Y)" に最終採用数を記す。
-  - Frontiers in VR の journal hand-search(`search_replication.md`)も同じ右カラム側だが、
-    "Websites/Organisations" 行として **citation searching とは別行**に分けて計上する。
-- 本文の検索戦略節に1段落: 「厳格な venue 品質フィルタ(CORE A\*/A + SJR Q1)により
-  学際/ワークショップ会場の主題関連文献が脱落しうるため、Known-Item Test で同定した脱落
-  (`outputs/venue_dropped_known_items.csv`)を起点にスノーボーリングを実施した」旨を明記する。
+### 4.1 PRISMA 2020 フロー図における位置づけ
+
+PRISMA 2020 の「データベース検索 + その他の情報源」版フロー図を用いる。
+スノーボーリングで得た文献は**右カラム(Identification of studies via other methods)**を通り、
+Phase 4 の適格性評価で左カラムと合流する。
+
+```mermaid
+flowchart TB
+    subgraph L["Identification of studies via databases"]
+        L1["Records identified from databases<br/>ACM 7,997 / IEEE 1,276+297 / Scopus 4,331<br/>n = 14,682<br/><i>第2波統合後に更新される</i>"]
+        L2["Duplicate records removed<br/>n = 2,139"]
+        L3["Records after de-duplication<br/>n = 12,543"]
+        L4["Records excluded by venue filter<br/>CORE A*/A + SJR Q1 に非該当<br/>n = 9,634"]
+        L5["Records after venue filter<br/>n = 2,909"]
+        L6["Records excluded by keyword rules<br/>Phase 3a・決定論的<br/>n = 1,082"]
+        L7["Records screened on title/abstract<br/>Phase 3b・評価者2名/件<br/>n = 1,827"]
+        L8["Reports assessed for eligibility<br/>Phase 4・全文<br/>n = TBD"]
+        L1 --> L2 --> L3 --> L4 --> L5 --> L6 --> L7 --> L8
+    end
+
+    subgraph R["Identification of studies via other methods"]
+        R1["Seed set<br/>Venueフィルタで脱落した known-item<br/>n = 6"]
+        R2["Records identified via citation searching<br/>backward 173 + forward 1,681<br/>ユニーク n = 1,801"]
+        R3["Records already identified in database search<br/>右カラムに二重計上しない<br/>n = 398"]
+        R4["New records via citation searching<br/>n = 1,403<br/>うち DOI 欠落 135 は手作業で同定"]
+        R5["Records screened on title/abstract<br/>Phase 3b と同一基準<br/>n = 1,403"]
+        R6["Reports assessed for eligibility<br/>Phase 4・全文<br/>n = TBD"]
+        R1 --> R2 --> R3 --> R4 --> R5 --> R6
+    end
+
+    L8 --> INC["Studies included in review<br/>n = TBD"]
+    R6 --> INC
+```
+
+### 4.2 各ステップの定義(右カラム)
+
+| 段階 | 定義 | 現在値 |
+|---|---|---|
+| Seed set | Known-Item Test で **Phase 2 の Venue フィルタにより脱落**した in-scope 文献 | 6 |
+| Records identified | シードの前方(被引用)・後方(参考文献)を1ホップ探索して得た文献。DOI優先・正規化タイトル代替で一意化 | 1,801 |
+| うち重複 | 既存コーパス(`raw/*.csv` + `step3_kw_included.csv`)に既出。**左カラムで同定済みなので右では数えない** | 398 |
+| New records | 右カラムの "Records identified via citation searching" として報告する数 | **1,403** |
+| Screened | Phase 3b と**同一の**適格性基準で Title/Abstract 判定 | 1,403 |
+| Assessed | 全文評価(Phase 4)。左カラムと同じ体制・同じ PICOS | TBD |
+
+### 4.3 ★重要な設計判断: 右カラムに Venue フィルタを適用しない
+
+**右カラムには Phase 2(CORE A*/A + SJR Q1)を適用しない。**
+
+理由: スノーボーリングの目的が「**Venue フィルタが落とした主題関連文献の回収**」である以上、
+回収したものに同じフィルタを掛け直せば同じ理由で再び落ちる。目的と手段が矛盾する。
+実際、シード #10(ICAT-EGVE)・#13(MIG)はいずれも低ランク会場で脱落した文献であり、
+Venue フィルタを適用すると自分自身すら通らない。
+
+参考値として、新規1,403件のうち Phase 2 基準を満たすのは **579件**、満たさないのが **824件**。
+**この824件こそが本来の回収対象**であり、ここを切ると右カラムを設ける意味が無くなる。
+
+`snowball_search.py` が付与する `venue_rank_note` は**参考情報であり採否には使わない**
+(スクリプト側でもフィルタしていない)。読む順序のトリアージにのみ用いてよい。
+
+> **本文への記載(必須)**: 「厳格な venue 品質フィルタ(CORE A*/A + SJR Q1)により
+> 学際・ワークショップ会場の主題関連文献が系統的に脱落することが Known-Item Test で判明したため
+> (13件中6件)、脱落文献を起点とする citation searching を補完的に実施した。
+> **citation searching で同定した文献には venue フィルタを適用していない**」ことを明記する。
+
+### 4.4 計上ルール
+
+- `in_db_already=Y` の398件は**右カラムに計上しない**(左カラムで既に同定済み)。
+- **DOI 欠落135件**は自動照合では既出判定ができない。手作業でタイトル照合し、
+  既出なら `in_db_already` を Y に修正してから計上する(**未実施**)。
+- 探索は **1ホップのみ実施済み**。2ホップ目を行う場合は
+  `--seeds-csv` で採用文献を再投入し、**ホップごとに件数を分けて記録**する。
+- Frontiers in VR の journal hand-search(`search_replication.md`)は同じ右カラムだが、
+  "Websites/Organisations" 行として **citation searching とは別行**に計上する。
+- **後方探索が取得できなかったシード #10**(S2 非開示・Crossref 未登録)は、
+  取得不能である旨を Limitations に記載する。手作業補完を行った場合はその旨も記録する。
+
+### 4.5 出力ファイルの列
+
+`outputs/snowballing_log.csv`
+
+| 列 | 内容 |
+|---|---|
+| `seed_id` / `seed_title` | シード文献 |
+| `direction` | `backward`(参考文献) / `forward`(被引用) |
+| `found_title` / `found_doi` / `found_year` / `found_venue` | 発見された文献 |
+| `in_db_already` | `Y`=既存コーパスに既出(右カラムに計上しない) / `N`=新規 |
+| `venue_rank_note` | CORE/SJR 照合結果。**参考情報。採否には使わない** |
+| `ref_source` | `S2` / `Crossref` / `取得不可`。後方探索の取得経路(PRISMA-S 用) |
+| `picos_decision` | **空欄** ← 著者が include/exclude を記入 |
+| `reason` | **空欄** ← 著者が理由を記入 |
 
 ## 5. 完了チェックリスト
 
