@@ -1,6 +1,10 @@
 ## 1. 概要
 
-本研究では、VR・HCI分野における主要な文献データベースである ACM Digital Library および IEEE Xplore, 心理・医学分野における主要な文献データベースである PubMed, Scopus から抽出された合計 ○○件 の文献候補に対し、多段階のスクリーニング及び分類を実施し、その後結果から多角的な視点で考察を行う。
+本研究では、VR・HCI分野における主要な文献データベースである ACM Digital Library および IEEE Xplore、学際的カバレッジと心理・認知科学分野の捕捉を担う Scopus の**計3データベース**から抽出された合計 **26,434件**（第1波13,901件 + 第2波12,533件、DB間重複を含む）の文献候補に対し、多段階のスクリーニング及び分類を実施し、その後結果から多角的な視点で考察を行う。
+
+> **注（数値の確定状況）:** 上記は `ResearchVR4.csv`（2026-08-10 生成）の件数。Phase 1 以降の
+> 各段の件数は、Venue 正規化改修後の**公式再実行で確定**する（現行の `step*.csv` は
+> 2026-07-17 実行の第1波データにもとづく凍結値）。
 
 ## 2. 本調査の目的とRQ
 
@@ -35,13 +39,30 @@
 
 情報の網羅性とHCI分野・心理・認知科学分野における権威性を担保するため、以下の主要学術データベースを対象とする。
 
-- **ACM Digital Library**
-- **IEEE Xplore**
-- **PubMed**
-- **Scopus**
-- **PsycInfo** (PubMedでの検索が不十分な場合の補完として導入)
+- **ACM Digital Library** — HCI・VR研究の中核会場
+- **IEEE Xplore** — HCI・VR研究の中核会場
+- **Scopus** — 学際的カバレッジ。心理系文献の実質的な捕捉源
 
-検索クエリは、「没入環境」「身体表象」「知覚評価」の3つのコンセプトをAND条件で結合し、TitleおよびAbstractを対象に実行する。
+> **不使用としたDB（Rev.8 で確定、2026-07-22）:**
+> - ~~**PubMed**~~ — 医学・治療目的の文献が中心で本サーベイのスコープ外。主題適合性が低く
+>   選定基準を満たさない。初回検索は実施済み（781件、`raw/PubMed.csv` に経緯として保存）だが
+>   **PRISMA の "records identified" には含めない**。
+> - ~~**PsycInfo**~~ — アクセス制約により利用不可（Rev.5 で未実行が確定）。心理系文献の捕捉は
+>   Scopus に依拠し、その妥当性は Known-Item Test で実証済み。残余リスクはスノーボーリングで緩和する。
+>
+> 正当化の全文は `docs/methodology_decision_Rev7.md` §Rev.8追記（Threats to Validity へ転用可）。
+
+検索クエリは、「没入環境」「身体表象」「知覚評価」の3つのコンセプトをAND条件で結合し、
+**Title および Abstract（TA scope）**を対象に実行する。
+
+> **scope の確定（Rev.10/Rev.11、2026-08-10〜11）:** 実効 scope は **TA（Title-Abstract）**で最終確定し、
+> Keyword を含む TAK への格上げは行わない。TAK は Scopus 実測で +87%（2,533→4,727件）となり
+> 人手2名/件の Phase 3b の工数をほぼ倍にする一方、Known-Item Test では TA と全体で
+> recall が同値（いずれも 8/12 = 66.7%）であり、**recall 上のコストが実測でゼロ**だったため。
+>
+> **ただし第1波は scope が異なる:** 第1波 Scopus は `TITLE-ABS-KEY`、第1波 IEEE は
+> より広いフィールド指定（All Metadata 等と推定）で実行されていたことが実測で判明している
+> （Rev.11）。この非均質性は Threats to Validity に明記する。
 
 > **Unified Search Query（現行・Rev.6, 2026-07-17 著者確定。再検索は実施待ち）:**
 `("Virtual Reality" OR "VR" OR "HMD" OR "head-mounted display" OR "head mounted display"

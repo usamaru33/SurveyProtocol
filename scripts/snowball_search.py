@@ -268,6 +268,27 @@ def load_default_seeds() -> list[dict]:
                 continue
             doi = extract_doi_from_field(ref_row.get("DOI_or_URL", ""))
             seeds.append({"id": seed_id, "title": ref_row.get("Title", "").strip(), "doi": doi})
+
+    # 定義シードの追加(Rev.11)。
+    # #3 Kilteni 2012 は Rev.11 で background に移したため venue_dropped_known_items.csv
+    # (in-scope のみ)から外れるが、**後方探索は失ってはいけない**。実測で、その参考文献は
+    # Botvinick&Cohen 1998 / Lenggenhager 2007 / Slater 2010 / Petkova&Ehrsson 2008 の
+    # 心理接合点の古典すべてに到達しており、snowballing_protocol.md §1(3) が
+    # 「background 文献への到達目標」として求めている点検そのものを担っている。
+    # 前方探索は DEFINITIONAL_SEEDS により別途スキップされる(§1.3)。
+    have = {s["id"] for s in seeds}
+    for seed_id in DEFINITIONAL_SEEDS:
+        if seed_id in have:
+            continue
+        ref_row = refs_by_id.get(seed_id)
+        if not ref_row:
+            print(f"[WARN] 定義シード #{seed_id} が self_scale_references.csv に見つかりません")
+            continue
+        seeds.append({"id": seed_id,
+                      "title": ref_row.get("Title", "").strip(),
+                      "doi": extract_doi_from_field(ref_row.get("DOI_or_URL", ""))})
+        print(f"[INFO] 定義シード #{seed_id} を後方探索専用シードとして追加"
+              f"(background だが §1(3) の到達点検に必要)")
     return seeds
 
 

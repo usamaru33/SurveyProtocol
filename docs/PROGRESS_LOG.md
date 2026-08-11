@@ -37,13 +37,13 @@
 
 ## 完了していること
 
-### 1. プロトコル（Rev.9 まで確定）
+### 1. プロトコル（Rev.11 まで確定）
 - **DB構成: 3DB（ACM DL / IEEE Xplore / Scopus）**。PubMed は Rev.8 で不使用に確定、PsycINFO はアクセス制約で不使用。
 - **判定に AI/LLM は不使用**（Rev.2）。Phase 3a は決定論的キーワード除外、Phase 3b/4 は人手。
 - **Venue 基準: CORE A*/A のみ + SJR Q1 のみ**（Rev.4）。Q2脱落826件は Threats で報告。
-- **検索 scope: TA（Title-Abstract）**（Rev.7/8）。
+- **検索 scope: TA（Title-Abstract）**（Rev.10 で最終確定）。第1波のみ scope が異なる（Scopus=TAK / IEEE=広域、Rev.11）。
 - **評価者3名のペア分担 + ペアワイズ Cohen's κ の平均**（Rev.9）。
-- 変更履歴は `docs/protocol_changelog.md`。**`rule.md` 本文は Rev.9 分のみ反映済みで、Rev.8 分は未反映。**
+- 変更履歴は `docs/protocol_changelog.md`。**`rule.md` 本文は Rev.11 までを反映済み（2026-08-11）。**
 
 ### 2. 検索データ
 
@@ -55,10 +55,11 @@
 | 第1波 | ~~PubMed~~ | 781（Rev.8 で不使用） | `raw/PubMed.csv` |
 | **第2波** | **Scopus** | **2,542** | `raw/scopus_wave2_20260730.csv` |
 | **第2波** | **ACM DL** | **9,630** | `raw/acm_wave2_20260803.csv` |
-| 第2波 | IEEE Xplore | 379（**未取得**） | — |
+| **第2波** | **IEEE Xplore** | **361** | `raw/ieee_wave2_20260810.csv` |
 
 - 第2波は Rev.6 の G1拡張クエリ。ACM は **title検索 6,013 + abstract検索 8,331 の和集合**（`docs/search_strings.md` にスライス内訳）。
-- Zotero 往復の無損失を2例で実測（Scopus 2,542 / ACM 9,630 とも完全一致）。
+- Zotero 往復の無損失を3例で実測（Scopus 2,542 / ACM 9,630 / IEEE 361 とも一致）。
+- **統合生データ `ResearchVR4.csv` = 26,434件**（`scripts/merge_raw.py`、Source_DB 列つき、PubMed 除外）。
 
 ### 3. スクリーニング Phase 1〜3（**第1波データでの結果。凍結中**）
 
@@ -73,8 +74,8 @@
   第2波統合後に正規化改修とあわせて公式再実行する方針。
 
 ### 4. 検証基盤
-- **Known-Item Test**（`scripts/known_item_test.py`）: gold set = `self_scale_references.csv`（in-scope 13件）。
-  現在 step0 **69.23%**（目標 ≥80%）→ step2 23.08%。脱落分析は `known_item_analysis.md` に自動生成。
+- **Known-Item Test**（`scripts/known_item_test.py`）: gold set = `self_scale_references.csv`（in-scope 12件）。
+  現在 step0 **66.67%**（8/12、目標 ≥80%）→ step2 25.00%（Rev.11 で #3 を background に移し分母12）。脱落分析は `known_item_analysis.md` に自動生成。
 - **エクスポート完全性の監査**（`scripts/export_completeness_audit.py`）: 打ち切り検出・重複・
   期待件数との突き合わせ・gold set 照合（HIT/SUSPECT/MISS）。ACM の1,000件打ち切りを検出した実績あり。
 - **統合生データの生成**（`scripts/merge_raw.py`）: `Source_DB` 列を付与。PubMed は既定で除外。
@@ -85,7 +86,7 @@
 ### 5. API 検索の自動化
 - `scripts/db_search_scopus.py`（**稼働中**）/ `scripts/db_search_ieee.py`（403 で停止中）/
   `scripts/api_search_common.py`（クエリ生成・polite_get・RIS出力・.env読み込み）。
-- `scripts/snowball_search.py`（S2 引用探索、**未実行**）、`scripts/enrich_abstracts.py`（Abstract補完、少数件試験のみ）。
+- `scripts/snowball_search.py`（S2 引用探索、**1ホップ実行済み** 1,854行/新規1,433件。列追加のため要再実行）、`scripts/enrich_abstracts.py`（Abstract補完、少数件試験のみ）。
 
 ### 6. 関連ツール `../docs-system`（Next.js、別リポジトリ相当）
 - Semantic Scholar 検索 → 引用ネットワーク可視化（D3）→ Supabase + R2。**サーベイ本体とは未接続。**

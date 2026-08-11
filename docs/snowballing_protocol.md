@@ -2,7 +2,7 @@
 
 > PRISMA 2020「Identification of studies via **other methods**」(フロー図右カラム、
 > "Citation searching" の行)に計上する補完検索の手順。
-> **なぜ必要か:** `methodology_decision_Rev7.md` の最重要発見 — Known-Item 13件中 **6件が
+> **なぜ必要か:** `methodology_decision_Rev7.md` の最重要発見 — Known-Item(in-scope)12件中 **5件が
 > Venue ホワイトリスト(CORE A\*/A + SJR Q1)で step2 脱落**(`outputs/venue_dropped_known_items.csv`)。
 > これは検索式や DB 構成の問題ではなく、厳格な venue 品質フィルタによる学際/ワークショップ会場の
 > 取りこぼしである。この構造的な漏れをスノーボーリングで回収し、透明に報告する。
@@ -25,17 +25,17 @@
 
 | | (A) 既知文献の回収 | (B) 未知文献の発見 |
 |---|---|---|
-| 対象 | step2 で脱落した Known-Item 6件 | まだ誰も気づいていない主題適合文献 |
+| 対象 | step2 で脱落した Known-Item **5件** | まだ誰も気づいていない主題適合文献 |
 | 手段 | **DOI による直接回収**(下記 §1.1) | citation searching(前方・後方探索) |
 | 探索コスト | **ゼロ**(DOI は既知) | 新規候補 1,433件の人手判定 |
 | 判断 | `drop_category` 別の決定論的ルーティング | PICOS による個別判定 |
 
-**要点: 6件は「既知」なのだから、引用探索で釣り上げる対象ではない。**
+**要点: 5件は「既知」なのだから、引用探索で釣り上げる対象ではない。**
 DOI が分かっている文献を1,433件の候補を読んで回収するのは手段と目的が逆立ちしている。
 citation searching が本来担うのは (B) — venue フィルタが落とした**未知の**文献の発見であり、
-6件はその探索の**シード**であって回収**対象**ではない。
+5件はその探索の**シード**であって回収**対象**ではない。
 
-### 1.1 (A) 既知6件の回収 — 決定論的ルーティング
+### 1.1 (A) 既知5件の回収 — 決定論的ルーティング
 
 `outputs/venue_dropped_known_items.csv` の `drop_category` に従い、各件を以下に振り分ける。
 citation searching は使わない。判断と理由は PROGRESS_LOG.md に記録する。
@@ -43,7 +43,7 @@ citation searching は使わない。判断と理由は PROGRESS_LOG.md に記�
 | drop_category | 該当 | 処理 |
 |---|---|---|
 | `unmatched` | #7 Augmented Human / #8 APGV-SAP / #13 MIG | `venue_aliases.csv`・正規化改修(`normalization_design.md`)で救済を試す。A\*/A・Q1 に照合されれば **step2 に復帰**(左カラム。右カラムには計上しない) |
-| `below_rank` | #3 Presence(CORE C) / #10 ICAT-EGVE(CORE C) | 会場はリストにあるがランク不足。品質基準を貫くなら除外維持。seminal な場合のみ**限定的復帰**を Threats に明記のうえ許容 |
+| `below_rank` | #10 ICAT-EGVE(CORE C) | 会場はリストにあるがランク不足。品質基準を貫くなら除外維持。seminal な場合のみ**限定的復帰**を Threats に明記のうえ許容 |
 | `criterion` | #14 Cognitive Processing(SJR Q2) | 基準どおりの除外。**復帰させない**。Threats で「Q1限定により失われた主題関連文献」として報告 |
 
 > **左カラム / 右カラムの別に注意:** `unmatched` の救済は「検索では捕捉できていた文献の
@@ -57,8 +57,9 @@ citation searching は使わない。判断と理由は PROGRESS_LOG.md に記�
 以下は **(B) 未知文献の発見** のためのシード選定である。
 スノーボーリングの起点(seed set)は**恣意的に広げない**。以下に限定する:
 
-1. **step2 で脱落した Known-Item 6件**(`outputs/venue_dropped_known_items.csv`)。
-   これらは著者が「必ず含まれるべき」と事前判断した文献であり、回収の第一優先。
+1. **step2 で脱落した Known-Item 5件**(`outputs/venue_dropped_known_items.csv`)。
+   これらは (A) で直接回収する対象そのものではなく、**同種の未知文献を掘り当てるための起点**として使う
+   (回収と発見の区別は §0)。
 2. **最終候補(step3_kw_included.csv)に生存した高中心性の文献**のうち、著者が
    レビューの柱(Intro/RW/Taxonomy の引用予定)に据えるもの。数を絞る(例: 10〜20件)。
 3. Known-Item のうち **background(#19 Botvinick&Cohen 1998, #20 Lenggenhager 2007 等)**は、
@@ -163,14 +164,14 @@ S2 の `/paper/DOI:` で解決してから記録する(`resolve_missing_metadata
   検索経路が違うだけで、包含基準は緩めない。
 - **Venue ランク(CORE/SJR)基準の適用について**は、脱落カテゴリ別に扱う
   (`outputs/venue_dropped_known_items.csv` の `drop_category`)。
-  **既知6件そのものの処理は §1.1 に集約した**(以下は同じ規則の詳述):
+  **既知5件そのものの処理は §1.1 に集約した**(以下は同じ規則の詳述):
   - `criterion`(例 #14 Gulliver, SJR Q2): 品質基準どおりの除外。**原則として本編には復帰させず**、
     Threats to Validity で「Q1限定により失われた主題関連文献」として報告する。
   - `unmatched`(例 #7/#8/#13, リスト未照合): まず `venue_aliases.csv`・正規化での救済を試す
     (`normalization_design.md`)。救済で A\*/A・Q1 に照合されれば step2 に復帰。
     真にランキング未収載(ワークショップ等)なら、スノーボーリングでの回収+個別判断。
-  - `below_rank`(例 #3 Presence=CORE C, #10 ICAT-EGVE=CORE C): 会場はリストにあるがランク不足。
-    品質基準を貫くなら除外維持。ただし当該文献が seminal(#3 Kilteni 2012 は用語定義の典拠)な場合は、
+  - `below_rank`(例 #10 ICAT-EGVE=CORE C): 会場はリストにあるがランク不足。
+    品質基準を貫くなら除外維持。ただし当該文献が seminal な場合は、
     **「Known-Item として著者が必須と判断した文献の限定的復帰」**を Threats に明記のうえ許容してよい。
     判断と理由を PROGRESS_LOG.md に必ず記録する。
 
@@ -185,7 +186,7 @@ Phase 4 の適格性評価で左カラムと合流する。
 ```mermaid
 flowchart TB
     subgraph L["Identification of studies via databases"]
-        L1["Records identified from databases<br/>ACM 7,997 / IEEE 1,276+297 / Scopus 4,331<br/>n = 14,682<br/><i>第2波統合後に更新される</i>"]
+        L1["Records identified from databases<br/>第1波 ACM 7,997 / IEEE 1,276+297 / Scopus 4,331<br/>第2波 ACM 9,630 / IEEE 361 / Scopus 2,542<br/>n = 26,434 (ResearchVR4.csv)<br/><i>Phase1以降は公式再実行待ちのため旧値</i>"]
         L2["Duplicate records removed<br/>n = 2,139"]
         L3["Records after de-duplication<br/>n = 12,543"]
         L4["Records excluded by venue filter<br/>CORE A*/A + SJR Q1 に非該当<br/>n = 9,634"]
@@ -197,7 +198,7 @@ flowchart TB
     end
 
     subgraph R["Identification of studies via other methods"]
-        R1["Seed set<br/>Venueフィルタで脱落した known-item<br/>n = 6"]
+        R1["Seed set<br/>Venueフィルタで脱落した known-item 5<br/>+ 定義シード #3(後方のみ)<br/>n = 5 + 1"]
         R2["Records identified via citation searching<br/>backward 173 + forward 1,681<br/>ユニーク n = 1,854"]
         R3["Records already identified in database search<br/>右カラムに二重計上しない<br/>n = 421"]
         R4["New records via citation searching<br/>n = 1,433<br/>うち DOI 欠落 139 は手作業で同定"]
@@ -214,7 +215,7 @@ flowchart TB
 
 | 段階 | 定義 | 現在値 |
 |---|---|---|
-| Seed set | Known-Item Test で **Phase 2 の Venue フィルタにより脱落**した in-scope 文献 | 6 |
+| Seed set | Known-Item Test で **Phase 2 の Venue フィルタにより脱落**した in-scope 文献(5)+ 定義シード #3(後方専用、§1.3) | 5 + 1 |
 | Records identified | シードの前方(被引用)・後方(参考文献)を1ホップ探索して得た文献。DOI優先・正規化タイトル代替で一意化 | 1,854 |
 | うち重複 | 既存コーパス(`raw/*.csv` + `step3_kw_included.csv`)に既出。**左カラムで同定済みなので右では数えない** | 421 |
 | New records | 右カラムの "Records identified via citation searching" として報告する数 | **1,433** |
@@ -238,7 +239,7 @@ Venue フィルタを適用すると自分自身すら通らない。
 
 > **本文への記載(必須)**: 「厳格な venue 品質フィルタ(CORE A*/A + SJR Q1)により
 > 学際・ワークショップ会場の主題関連文献が系統的に脱落することが Known-Item Test で判明したため
-> (13件中6件)、脱落文献を起点とする citation searching を補完的に実施した。
+> (in-scope 12件中5件)、脱落文献を起点とする citation searching を補完的に実施した。
 > **citation searching で同定した文献には venue フィルタを適用していない**」ことを明記する。
 
 ### 4.4 計上ルール
