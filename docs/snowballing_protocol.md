@@ -18,8 +18,43 @@
 
 ---
 
+## 0. 2つの目的を分離する(2026-08-10 改訂)
+
+本手続きは長らく「Venue フィルタで脱落した Known-Item **6件の回収**」と説明してきたが、
+実際には性質の違う2つの作業が混ざっており、それが工数の大半を無駄にしていた。以下のとおり分離する。
+
+| | (A) 既知文献の回収 | (B) 未知文献の発見 |
+|---|---|---|
+| 対象 | step2 で脱落した Known-Item 6件 | まだ誰も気づいていない主題適合文献 |
+| 手段 | **DOI による直接回収**(下記 §1.1) | citation searching(前方・後方探索) |
+| 探索コスト | **ゼロ**(DOI は既知) | 新規候補 1,433件の人手判定 |
+| 判断 | `drop_category` 別の決定論的ルーティング | PICOS による個別判定 |
+
+**要点: 6件は「既知」なのだから、引用探索で釣り上げる対象ではない。**
+DOI が分かっている文献を1,433件の候補を読んで回収するのは手段と目的が逆立ちしている。
+citation searching が本来担うのは (B) — venue フィルタが落とした**未知の**文献の発見であり、
+6件はその探索の**シード**であって回収**対象**ではない。
+
+### 1.1 (A) 既知6件の回収 — 決定論的ルーティング
+
+`outputs/venue_dropped_known_items.csv` の `drop_category` に従い、各件を以下に振り分ける。
+citation searching は使わない。判断と理由は PROGRESS_LOG.md に記録する。
+
+| drop_category | 該当 | 処理 |
+|---|---|---|
+| `unmatched` | #7 Augmented Human / #8 APGV-SAP / #13 MIG | `venue_aliases.csv`・正規化改修(`normalization_design.md`)で救済を試す。A\*/A・Q1 に照合されれば **step2 に復帰**(左カラム。右カラムには計上しない) |
+| `below_rank` | #3 Presence(CORE C) / #10 ICAT-EGVE(CORE C) | 会場はリストにあるがランク不足。品質基準を貫くなら除外維持。seminal な場合のみ**限定的復帰**を Threats に明記のうえ許容 |
+| `criterion` | #14 Cognitive Processing(SJR Q2) | 基準どおりの除外。**復帰させない**。Threats で「Q1限定により失われた主題関連文献」として報告 |
+
+> **左カラム / 右カラムの別に注意:** `unmatched` の救済は「検索では捕捉できていた文献の
+> 照合ミスの修正」なので **左カラム(database searching)の話**であり、
+> "Identification via other methods" に計上してはならない。
+
+---
+
 ## 1. 対象(シード)の選び方
 
+以下は **(B) 未知文献の発見** のためのシード選定である。
 スノーボーリングの起点(seed set)は**恣意的に広げない**。以下に限定する:
 
 1. **step2 で脱落した Known-Item 6件**(`outputs/venue_dropped_known_items.csv`)。
@@ -36,6 +71,70 @@
 > **区別の明記:** シード自体(step3 生存分)は既にDB検索で捕捉済みなので二重計上しない。
 > スノーボーリングで**新たに**発見され、かつDB検索の統合データに不在の文献のみを
 > "other methods" に計上する。
+
+### 1.2 シードの性質による扱いの差(2026-08-10 実測にもとづく)
+
+1ホップ実行(2026-08-10、`outputs/snowballing_log.csv` 1,854行 / 新規1,433件)を
+シード別に集計すると、**主題シードと定義シードで効率が2桁違う**ことが分かった。
+「G3語(size/scale/height/distance)を含む率」は主題適合性の決定論的な代理指標である。
+
+| シード | 性格 | 新規候補 | G3語を含む率 |
+|---|---|---|---|
+| #10 Dwarf or Giant | 主題(眼高・IPD) | 22 | **59.1%** |
+| #8 eye height and avatars | 主題(眼高) | 77 | **42.9%** |
+| #13 Scaling Player Size | 主題(スケーリング) | 8 | 37.5% |
+| #7 Distortion in Perceived Size | 主題(サイズ知覚) | 34 | 29.4% |
+| #14 Gulliver's virtual travels | 主題(極端身体サイズ) | 44 | 18.2% |
+| **#3 The Sense of Embodiment in VR** | **用語定義** | **1,248** | **0.9%** |
+
+**#3 だけで新規候補の 87% を占め、しかも主題密度は他シードの 1/30 〜 1/60 である。**
+理由は明白で、#3(Kilteni et al. 2012)は身体化研究全体の用語定義の典拠として
+被引用1,500件超を持つ論文であり、その前方探索は「自己スケール文献」ではなく
+「身体化文献すべて」を引いてくる。
+
+**#3 由来1,188件(前方・新規)を目視した結果:** G3語を含む11件のうち、実際に主題適合なのは
+**2件のみ**(`Perception and Embodiment for Motion-Scaled Virtual Hands`、
+`Effects of Viewpoint Height & Fluctuation on Walking Perception`)。残る9件は誤爆で、
+内訳は `embodiment scale`=**質問紙の尺度**、`Large-scale`/`Scalable`=**システム規模**、
+`aesthetic distance`=**比喩的な距離**、`heightism`=身長の社会学(VRですらない)。
+**1,188件を読んで2件**という効率である。
+
+### 1.3 決定(2026-08-11 著者確定): #3 は後方探索のみ
+
+**#3 を前方探索のシードから外す。後方探索は残す。**
+
+対して **#3 の後方探索(参考文献65件)は高価値**であることが実測で確認された。
+本プロトコルが §1(3) で「後方探索の到達目標」としていた心理接合点の古典に、すべて到達している:
+
+| 到達 | 文献 |
+|---|---|
+| ✅ | Botvinick & Cohen 1998(ラバーハンド錯覚) |
+| ✅ | Lenggenhager et al. 2007(Video ergo sum) |
+| ✅ | Slater et al. 2010(body transfer) |
+| ✅ | Petkova & Ehrsson 2008(body swap) |
+
+定義論文は「何を土台にしたか」を辿る方向でのみ機能する。前方は身体化研究全体を引いてくるだけである。
+
+**実装:** `snowball_search.py` の `DEFINITIONAL_SEEDS = ("3",)`。
+`--no-forward-seeds` で上書き可能(空文字を渡せば従来どおり全シードで前方探索する)。
+
+**方針まとめ:**
+- **主題シード5件(#7/#8/#10/#13/#14)は前方・後方とも全件を読む。** 計185件、密度18〜59%。
+- **#3 は後方のみ**(65件)。
+- 人手判定の対象は **1,433件 → 約245件**に圧縮される。
+- **PRISMA-S に逸脱として明記する**: 「シード1件(定義典拠論文)については前方探索を実施していない。
+  理由は被引用が主題非依存であり、実測で1,188件中の主題適合が2件であったため」。
+
+### 1.4 後方探索のメタデータ補完(必須)
+
+後方探索は Crossref フォールバック経由だと **DOI しか返らない項目が多い**。実測(2026-08-10)では
+後方173件のうち **93件(54%)がタイトル欠落**、要旨は全件欠落だった(前方は S2 由来で欠落0件)。
+**この状態では Title/Abstract を読む Phase 3b にかけられない。**
+
+`snowball_search.py` は後方探索の結果に対し、DOI を持つが Title/Abstract を欠くレコードを
+S2 の `/paper/DOI:` で解決してから記録する(`resolve_missing_metadata()`)。
+**DOI が無いレコードは解決しない**(タイトル照合による同定は誤同定の危険があるため)。
+解決できなかった件数は §4.4 の「DOI 欠落は手作業で同定」の対象として残る。
 
 ## 2. 手続き
 
@@ -63,7 +162,8 @@
 - スノーボーリングで得た候補も、**本編と同じ PICOS / Phase 3b の人手基準**で採否を判定する。
   検索経路が違うだけで、包含基準は緩めない。
 - **Venue ランク(CORE/SJR)基準の適用について**は、脱落カテゴリ別に扱う
-  (`outputs/venue_dropped_known_items.csv` の `drop_category`):
+  (`outputs/venue_dropped_known_items.csv` の `drop_category`)。
+  **既知6件そのものの処理は §1.1 に集約した**(以下は同じ規則の詳述):
   - `criterion`(例 #14 Gulliver, SJR Q2): 品質基準どおりの除外。**原則として本編には復帰させず**、
     Threats to Validity で「Q1限定により失われた主題関連文献」として報告する。
   - `unmatched`(例 #7/#8/#13, リスト未照合): まず `venue_aliases.csv`・正規化での救済を試す
@@ -98,10 +198,10 @@ flowchart TB
 
     subgraph R["Identification of studies via other methods"]
         R1["Seed set<br/>Venueフィルタで脱落した known-item<br/>n = 6"]
-        R2["Records identified via citation searching<br/>backward 173 + forward 1,681<br/>ユニーク n = 1,801"]
-        R3["Records already identified in database search<br/>右カラムに二重計上しない<br/>n = 398"]
-        R4["New records via citation searching<br/>n = 1,403<br/>うち DOI 欠落 135 は手作業で同定"]
-        R5["Records screened on title/abstract<br/>Phase 3b と同一基準<br/>n = 1,403"]
+        R2["Records identified via citation searching<br/>backward 173 + forward 1,681<br/>ユニーク n = 1,854"]
+        R3["Records already identified in database search<br/>右カラムに二重計上しない<br/>n = 421"]
+        R4["New records via citation searching<br/>n = 1,433<br/>うち DOI 欠落 139 は手作業で同定"]
+        R5["Records screened on title/abstract<br/>Phase 3b と同一基準<br/>n = 1,433"]
         R6["Reports assessed for eligibility<br/>Phase 4・全文<br/>n = TBD"]
         R1 --> R2 --> R3 --> R4 --> R5 --> R6
     end
@@ -115,10 +215,10 @@ flowchart TB
 | 段階 | 定義 | 現在値 |
 |---|---|---|
 | Seed set | Known-Item Test で **Phase 2 の Venue フィルタにより脱落**した in-scope 文献 | 6 |
-| Records identified | シードの前方(被引用)・後方(参考文献)を1ホップ探索して得た文献。DOI優先・正規化タイトル代替で一意化 | 1,801 |
-| うち重複 | 既存コーパス(`raw/*.csv` + `step3_kw_included.csv`)に既出。**左カラムで同定済みなので右では数えない** | 398 |
-| New records | 右カラムの "Records identified via citation searching" として報告する数 | **1,403** |
-| Screened | Phase 3b と**同一の**適格性基準で Title/Abstract 判定 | 1,403 |
+| Records identified | シードの前方(被引用)・後方(参考文献)を1ホップ探索して得た文献。DOI優先・正規化タイトル代替で一意化 | 1,854 |
+| うち重複 | 既存コーパス(`raw/*.csv` + `step3_kw_included.csv`)に既出。**左カラムで同定済みなので右では数えない** | 421 |
+| New records | 右カラムの "Records identified via citation searching" として報告する数 | **1,433** |
+| Screened | Phase 3b と**同一の**適格性基準で Title/Abstract 判定 | 1,433 |
 | Assessed | 全文評価(Phase 4)。左カラムと同じ体制・同じ PICOS | TBD |
 
 ### 4.3 ★重要な設計判断: 右カラムに Venue フィルタを適用しない
@@ -130,7 +230,7 @@ flowchart TB
 実際、シード #10(ICAT-EGVE)・#13(MIG)はいずれも低ランク会場で脱落した文献であり、
 Venue フィルタを適用すると自分自身すら通らない。
 
-参考値として、新規1,403件のうち Phase 2 基準を満たすのは **579件**、満たさないのが **824件**。
+参考値として、新規1,433件のうち Phase 2 基準を満たすのは **579件**、満たさないのが **824件**。
 **この824件こそが本来の回収対象**であり、ここを切ると右カラムを設ける意味が無くなる。
 
 `snowball_search.py` が付与する `venue_rank_note` は**参考情報であり採否には使わない**
@@ -144,7 +244,7 @@ Venue フィルタを適用すると自分自身すら通らない。
 ### 4.4 計上ルール
 
 - `in_db_already=Y` の398件は**右カラムに計上しない**(左カラムで既に同定済み)。
-- **DOI 欠落135件**は自動照合では既出判定ができない。手作業でタイトル照合し、
+- **DOI 欠落139件**は自動照合では既出判定ができない。手作業でタイトル照合し、
   既出なら `in_db_already` を Y に修正してから計上する(**未実施**)。
 - 探索は **1ホップのみ実施済み**。2ホップ目を行う場合は
   `--seeds-csv` で採用文献を再投入し、**ホップごとに件数を分けて記録**する。
@@ -162,11 +262,33 @@ Venue フィルタを適用すると自分自身すら通らない。
 | `seed_id` / `seed_title` | シード文献 |
 | `direction` | `backward`(参考文献) / `forward`(被引用) |
 | `found_title` / `found_doi` / `found_year` / `found_venue` | 発見された文献 |
+| `found_abstract` | 要旨(**2026-08-10 追加**)。Phase 3b は Title/Abstract を読む手続きなので、これが無いとログ単体でスクリーニングできない |
 | `in_db_already` | `Y`=既存コーパスに既出(右カラムに計上しない) / `N`=新規 |
 | `venue_rank_note` | CORE/SJR 照合結果。**参考情報。採否には使わない** |
 | `ref_source` | `S2` / `Crossref` / `取得不可`。後方探索の取得経路(PRISMA-S 用) |
+| `kw_g1` / `kw_g2` / `kw_g3` / `kw_groups` | Title+Abstract に対する概念群の命中(**2026-08-10 追加**)。§4.6 の**読む順序専用** |
 | `picos_decision` | **空欄** ← 著者が include/exclude を記入 |
 | `reason` | **空欄** ← 著者が理由を記入 |
+
+> **旧ログとの非互換:** 2026-08-10 に5列を追加したため、旧12列の
+> `outputs/snowballing_log.csv` には追記できない(スクリプトが列構成を照合して中断する)。
+> 再実行前に旧ログを `outputs/snowballing_log_pre20260810.csv` に退避すること。
+
+### 4.6 読む順序のトリアージ(概念群スコア)
+
+`kw_groups` は Title+Abstract に Rev.6 統合クエリの3概念群がいくつ成立したかを表す
+(決定論的・LLM 不使用)。**降順に読む**ことで、少ない読解量で主題適合文献に到達できる。
+
+**これは順序付けであって除外ではない。** citation searching の存在意義は
+「検索式が取りこぼした文献の回収」なので、同じ検索式で機械的に切れば目的と矛盾する
+(§4.3 で venue フィルタを右カラムに適用しないのと同じ理屈)。
+`kw_groups` による足切りを行う場合は、**適用範囲・閾値・除外件数を PRISMA-S に
+逸脱として明記する**こと(§1.2 の #3 対応がこれに該当する)。
+
+> **タイトルだけでは判定できない(実測):** 新規1,433件のうち、**タイトルのみで3群が
+> 揃うのは 0件**であった。IEEE 第2波で実際に検索がヒットした文献でも、タイトルのみ成立は
+> 5%、Title+Abstract で 91% が成立する。`found_abstract` の取得が
+> トリアージ成立の前提条件である。
 
 ## 5. 完了チェックリスト
 

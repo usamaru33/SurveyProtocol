@@ -87,8 +87,57 @@ load_dotenv()
 BASE_URL = "https://api.semanticscholar.org/graph/v1"
 CROSSREF_URL = "https://api.crossref.org/works"
 PAPER_FIELDS = "title,abstract,year,venue,externalIds"
-REF_CIT_FIELDS = f"title,year,venue,externalIds"
+# 発見された文献にも **abstract を必ず含める**(2026-08-10 追加)。
+# 理由が2つある:
+#  (1) Phase 3b は Title/Abstract を人が読む手続きなので、要旨が無いログは
+#      そのままではスクリーニングに使えず、著者が1件ずつ引きに行くことになる。
+#  (2) 概念群(G1/G2/G3)の判定はタイトルだけでは成立しない。実測では
+#      新規1,433件のうちタイトルで3群が揃うのは **0件**、IEEE 第2波で
+#      実際に検索がヒットした文献でもタイトルのみ成立は 5% にすぎず、
+#      91% が Title+Abstract で初めて成立する。
+REF_CIT_FIELDS = f"title,abstract,year,venue,externalIds"
 MAX_HOPS_WARN = 2  # snowballing_protocol.md §2.3: 2ホップまで(超えたら警告のみ、強制はしない)
+
+# ---------------------------------------------------------------------------
+# 概念群(Rev.6 統合クエリの G1/G2/G3)による**読む順序のトリアージ**
+#
+# 用途は「順序付け」であって「除外」ではない。citation searching の存在意義は
+# 検索式が取りこぼした文献の回収なので、同じ検索式で機械的に切ると目的と矛盾する
+# (venue フィルタを右カラムに適用しないのと同じ理屈。snowballing_protocol.md §4.3)。
+# 除外に使う場合は**明示的な逸脱として PRISMA-S に記載**すること。
+#
+# 判定は Title + Abstract に対して行う(タイトルのみでは成立しない。上の
+# REF_CIT_FIELDS のコメント参照)。決定論的・LLM 不使用。
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# 用語定義シード — 前方探索を行わない(Rev.10、2026-08-10 実測にもとづく)
+#
+# #3 Kilteni et al. 2012 は「sense of embodiment(SoO/SoA/self-location)」の定義典拠であり、
+# 被引用1,500件超。その被引用は「自己スケール文献」ではなく「身体化に言及する研究すべて」で、
+# 新規候補1,188件のうち G3語(size/scale/height/distance)を含むのは11件、
+# うち実際に主題適合なのは2件程度でしかなかった(残りは embodiment *scale*=質問紙尺度、
+# large-*scale*=システム規模、aesthetic *distance*=比喩 等の誤爆)。
+# 一方、**後方探索(参考文献65件)は高価値**で、Botvinick&Cohen 1998 / Lenggenhager 2007 /
+# Slater 2010 / Petkova&Ehrsson 2008 の心理接合点の古典すべてに到達している
+# (snowballing_protocol.md §1.3 が「到達目標」としていたもの)。
+# したがって #3 は **後方のみ**とする。
+# ---------------------------------------------------------------------------
+DEFINITIONAL_SEEDS = ("3",)
+
+KW_GROUPS = {
+    "g1": re.compile(r"\b(virtual realit\w*|vr|hmds?|head[- ]mounted displays?"
+                     r"|virtual environment\w*|immersive virtual)\b", re.I),
+    "g2": re.compile(r"\b(avatars?|bod(?:y|ies|ily)|embodiment|embodied)\b", re.I),
+    "g3": re.compile(r"\b(sizes?|scal\w*|heights?|distances?)\b", re.I),
+}
+
+
+def kw_flags(title: str, abstract: str) -> dict:
+    """Title+Abstract に対する概念群の命中フラグと成立群数を返す。"""
+    text = f"{title or ''} {abstract or ''}"
+    hits = {g: ("Y" if rx.search(text) else "N") for g, rx in KW_GROUPS.items()}
+    return {**{f"kw_{g}": v for g, v in hits.items()},
+            "kw_groups": sum(1 for v in hits.values() if v == "Y")}
 
 
 # ---------------------------------------------------------------------------
@@ -335,6 +384,42 @@ def fetch_references(paper_id: str, doi: str, limit: int = 0) -> tuple[list[dict
     return [], "取得不可"
 
 
+def resolve_missing_metadata(records: list[dict]) -> int:
+    """タイトル or 要旨を欠くレコードを、DOI から S2 で解決して埋める。
+
+    【なぜ】Crossref の reference リストは DOI しか持たない項目が多く、要旨は一切返さない。
+    2026-08-10 の実測では後方探索 173件のうち **93件(54%)がタイトル欠落**で、
+    そのままでは Title/Abstract を読む Phase 3b にかけられなかった
+    (前方探索は S2 由来なので欠落0件)。後方探索は #3 の参考文献から
+    Botvinick&Cohen 1998 / Lenggenhager 2007 等の心理接合点の古典に到達できる
+    **高価値な経路**であり、読めない状態で放置してはいけない。
+
+    DOI が無いレコードは解決できない(タイトル照合は誤同定の危険があるため行わない)。
+    戻り値: 解決できた件数。
+    """
+    targets = [r for r in records
+               if ((r.get("externalIds") or {}).get("DOI"))
+               and (not (r.get("title") or "").strip() or not (r.get("abstract") or "").strip())]
+    if not targets:
+        return 0
+    print(f"        [INFO] タイトル/要旨の欠落 {len(targets)} 件を DOI から解決中...")
+    filled = 0
+    for r in targets:
+        doi = (r.get("externalIds") or {}).get("DOI")
+        resp = polite_get(f"{BASE_URL}/paper/DOI:{doi}",
+                          params={"fields": PAPER_FIELDS}, headers=_headers())
+        if resp is None or resp.status_code != 200:
+            continue
+        d = resp.json()
+        for field in ("title", "abstract", "year", "venue"):
+            if not (r.get(field) or "") and d.get(field):
+                r[field] = d[field]
+        if (r.get("title") or "").strip():
+            filled += 1
+    print(f"        [INFO] うち {filled} 件でタイトルを取得")
+    return filled
+
+
 def fetch_citations(paper_id: str, limit: int = 0) -> tuple[list[dict], str]:
     """前方探索。ページングで取り切る。"""
     recs, capped = _paged("citations", paper_id, "citingPaper", limit)
@@ -353,12 +438,20 @@ def main() -> None:
                     help="backward(参考文献) / forward(被引用) / 両方はカンマ区切り(既定)")
     ap.add_argument("--limit-per-seed", type=int, default=0,
                     help="1シードあたりの取得上限(0=無制限。API側の offset 上限10,000まで)")
+    ap.add_argument("--no-forward-seeds", type=str, default=",".join(DEFINITIONAL_SEEDS),
+                    help=(f"前方探索を行わないシードID(カンマ区切り)。既定 '{','.join(DEFINITIONAL_SEEDS)}'"
+                          f" = 用語定義シード(Rev.10)。空文字を渡すと全シードで前方探索する"))
     args = ap.parse_args()
 
     directions = [d.strip() for d in args.directions.split(",") if d.strip()]
     for d in directions:
         if d not in ("backward", "forward"):
             sys.exit(f"[ERROR] 不明な direction: {d}(backward/forward のみ)")
+
+    no_forward = {s.strip() for s in args.no_forward_seeds.split(",") if s.strip()}
+    if no_forward and "forward" in directions:
+        print(f"[INFO] 前方探索を行わないシード: {sorted(no_forward)}"
+              f"(用語定義シード。理由は snowballing_protocol.md §1.2)")
 
     seeds = load_seeds_csv(args.seeds_csv) if args.seeds_csv else load_default_seeds()
     if not seeds:
@@ -381,8 +474,15 @@ def main() -> None:
             continue
 
         for direction in directions:
+            if direction == "forward" and str(seed["id"]) in no_forward:
+                print(f"    forward: スキップ(用語定義シードのため。"
+                      f"snowballing_protocol.md §1.2 / changelog Rev.10)")
+                continue
+
             if direction == "backward":
                 found, src = fetch_references(paper_id, seed["doi"], args.limit_per_seed)
+                # 後方探索は Crossref 経由だとタイトル・要旨が欠けるため必ず補完する
+                resolve_missing_metadata(found)
             else:
                 found, src = fetch_citations(paper_id, args.limit_per_seed)
             print(f"    {direction}: {len(found)} 件  (出典: {src})")
@@ -409,38 +509,65 @@ def main() -> None:
                     else:
                         note = "未照合"
 
+                f_abst = f.get("abstract") or ""
+
                 rows.append({
                     "seed_id": seed["id"],
                     "seed_title": seed["title"],
                     "direction": direction,
                     "found_title": f_title,
+                    "found_abstract": f_abst,
                     "found_doi": norm_doi(f_doi),
                     "found_year": f.get("year") or "",
                     "found_venue": venue,
                     "in_db_already": in_db,
                     "venue_rank_note": note,
                     "ref_source": src,
+                    **kw_flags(f_title, f_abst),
                     "picos_decision": "",  # 著者記入
                     "reason": "",          # 著者記入
                 })
 
     out_path = ROOT / "outputs" / "snowballing_log.csv"
     is_new = not out_path.exists()
-    fieldnames = ["seed_id", "seed_title", "direction", "found_title", "found_doi",
-                  "found_year", "found_venue", "in_db_already", "venue_rank_note", "ref_source",
+    fieldnames = ["seed_id", "seed_title", "direction", "found_title", "found_abstract",
+                  "found_doi", "found_year", "found_venue", "in_db_already", "venue_rank_note",
+                  "ref_source", "kw_g1", "kw_g2", "kw_g3", "kw_groups",
                   "picos_decision", "reason"]
+
+    # 追記モードなので、既存ファイルの列構成が変わっていたら**黙って壊さず中断する**。
+    # (2026-08-10 に found_abstract / kw_* 列を追加したため、旧12列のログには追記できない)
+    if not is_new:
+        with out_path.open(encoding="utf-8-sig", newline="") as f:
+            old = next(csv.reader(f), [])
+        if old != fieldnames:
+            sys.exit(
+                f"[ERROR] 既存の {out_path.name} は列構成が古いため追記できません。\n"
+                f"        旧 {len(old)} 列 / 新 {len(fieldnames)} 列"
+                f"(追加: found_abstract, kw_g1..g3, kw_groups)\n"
+                f"        旧ログを退避してから再実行してください:\n"
+                f"          mv outputs/snowballing_log.csv outputs/snowballing_log_pre20260810.csv")
+
     with out_path.open("a", encoding="utf-8-sig", newline="") as f:
         w = csv.DictWriter(f, fieldnames=fieldnames)
         if is_new:
             w.writeheader()
         w.writerows(rows)
 
-    new_candidates = sum(1 for r in rows if r["in_db_already"] == "N")
-    print(f"\n[INFO] 追記 {len(rows)} 件(うち既存コーパスに無い新規候補 {new_candidates} 件)")
+    new_candidates = [r for r in rows if r["in_db_already"] == "N"]
+    print(f"\n[INFO] 追記 {len(rows)} 件(うち既存コーパスに無い新規候補 {len(new_candidates)} 件)")
+    if new_candidates:
+        print("[INFO] 新規候補の概念群(Title+Abstract、読む順序のトリアージ用):")
+        for g in (3, 2, 1, 0):
+            n = sum(1 for r in new_candidates if r["kw_groups"] == g)
+            print(f"          {g}群成立: {n:5d} 件")
+        noabs = sum(1 for r in new_candidates if not r["found_abstract"].strip())
+        print(f"       ※ 要旨を取得できなかったもの {noabs} 件(kw_* は過小評価になる)")
     print(f"[INFO] 出力: {out_path}")
-    print("[NEXT] picos_decision 列に include/exclude、reason 列に理由を著者が記入すること。"
-          "in_db_already=Y の行は 'other methods' に二重計上しないこと"
-          "(docs/snowballing_protocol.md §4)。")
+    print("[NEXT] kw_groups の降順に読み、picos_decision 列に include/exclude、"
+          "reason 列に理由を著者が記入すること。")
+    print("       kw_groups は**順序付け専用**。これで機械的に除外する場合は"
+          "逸脱として PRISMA-S に明記すること(docs/snowballing_protocol.md §4.3/§4.6)。")
 
 
 if __name__ == "__main__":

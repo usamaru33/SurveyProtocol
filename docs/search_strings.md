@@ -46,6 +46,15 @@ AND ("Size" OR "Scale" OR "Height" OR "Distance")
 > 記録先は本表の「Fields searched」列。現在「要著者確認」のままの初回分も、著者の検索履歴から
 > 判明したら遡って埋める(判明しなければ「記録なし」と明記し Threats で言及)。
 
+> **【Rev.10 確定(2026-08-10)】実効 scope は Title-Abstract (TA) で最終確定。TAK への格上げは行わない。**
+> 第2波統合後の実測(`ResearchVR4.csv` 26,434件)で判断した: 第2波12,533件は gold set を1件も
+> 新規回収せず、第1波にしか無い gold は **#3 Kilteni の1件のみ**。同論文はタイトル・要旨とも
+> G3語を含まず TA では構造的に到達不能だが、TAK で救える保証も無い(索引語は未確認)。
+> 一方 TAK は Scopus 実測で +87%(2,533→4,727)であり、人手2名/件の Phase 3b の工数を
+> ほぼ倍にする。**#3 を含む脱落文献は Phase 2 後のスノーボーリングで名指しで回収する方針**に切り替えた
+> (`protocol_changelog.md` Rev.10、`snowballing_protocol.md` §0/§1.1)。
+> 以下の「TA+K に格上げする場合のみ」という留保は **Rev.10 で失効**。
+
 > **【Rev.8 確定(2026-07-22)】DB構成を3DB(ACM/IEEE/Scopus)に確定。PubMed は不使用。**
 > 理由・詳細は `protocol_changelog.md` Rev.8、正当化ドラフトは `methodology_decision_Rev7.md` §Rev.8追記を参照。
 > 下表の PubMed / PsycInfo 行は**経緯として保存**し削除しない(初回検索は実施済みの事実であり、
@@ -77,7 +86,7 @@ AND ("Size" OR "Scale" OR "Height" OR "Distance")
 | Scopus(第2波) | `TITLE-ABS(("Virtual Reality" OR "VR" OR "HMD" OR "head-mounted display" OR "head mounted display" OR "Virtual Environment*" OR "immersive virtual") AND ("Avatar" OR "Body" OR "Embodiment") AND ("Size" OR "Scale" OR "Height" OR "Distance"))` | TITLE-ABS | なし(view=COMPLETE) | 2026-07-30 | **2,542** ✅ |
 | ACM DL(第2波・title検索) | Rev.6 改訂クエリを `Title:` 指定で実行 | Title のみ | 出版年でスライス(下表) | 2026-08-02〜03 | **6,012**(UI表示) / 取得 6,013 |
 | ACM DL(第2波・abstract検索) | Rev.6 改訂クエリを `Abstract:` 指定で実行 | Abstract のみ | 出版年でスライス(下表) | 2026-08-02〜03 | **8,328**(UI表示) / 取得 8,331 |
-| IEEE Xplore(第2波) | — | `"Document Title":` / `"Abstract":` | — | 未実施 | 379(UI表示のみ、エクスポート待ち) |
+| IEEE Xplore(第2波) | **要著者確認**(Command Search の構文を verbatim で記録すること) | `"Document Title":` / `"Abstract":`(**要著者確認**) | **要著者確認** | 2026-08-10 | **361**(取得・ユニーク) ✅ |
 
 > **ACM は Title 検索と Abstract 検索の和集合**(Rev.9 時点の決定、`search_replication.md` §1)。
 > **代償: フィールド横断の一致(例: G1 はタイトル・G2 は要旨にのみ出現)を取りこぼす。**
@@ -85,6 +94,21 @@ AND ("Size" OR "Scale" OR "Height" OR "Distance")
 >
 > 取得件数が UI 表示をわずかに上回るのは、エクスポートが数日にまたがったことによる索引の自然増。
 > 不足ではないため許容する。**和集合のユニークは 9,630件**(`raw/acm_wave2_20260803.csv`)。
+
+> **IEEE 第2波の取得メモ(2026-08-10):** 100件単位の分割エクスポート5本(`raw/IEEE2/*.bib`)を
+> `scripts/merge_bib.py` で統合 → 全370件 / **ユニーク361件**(スライス間重複9件を除去)。
+> Zotero 経由の CSV は**二重取り込みで670行**あったため、DOI優先・正規化タイトル代替の
+> キーで重複309行を除去して `raw/ieee_wave2_20260810.csv`(361行)とした。
+> Abstract 充足率 100% / DOI 99.4%。bib とのキー集合は一致(DOI欠損2件はタイトル表記差のみ)。
+>
+> **未解決:** 2026-08-01 時点の UI 表示値 **379件** との差 18件。ただしこの 379 は
+> ACM の「81件」が構文エラーと判明したのと同じセッションの値であり、期待値としての信頼性が低い
+> (`PROGRESS_LOG.md` 2026-08-01)。**今回の検索の UI 表示件数を著者が確認すること。**
+>
+> **重要(Threats 行き):** 第1波IEEE(1,276+297)のうち **1,077件が第2波に現れない**。
+> これらは TA で3群が成立するのが **4.7%** にすぎず(第2波に残った322件は 91.0% が成立)、
+> **第1波IEEE がより広いフィールドscope(All Metadata 等)で実行されていた**ことの実測証拠である。
+> 第2波の TA 準拠が正しい挙動。「Fields searched = 要著者確認」だった項目への回答でもある。
 
 ### ACM 第2波のスライス内訳(エクスポート上限1,000件への対応)
 
