@@ -170,9 +170,14 @@
   **他の項目にも同種の誤りが残っている可能性がある。** in-scope を拡充する際は
   DOI・年・掲載誌・著者の整合を確認すること。検出には `export_completeness_audit.py` の
   SUSPECT 判定（タイトル一致だが DOI 不一致）が使える。
-- **`known_item_test.py` はタイトル一致の偽陽性を検出できない** — DOI が両方にあって食い違う場合でも
-  タイトルが一致すれば「捕捉」と判定する。gold set #13 の誤りを見逃した原因。
-  `export_completeness_audit.py` 側では対応済みだが、**本体は未修正**。
+- ~~**`known_item_test.py` はタイトル一致の偽陽性を検出できない**~~ → **解決済み（2026-08-12）**。
+  両方向の偽陽性を検出するようにした:
+  ① タイトル一致だが DOI 食い違い → `SUSPECT`（捕捉と数えない）
+  ② **DOI 一致だがタイトルが別物** → `SUSPECT`（gold set の DOI 誤記で実在する別論文を掴む case。#13 の実例）
+  ③ DOI 一致でタイトルに表記差 → `DOI(表記差)` として recall には算入しつつ `[METADATA]` 警告
+  判定境界 `DOI_TITLE_SUSPECT_THRESHOLD = 0.60` は実測で決定（同一論文の表記差 0.736 /
+  誤DOIによる別論文 0.330）。導入時に **gold set #6 のタイトル誤記を新たに検出**し修正した。
+  `export_completeness_audit.py` と結果が一致することを確認済み（HIT 8/12・SUSPECT 0）。
 - Windows での実行は `python -X utf8` を付けること（文字化け防止）。
 
 ---

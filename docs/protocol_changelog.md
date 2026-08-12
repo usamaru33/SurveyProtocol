@@ -73,7 +73,14 @@ ACM 第2波は `Title:` 検索と `Abstract:` 検索を**別々に実行して�
 
 ### 影響範囲
 
-- `self_scale_references.csv`(#3 の SearchScope)、`outputs/venue_dropped_known_items.csv`(6→5件)、
+**【2026-08-12 追記】gold set #6 のタイトル誤記を修正。** `known_item_test.py` に偽陽性検出を
+実装したところ、#6 Banakou et al. 2013 のタイトルが実物と食い違っていたことが判明した
+(旧 `...and implicit self-identification with child-like attributes` →
+新 `...and implicit attitude changes`)。DOI は正しかったため **recall には影響しない**(8/12 のまま)。
+2026-08-03 の監査で「他の項目にも同種の誤りが残っている可能性」と記録されていたものの実例であり、
+機械的な検出手段ができたことで再発を防げるようになった。
+
+- `self_scale_references.csv`(#3 の SearchScope、#6 の Title)、`outputs/venue_dropped_known_items.csv`(6→5件)、
   `outputs/known_item_test.csv`、`known_item_analysis.md` を再生成済み
 - `scripts/snowball_search.py`: #3 は background になり既定シード(in-scope由来)から外れるため、
   **後方探索専用シードとして明示的に追加**する処理を `load_default_seeds()` に追加した。
