@@ -37,7 +37,7 @@
 
 ## 完了していること
 
-### 1. プロトコル（Rev.11 まで確定）
+### 1. プロトコル（Rev.12 まで確定）
 - **DB構成: 3DB（ACM DL / IEEE Xplore / Scopus）**。PubMed は Rev.8 で不使用に確定、PsycINFO はアクセス制約で不使用。
 - **判定に AI/LLM は不使用**（Rev.2）。Phase 3a は決定論的キーワード除外、Phase 3b/4 は人手。
 - **Venue 基準: CORE A*/A のみ + SJR Q1 のみ**（Rev.4）。Q2脱落826件は Threats で報告。
@@ -61,21 +61,27 @@
 - Zotero 往復の無損失を3例で実測（Scopus 2,542 / ACM 9,630 / IEEE 361 とも一致）。
 - **統合生データ `ResearchVR4.csv` = 26,434件**（`scripts/merge_raw.py`、Source_DB 列つき、PubMed 除外）。
 
-### 3. スクリーニング Phase 1〜3（**第1波データでの結果。凍結中**）
+### 3. スクリーニング Phase 1〜3（**Rev.12 公式再実行済み・凍結解除**）
 
 ```
-14,682 件（ResearchVR3.csv）
-  → Phase 1 重複削除        : -2,139 → 12,543 件
-  → Phase 2 Venueランク      : -9,634 →  2,909 件
-  → Phase 3 キーワード除外    : -1,082 →  1,827 件（step3_kw_included.csv ★最終候補）
+26,434 件（ResearchVR4.csv = 3DB × 第1波+第2波）
+  → Phase 1 重複削除        : -8,092 → 18,342 件
+  → Phase 2 Venueランク      : -14,317 →  4,025 件
+  → Phase 3 キーワード除外    : -1,366 →  2,659 件（step3_kw_included.csv ★最終候補）
 ```
 
-- **この step ファイルは 2026-07-17 15:06 の実行結果**で、同日追加の Venue エイリアス表を通していない。
-  第2波統合後に正規化改修とあわせて公式再実行する方針。
+- **2026-08-12 に正規化改修（Rev.12）を適用して公式再実行**。2026-07-17 15:06 以来の凍結を解除した。
+  旧値（14,682→12,543→2,909→1,827）は第1波・4DB 前提であり**以後は使用しない**。
+- Phase 3 内訳: Cat1 非没入 568 / Cat2 技術・非実証 113 / Cat3 臨床・医療 775。
+- Phase 2 出力に `Match_Stage` / `Match_Guard_Note` を追加（誤照合を可視化する監査列）。
+  unmatched 9,066件のうちガード起因は 865件（9.5%）。
+- **Phase 3b の工数は 3名ペア分担で約 1,773件/人**（2,659×2÷3）。
 
 ### 4. 検証基盤
 - **Known-Item Test**（`scripts/known_item_test.py`）: gold set = `self_scale_references.csv`（in-scope 12件）。
-  現在 step0 **66.67%**（8/12、目標 ≥80%）→ step2 25.00%（Rev.11 で #3 を background に移し分母12）。脱落分析は `known_item_analysis.md` に自動生成。
+  現在 step0 **66.67%**（8/12、目標 ≥80%）→ step2 **25.00%**（Rev.12 再実行後も同値）。
+  **Rev.12 で脱落の性質が変わった**: venue 脱落5件の内訳が「照合漏れ3件」→「照合漏れ1件（#7のみ）/
+  ランク不足3件」へ。#8・#13 は正しく照合したうえで CORE B・C だった。脱落分析は `known_item_analysis.md` に自動生成。
 - **エクスポート完全性の監査**（`scripts/export_completeness_audit.py`）: 打ち切り検出・重複・
   期待件数との突き合わせ・gold set 照合（HIT/SUSPECT/MISS）。ACM の1,000件打ち切りを検出した実績あり。
 - **統合生データの生成**（`scripts/merge_raw.py`）: `Source_DB` 列を付与。PubMed は既定で除外。

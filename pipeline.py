@@ -190,11 +190,41 @@ def is_short_key(norm: str, max_tokens: int = 2) -> bool:
 
 
 def raw_similarity(a: str, b: str) -> float:
-    """案4のサニティチェック用。正規化前の元文字列同士の類似度。"""
+    """正規化前の元文字列同士の類似度。"""
     return difflib.SequenceMatcher(None, (a or "").lower(), (b or "").lower()).ratio()
 
 
-SANITY_THRESHOLD = 0.60   # 案4: 照合成立後に要求する元文字列類似度の下限
+SANITY_THRESHOLD = 0.60        # 案4: 元文字列類似度の下限
+CONTAINMENT_THRESHOLD = 0.80   # 案4: 語の包含率の下限(定型句で希釈される場合の救済)
+
+# 包含率の計算から外す純粋な機能語。**種別語や修飾語は落とさない**
+# ("international conference" を落とすと、ICSE と PACM SE のような別物まで
+#  包含率1.0になってしまう)。
+_FILLER = {"of", "the", "on", "and", "in", "for", "a", "an", "to", "at"}
+
+
+def _content_tokens(s: str) -> set[str]:
+    toks = re.findall(r"[a-z0-9]+", (s or "").lower())
+    return {t for t in toks
+            if t not in _FILLER and not re.fullmatch(r"\d+(?:st|nd|rd|th)?", t)}
+
+
+def containment(matched_title: str, data_venue: str) -> float:
+    """照合先タイトルの語が、データ側 Venue にどれだけ含まれているか。
+
+    元文字列の類似度だけで判定すると、"Proceedings of the 18th ACM International
+    Conference on Multimodal Interaction" のような**定型句で薄まった長い Venue 名**が
+    正しい照合先 "International Conference on Multimodal Interaction" に対しても
+    0.5 程度しか出ず、正当な照合まで棄却してしまう(実測で確認)。
+    照合先の語がデータ側に出揃っているかを見れば、この希釈に影響されない。
+    """
+    # CORE のタイトルは "(was International Conference on Multimodal Interfaces)" や
+    # "(ACM)" のような注記を含むことがある。これはデータ側 Venue には現れないので、
+    # 残したまま包含率を測ると正しい照合まで閾値割れする。
+    m = _content_tokens(re.sub(r"\([^)]*\)", " ", matched_title or ""))
+    if not m:
+        return 0.0
+    return len(m & _content_tokens(data_venue)) / len(m)
 
 
 def extract_parenthesized_acronym(name: str) -> str:
@@ -483,10 +513,20 @@ def resolve_venue(raw_venue: str, core: dict, sjr: dict, issn: str = "",
     rejected: list[str] = []
 
     def sane(entry_title: str, stage: str) -> bool:
+        """案4: 照合成立後の安全網。次のどちらかを満たせば通す。
+
+          (a) 元文字列類似度 ≥ SANITY_THRESHOLD
+          (b) 照合先の語の包含率 ≥ CONTAINMENT_THRESHOLD かつ照合先が3語以上
+              (定型句で希釈された長い Venue 名を正当に救済する。短い照合先で
+               包含だけを見ると偶発一致を通すため、語数の下限を課す)
+        """
         s = raw_similarity(raw_venue, entry_title)
         if s >= SANITY_THRESHOLD:
             return True
-        rejected.append(f"{stage}:'{entry_title}'(sim={s:.2f})")
+        c = containment(entry_title, raw_venue)
+        if c >= CONTAINMENT_THRESHOLD and len(_content_tokens(entry_title)) >= 3:
+            return True
+        rejected.append(f"{stage}:'{entry_title}'(sim={s:.2f}/cont={c:.2f})")
         return False
 
     marker = venue_type_marker(raw_venue)
@@ -709,6 +749,7 @@ def phase2_core(rows: list[dict], fieldnames: list[str],
         # --- Step 0: 著者確認済みエイリアス表(照合より先に参照。誤照合防止) ---
         alias = alias_lookup(raw_venue, aliases)
         if alias is not None:
+            row["Match_Stage"]    = "alias"   # Rev.12: 監査のため段を明示する
             row["Matched_Venue"]  = alias["canonical"]
             row["Ranking_Source"] = f"{alias['source']}(alias)"
             row["CORE_Rank"]      = alias["rank"] if alias["source"] == "CORE" else ""
