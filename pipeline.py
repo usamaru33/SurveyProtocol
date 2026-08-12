@@ -133,6 +133,70 @@ def normalize_venue(name: str) -> str:
     return re.sub(r"\s+", " ", n).strip()
 
 
+# ---------------------------------------------------------------------------
+# Venue 正規化の構造ガード(Rev.12、docs/normalization_design.md の案1/3/4/6)
+#
+# 現行の積極的な正規化はストップワードで種別語(journal of / transactions on /
+# conference on / symposium on / workshop)まで落とすため、**ジャーナルと会議が
+# 同一キーに融合する**。実測された衝突は 899キー・採否反転 426キー。
+# 例: ACM Transactions on Applied Perception(SJR)と ACM Symposium on Applied
+#     Perception(CORE B)が共に "acm applied perception" になる。
+# ---------------------------------------------------------------------------
+
+_JOURNAL_WORDS = re.compile(
+    r"\b(journal|transactions|magazine|letters|review|reviews|quarterly|bulletin)\b", re.I)
+_CONF_WORDS = re.compile(
+    r"\b(conference|symposium|workshop|proceedings|proc|congress|meeting|"
+    r"convention|colloquium)\b", re.I)
+
+
+def venue_type_marker(name: str) -> str:
+    """案1: Venue 名から種別マーカーを推定する。'J' / 'C' / ''(不明)。
+
+    ジャーナル語と会議語が両方出るとき(例: "Proceedings of the ACM on
+    Human-Computer Interaction" = PACM HCI はジャーナル扱いだが proceedings を含む)は
+    **判定不能として '' を返す**。誤ったマーカーを付けると正しい照合まで殺すため、
+    曖昧なら両方試す側に倒す。
+    """
+    has_j = bool(_JOURNAL_WORDS.search(name or ""))
+    has_c = bool(_CONF_WORDS.search(name or ""))
+    if has_j and not has_c:
+        return "J"
+    if has_c and not has_j:
+        return "C"
+    return ""
+
+
+def typed_key(marker: str, norm: str) -> str:
+    return f"{marker}:{norm}"
+
+
+def candidate_typed_keys(name: str, norm: str) -> list[str]:
+    """データ側 Venue に対する照合キー候補。種別不明なら J/C の両方を試す。"""
+    if not norm:
+        return []
+    m = venue_type_marker(name)
+    return [typed_key(m, norm)] if m else [typed_key("J", norm), typed_key("C", norm)]
+
+
+def is_short_key(norm: str, max_tokens: int = 2) -> bool:
+    """案3: トークン数が閾値以下の短いキーか。
+
+    短いキー("presence" / "sensors" 等)は正規化一致・fuzzy で誤照合しやすい
+    (実例: データの Presence 誌29件が "Annual International Workshop on Presence" に
+    吸われて CORE C 判定になった)。短キーでは exact(小文字原題)と ISSN のみ許可する。
+    """
+    return len(norm.split()) <= max_tokens
+
+
+def raw_similarity(a: str, b: str) -> float:
+    """案4のサニティチェック用。正規化前の元文字列同士の類似度。"""
+    return difflib.SequenceMatcher(None, (a or "").lower(), (b or "").lower()).ratio()
+
+
+SANITY_THRESHOLD = 0.60   # 案4: 照合成立後に要求する元文字列類似度の下限
+
+
 def extract_parenthesized_acronym(name: str) -> str:
     """Return text inside the last parentheses if it looks like an acronym,
     e.g. '2010 IEEE VR Conference (VR)' -> 'VR'"""
@@ -167,6 +231,9 @@ def load_core(core_path: Path) -> dict:
             core[norm] = entry
             if acronym:
                 core[acronym.lower()] = entry
+            # 案1: 種別マーカー付きキー。CORE は会議ランキングなので既定は 'C'。
+            typed = core.setdefault("__typed__", {})
+            typed.setdefault(typed_key(venue_type_marker(title) or "C", norm), entry)
     return core
 
 
@@ -249,6 +316,12 @@ def load_sjr(sjr_path: Path) -> dict:
             entry = {"original_title": title, "quartile": quartile}
             sjr[norm]          = entry
             sjr[title.lower()] = entry
+            # 案1: 種別マーカー付きキー。SJR は誌ランキングなので既定は 'J'。
+            # setdefault にしているのは、同一キーの「後勝ち上書き」を避けるため
+            # (実測の問題: キー 'sensors' が Q1 の Sensors ではなく後行の
+            #  Journal of Sensors(Q2)に上書きされ、Q1誌が Q2 として除外され得た)。
+            sjr.setdefault("__typed__", {}).setdefault(
+                typed_key(venue_type_marker(title) or "J", norm), entry)
             # ISSN index
             if issn_idx >= 0 and issn_idx < len(row):
                 issns_raw = row[issn_idx].strip().strip('"')
@@ -361,6 +434,136 @@ def best_sjr_match(venue: str, sjr: dict, issn: str = "", threshold: float = 0.8
 
     _sjr_cache[cache_key] = (None, None)
     return None, None
+
+
+_resolve_cache: dict[str, dict] = {}
+
+
+def resolve_venue(raw_venue: str, core: dict, sjr: dict, issn: str = "",
+                  fuzzy_threshold: float = 0.82) -> dict:
+    """Venue → ランキング照合(Rev.12)。
+
+    **案6: exact をリスト横断で fuzzy より常に優先する**照合順序:
+
+        1. CORE exact  (種別キー → 正規化キー → 小文字原題)
+        2. SJR  exact  (ISSN → 種別キー → 正規化キー → 小文字原題)
+        3. CORE acronym(括弧内略称)
+        4. CORE fuzzy  (最後の手段)
+
+    旧実装は「CORE を全段(fuzzy 含む)やってから SJR」だったため、SJR に正確な収載が
+    あってもCORE側の低類似 fuzzy が先に成立して奪っていた。最大の実例は
+    `Proceedings of the ACM on Human-Computer Interaction`(SJR に正確収載)が
+    CORE `Indian Conference on Human-Computer Interaction` に fuzzy 照合された **82件**。
+
+    ガード:
+      - 案3 短キーガード: 正規化キーのトークン数 ≤2 では正規化一致・fuzzy を禁止し、
+        小文字原題 exact と ISSN のみ許可する。
+      - 案4 サニティチェック: 照合成立後に元文字列類似度 ≥ SANITY_THRESHOLD を要求。
+        満たさなければ unmatched に落とす(silent failure を顕在化させる)。
+        ISSN 一致と小文字原題 exact は同一性が確定しているため対象外。
+
+    戻り値: {"source", "matched_title", "rank", "stage", "rejected"}
+            source は "CORE" / "SJR" / None。rejected はガードで棄却した根拠(あれば)。
+    """
+    ck = f"{raw_venue}||{issn}"
+    if ck in _resolve_cache:
+        return _resolve_cache[ck]
+
+    def out(source, title, rank, stage, rejected=""):
+        r = {"source": source, "matched_title": title, "rank": rank,
+             "stage": stage, "rejected": rejected}
+        _resolve_cache[ck] = r
+        return r
+
+    norm = normalize_venue(raw_venue)
+    low = (raw_venue or "").strip().lower()
+    short = is_short_key(norm)
+    core_typed = core.get("__typed__", {})
+    sjr_typed = sjr.get("__typed__", {})
+    rejected: list[str] = []
+
+    def sane(entry_title: str, stage: str) -> bool:
+        s = raw_similarity(raw_venue, entry_title)
+        if s >= SANITY_THRESHOLD:
+            return True
+        rejected.append(f"{stage}:'{entry_title}'(sim={s:.2f})")
+        return False
+
+    marker = venue_type_marker(raw_venue)
+
+    def is_true_raw_hit(entry: dict) -> bool:
+        """`low in db` が本当に「原題(または略称)そのもの」の一致かを検証する。
+
+        core/sjr の辞書は**正規化キーと原題キーを同じ名前空間に混ぜている**ため、
+        `low in db` だけでは正規化キーへの偶然の一致を拾ってしまう。
+        実例: データ 'Presence' は core['presence'](= "Annual International Workshop
+        on Presence" の正規化キー)に当たり、原題一致を装って短キーガードを迂回していた。
+        同様に 'Sensors' は sjr['sensors'](= "Journal of Sensors" の正規化キー)に当たる。
+        """
+        t = (entry.get("original_title") or "").strip().lower()
+        a = (entry.get("acronym") or "").strip().lower()
+        return low == t or (bool(a) and low == a)
+
+    # --- 1. CORE exact -----------------------------------------------------
+    if low in core and is_true_raw_hit(core[low]):
+        e = core[low]
+        return out("CORE", e["original_title"], e["rank"], "core_exact_raw")
+    if norm and not short:
+        for k in candidate_typed_keys(raw_venue, norm):
+            e = core_typed.get(k)
+            if e and sane(e["original_title"], "core_typed"):
+                return out("CORE", e["original_title"], e["rank"], "core_exact_typed")
+        # 種別が確定しているときは素の正規化キーへフォールバックしない。
+        # フォールバックすると種別マーカーの意味が消える(実例: ACM Transactions on
+        # Applied Perception(J)が ACM Symposium on Applied Perception(C)に当たる)。
+        if not marker:
+            e = core.get(norm)
+            if e and sane(e["original_title"], "core_norm"):
+                return out("CORE", e["original_title"], e["rank"], "core_exact_norm")
+
+    # --- 2. SJR exact ------------------------------------------------------
+    issn_index = sjr.get("__issn_index__", {})
+    for raw_issn in re.split(r"[,\s]+", issn or ""):
+        raw_issn = raw_issn.strip().replace("-", "")
+        if raw_issn and raw_issn in issn_index:
+            e = issn_index[raw_issn]
+            return out("SJR", e["original_title"], e["quartile"], "sjr_issn")
+    if low in sjr and low != "__issn_index__" and is_true_raw_hit(sjr[low]):
+        e = sjr[low]
+        return out("SJR", e["original_title"], e["quartile"], "sjr_exact_raw")
+    if norm and not short:
+        for k in candidate_typed_keys(raw_venue, norm):
+            e = sjr_typed.get(k)
+            if e and sane(e["original_title"], "sjr_typed"):
+                return out("SJR", e["original_title"], e["quartile"], "sjr_exact_typed")
+        if not marker:
+            e = sjr.get(norm)
+            if e and norm != "__issn_index__" and sane(e["original_title"], "sjr_norm"):
+                return out("SJR", e["original_title"], e["quartile"], "sjr_exact_norm")
+
+    # --- 3. CORE acronym ---------------------------------------------------
+    acronym = extract_parenthesized_acronym(raw_venue)
+    if acronym:
+        for k in (acronym.lower(), normalize_venue(acronym)):
+            e = core.get(k) if k else None
+            if e and sane(e["original_title"], "core_acronym"):
+                return out("CORE", e["original_title"], e["rank"], "core_acronym")
+
+    # --- 4. CORE fuzzy(最後の手段) ----------------------------------------
+    if norm and not short:
+        searchable = {k: v for k, v in core.items() if not k.startswith("__")}
+        bk, bs = _fuzzy_best(norm, searchable, fuzzy_threshold)
+        if bk and bs >= fuzzy_threshold:
+            e = core[bk]
+            if sane(e["original_title"], "core_fuzzy"):
+                return out("CORE", e["original_title"], e["rank"], "core_fuzzy")
+
+    note = ""
+    if short and norm:
+        note = f"短キーガード(tokens<=2: '{norm}')"
+    if rejected:
+        note = (note + " / " if note else "") + "サニティ棄却 " + "; ".join(rejected[:3])
+    return out(None, None, None, "unmatched", note)
 
 
 def compile_exclusions(cats):
@@ -491,8 +694,14 @@ def phase2_core(rows: list[dict], fieldnames: list[str],
     sjr_q_dist: dict[str, int] = defaultdict(int)  # SJR quartiles
     unmatched_venues: list[str] = []
 
-    out_fields_incl = fieldnames + ["Matched_Venue", "Ranking_Source", "CORE_Rank", "SJR_Quartile"]
-    out_fields_excl = fieldnames + ["Matched_Venue", "Ranking_Source", "CORE_Rank", "SJR_Quartile", "Excl_Reason_Phase2"]
+    # Rev.12: Match_Stage(どの段で照合したか)と Match_Guard_Note(ガードの棄却理由)を
+    # 出力に含める。誤照合が「起きたら見える」状態にするのが構造ガードの本質なので、
+    # 監査可能性のために必ず残す。
+    _rev12 = ["Match_Stage", "Match_Guard_Note"]
+    out_fields_incl = fieldnames + ["Matched_Venue", "Ranking_Source", "CORE_Rank",
+                                    "SJR_Quartile"] + _rev12
+    out_fields_excl = fieldnames + ["Matched_Venue", "Ranking_Source", "CORE_Rank",
+                                    "SJR_Quartile", "Excl_Reason_Phase2"] + _rev12
 
     for row in rows:
         raw_venue = (row.get(venue_col, "") or "") if venue_col else ""
@@ -522,8 +731,15 @@ def phase2_core(rows: list[dict], fieldnames: list[str],
                 excluded.append(row)
             continue
 
-        # --- Step A: CORE lookup ---
-        matched_title, rank = best_core_match(raw_venue, core)
+        # --- Step A/B: 照合(Rev.12: exact をリスト横断で fuzzy より優先) ---
+        raw_issn = (row.get(issn_col, "") or "") if issn_col else ""
+        res = resolve_venue(raw_venue, core, sjr, issn=raw_issn)
+        matched_title, rank = (res["matched_title"], res["rank"]) \
+            if res["source"] == "CORE" else (None, None)
+        row["Match_Stage"] = res["stage"]
+        if res["rejected"]:
+            row["Match_Guard_Note"] = res["rejected"]
+            stats["guard_rejected"] = stats.get("guard_rejected", 0) + 1
 
         if matched_title is not None:
             row["Matched_Venue"]   = matched_title
@@ -541,9 +757,9 @@ def phase2_core(rows: list[dict], fieldnames: list[str],
                 excluded.append(row)
             continue
 
-        # --- Step B: SJR lookup (for journals not in CORE) ---
-        raw_issn  = (row.get(issn_col, "") or "") if issn_col else ""
-        sjr_title, quartile = best_sjr_match(raw_venue, sjr, issn=raw_issn)
+        # --- Step B: SJR 側の結果(同じ resolve_venue の戻り値を使う) ---
+        sjr_title, quartile = (res["matched_title"], res["rank"]) \
+            if res["source"] == "SJR" else (None, None)
 
         if sjr_title is not None:
             row["Matched_Venue"]   = sjr_title
