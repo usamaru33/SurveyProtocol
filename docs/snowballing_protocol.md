@@ -186,15 +186,17 @@ Phase 4 の適格性評価で左カラムと合流する。
 ```mermaid
 flowchart TB
     subgraph L["Identification of studies via databases"]
-        L1["Records identified from databases<br/>第1波 ACM 7,997 / IEEE 1,276+297 / Scopus 4,331<br/>第2波 ACM 9,630 / IEEE 361 / Scopus 2,542<br/>n = 26,434 (ResearchVR4.csv)<br/><i>Phase1以降は公式再実行待ちのため旧値</i>"]
-        L2["Duplicate records removed<br/>n = 2,139"]
-        L3["Records after de-duplication<br/>n = 12,543"]
-        L4["Records excluded by venue filter<br/>CORE A*/A + SJR Q1 に非該当<br/>n = 9,634"]
-        L5["Records after venue filter<br/>n = 2,909"]
-        L6["Records excluded by keyword rules<br/>Phase 3a・決定論的<br/>n = 1,082"]
-        L7["Records screened on title/abstract<br/>Phase 3b・評価者2名/件<br/>n = 1,827"]
+        L1["Records identified from databases<br/>第1波 ACM 7,997 / IEEE 1,276+297 / Scopus 4,331<br/>第2波 ACM 9,630 / IEEE 361 / Scopus 2,542<br/>n = 26,434 (ResearchVR4.csv)"]
+        L2["Duplicate records removed<br/>n = 8,092"]
+        L3["Records after de-duplication<br/>n = 18,342"]
+        LF["Records excluded by filter layer<br/>正規化クエリの再適用(Phase 1.5)<br/>n = 12,025"]
+        LG["Records after filter layer<br/>pass 2,610 + hold 3,707<br/>n = 6,317"]
+        L4["Records excluded by venue filter<br/>CORE A*/A + SJR Q1 に非該当<br/>n = 5,150"]
+        L5["Records after venue filter<br/>n = 1,167"]
+        L6["Records excluded by keyword rules<br/>Phase 3a・決定論的<br/>n = 383"]
+        L7["Records screened on title/abstract<br/>Phase 3b・評価者2名/件<br/>n = 784"]
         L8["Reports assessed for eligibility<br/>Phase 4・全文<br/>n = TBD"]
-        L1 --> L2 --> L3 --> L4 --> L5 --> L6 --> L7 --> L8
+        L1 --> L2 --> L3 --> LF --> LG --> L4 --> L5 --> L6 --> L7 --> L8
     end
 
     subgraph R["Identification of studies via other methods"]
