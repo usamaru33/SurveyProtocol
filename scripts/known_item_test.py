@@ -72,6 +72,10 @@ from pipeline import (  # noqa: E402
 
 FUZZY_THRESHOLD = 0.90  # Levenshtein 類似度の下限(候補提示用)
 
+# DOI は一致したがタイトルが食い違う場合に「別論文」と判定する類似度の境界。
+# 実測値にもとづく(同一論文の表記差 0.736 / 誤DOIによる別論文 0.330)。
+DOI_TITLE_SUSPECT_THRESHOLD = 0.60
+
 # 実際に実行された統合検索クエリ(search_strings.md / rule.md Rev.5)の3コンセプト群。
 # step0 脱落分析に使用。※旧版はrule.md計画段階のクエリを使っていたが、実行版に訂正済み。
 QUERY_CONCEPT_GROUPS: list[tuple[str, list[str]]] = [
@@ -188,12 +192,57 @@ class Dataset:
                     self.by_title[t] = row
 
     def match(self, doi: str, title_n: str):
-        """(row, method) を返す。確定一致しなければ (None, 'NONE')。"""
+        """(row, method) を返す。確定一致しなければ (None, 'NONE')。
+
+        **タイトル一致の偽陽性を検出する(2026-08-12 追加)。**
+        タイトルが一致してもコーパス側の DOI が gold set の DOI と食い違う場合、
+        それは同名の別論文である疑いが強い。旧実装はこれを無条件に「捕捉」と
+        判定しており、gold set #13 の誤り(3論文の情報が混在していた)を見逃した
+        直接の原因になった。同名別論文を捕捉と数えると **recall が過大に出る**。
+
+        判定は `export_completeness_audit.py` の `match_gold()` と同一基準:
+          - DOI 一致            → "DOI"(確定)
+          - タイトル一致 & コーパス側に DOI 無し → "TITLE"(確定扱い。照合の最後の手段)
+          - タイトル一致 & DOI 食い違い          → **"SUSPECT"(捕捉と数えない)**
+        SUSPECT は row を返さないため recall には算入されず、呼び出し側で警告される。
+        """
         if doi and doi in self.by_doi:
-            return self.by_doi[doi], "DOI"
+            row = self.by_doi[doi]
+            # DOI は一致したが**タイトルが別物**なら、gold set 側の DOI 誤記で
+            # 実在する別論文を掴んでいる疑い(#13 の実例: 誤記の DOI 10.1145/2617917 は
+            # 実在するが「Olfactory Adaptation in Virtual Environments」のもの)。
+            #
+            # 閾値は実測で決めた(下の DOI_TITLE_SUSPECT_THRESHOLD):
+            #   同一論文・表記差(#6 Banakou 2013、gold のタイトル末尾が実際と違う) = 0.736
+            #   誤DOI・完全な別論文(#13 旧)                                        = 0.330
+            # 0.60 を境界にすると両側に十分な余裕がある。
+            found_t = norm_title(row.get("Title", ""))
+            if title_n and found_t and found_t != title_n:
+                s = lev_similarity(title_n, found_t, floor=0.0)
+                if s is not None and s < DOI_TITLE_SUSPECT_THRESHOLD:
+                    return None, "SUSPECT"
+                # 別論文とまでは言えないが gold set の表記が実物と食い違っている
+                return row, "DOI(表記差)"
+            return row, "DOI"
         if title_n and title_n in self.by_title:
-            return self.by_title[title_n], "TITLE"
+            row = self.by_title[title_n]
+            found_doi = norm_doi(row.get("DOI", ""))
+            if doi and found_doi and found_doi != doi:
+                return None, "SUSPECT"
+            return row, "TITLE"
         return None, "NONE"
+
+    def suspect_detail(self, doi: str, title_n: str) -> str:
+        """SUSPECT の内訳(どの論文と衝突したか)を人間向けに1行で返す。"""
+        if doi and doi in self.by_doi:
+            row = self.by_doi[doi]
+            return (f"DOI={doi} は実在するが別論文のもの "
+                    f"(corpus側タイトル: 「{(row.get('Title') or '?')[:56]}」) "
+                    f"= gold set の DOI 誤記の疑い")
+        row = self.by_title.get(title_n) or {}
+        return (f"gold DOI={doi} / corpus DOI={norm_doi(row.get('DOI', ''))} "
+                f"({row.get('Publication Year', '?')}年 "
+                f"{(row.get('Publication Title') or '?')[:44]}) = 同名別論文の疑い")
 
     def fuzzy_candidates(self, title_n: str, limit: int = 3) -> list[tuple[str, float]]:
         """Levenshtein 類似度 ≥ 閾値のタイトル候補(提示のみ、自動確定しない)。"""
@@ -382,6 +431,8 @@ def main() -> None:
     compiled_excl = compile_exclusions(EXCLUSION_CATEGORIES)
 
     results: list[dict] = []
+    suspects: list[tuple] = []       # 識別子が食い違う(別論文の疑い。捕捉と数えない)
+    meta_warnings: list[tuple] = []  # 同一論文だが gold set のタイトル表記が実物と違う
     for it in items:
         doi = norm_doi(it.get("DOI", ""))
         title_n = norm_title(it.get("Title", ""))
@@ -404,6 +455,21 @@ def main() -> None:
             if row is not None:
                 if key == "step0":
                     matched_row_step0 = row
+                    if method == "DOI(表記差)":
+                        # 同一論文だが gold set のタイトル表記が実物と違う。
+                        # recall には算入するが、gold set の品質問題として必ず表に出す。
+                        meta_warnings.append(
+                            (it.get("#", "?"), it.get("Title", "").strip()[:60],
+                             (row.get("Title") or "").strip()[:60]))
+                continue
+            if method == "SUSPECT":
+                # タイトルは一致したが DOI が食い違う = 同名別論文の疑い。
+                # 捕捉と数えない(recall の過大報告を防ぐ)うえで、必ず表に出す。
+                detail = ds.suspect_detail(doi, title_n)
+                rec[f"{key}_fuzzy_candidates"] = detail
+                suspects.append((it.get("#", "?"), key, it.get("Title", "")[:52], detail))
+                if not drop_stage:
+                    drop_stage, drop_reason = key, f"SUSPECT: {detail}"
                 continue
             # 未確定 → FUZZY 候補提示(自動確定しない)
             cands = ds.fuzzy_candidates(title_n)
@@ -462,9 +528,31 @@ def main() -> None:
         fuzzy = sum(1 for r in results
                     if r[f"{key}_survived"] == "N"
                     and r[f"{key}_match_method"].startswith("FUZZY"))
+        susp = sum(1 for r in results
+                   if r[f"{key}_survived"] == "N"
+                   and r[f"{key}_match_method"] == "SUSPECT")
         note = f"  (+FUZZY要確認 {fuzzy})" if fuzzy else ""
+        note += f"  (+SUSPECT {susp})" if susp else ""
         print(f"  {key} {desc:<24}: {surv:>3}/{n}  recall={surv / n:.2%}{note}")
     print()
+
+    if suspects:
+        print("  " + "!" * 60)
+        print("  [SUSPECT] タイトルは一致したが DOI が食い違う = 同名別論文の疑い")
+        print("            捕捉として数えていない。gold set のメタデータを確認すること。")
+        for num, key, title, detail in suspects:
+            print(f"    #{num:>3} @{key}  {title}")
+            print(f"          └ {detail}")
+        print("  " + "!" * 60)
+        print()
+
+    if meta_warnings:
+        print("  [METADATA] DOI は一致するが gold set のタイトル表記が実物と食い違う")
+        print("             (同一論文と判定して recall には算入済み。表記の修正を推奨)")
+        for num, gold_t, corpus_t in meta_warnings:
+            print(f"    #{num:>3} gold  : {gold_t}")
+            print(f"         corpus: {corpus_t}")
+        print()
     for r in results:
         if r["drop_stage"] != "(全段階生存)":
             print(f"  [DROP@{r['drop_stage']}] {r['Title'][:60]}")
