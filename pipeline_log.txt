@@ -16,86 +16,95 @@
   Removed by DOI match   :    7,384
   Removed by Key match   :        0
   Removed by Title match :      708
+
+  --- Field merge from duplicates (Rev.13) ---
+    Abstract Note         :    4,172 件を重複コピーから補完
+    ISSN                  :    1,474 件を重複コピーから補完
+    DOI                   :        3 件を重複コピーから補完
   Total removed          :    8,092
   Records after dedup    :   18,342
 
   Output -> step1_dedup.csv
 
 ========================================================================
-  PHASE 2: CORE A/A* + SJR Q1 SCREENING
+  PHASE 1.5: FILTER LAYER (normalized query re-application)
 ========================================================================
 
   Input records   :   18,342
+  Pass (3 groups) :    2,610
+  Hold (要旨なし) :    3,707   ← 判定不能。除外せず人手へ
+  Fail (excluded) :   12,025
+  Records kept    :    6,317
+
+  --- 不成立だった概念群(重複計上) ---
+    G3 スケール知覚           :    8,898
+    G2 身体表象             :    8,734
+    G1 没入環境             :    2,421
+
+  Included output -> step1_5_filter_included.csv
+  Excluded output -> step1_5_filter_excluded.csv
+
+========================================================================
+  PHASE 2: CORE A/A* + SJR Q1 SCREENING
+========================================================================
+
+  Input records   :    6,317
   Venue column    : 'Publication Title'
   CORE entries    :    1,956
   SJR entries     :   50,327
   Venue aliases   :       33 keys
 
   --- CORE Rank Distribution ---
-    CORE A*              :  1,532
-    CORE A               :    281
-    CORE B               :  2,581
-    CORE C               :    340
-    CORE National: India :     86
-    CORE Regional:Scandinavia:     34
-    CORE Journal Published:     57
-    CORE Australasian B  :     14
-    CORE unranked: merged:     12
-    CORE Multiconference :     29
-    CORE National: USA   :     19
-    CORE National: Romania:      2
-    CORE National: japan :      1
-    CORE journal published:     11
-    CORE National/Regional:     23
-    CORE National(Spain) :      1
-    CORE National: Pakistan:      2
-    CORE National: Poland:      3
-    CORE Unranked        :      7
-    CORE National: S. Korea:      2
-    CORE Australasian C  :      1
-    CORE National: China :      4
+    CORE A*              :    258
+    CORE A               :     48
+    CORE B               :  1,048
+    CORE C               :     63
+    CORE Journal Published:      9
+    CORE Australasian B  :      4
+    CORE unranked: merged:      4
+    CORE National: India :      7
+    CORE National: USA   :      4
+    CORE Multiconference :      9
+    CORE Regional:Scandinavia:      6
+    CORE National: Romania:      1
+    CORE journal published:      3
+    CORE National/Regional:      1
+    CORE Unranked        :      3
+    CORE National: China :      2
     CORE National        :      1
 
   --- SJR Quartile Distribution ---
-    SJR  Q1              :  2,212
-    SJR  Q2              :  1,104
-    SJR  Q3              :    386
-    SJR  Q4              :    225
-    SJR  -               :    306
+    SJR  Q1              :    861
+    SJR  Q2              :    421
+    SJR  Q3              :    168
+    SJR  Q4              :    151
+    SJR  -               :    148
 
-  INCLUDED total         :    4,025
-    CORE A/A*            :      837
-    SJR Q1               :    2,184
-    Alias (high rank)    :    1,004
-  EXCLUDED total         :   14,317
-    CORE low rank (B/C)  :    1,322
-    SJR Q2/Q3/Q4         :    1,937
-    Alias (low rank)     :    1,992
-    Unmatched            :    9,066
+  INCLUDED total         :    1,167
+    CORE A/A*            :      181
+    SJR Q1               :      838
+    Alias (high rank)    :      148
+  EXCLUDED total         :    5,150
+    CORE low rank (B/C)  :      310
+    SJR Q2/Q3/Q4         :      860
+    Alias (low rank)     :      883
+    Unmatched            :    3,097
 
   --- Sample Unmatched Venues (first 30) ---
     Proceedings of the 2015 Virtual Reality International Conference
-    Proceedings of the 2020 4th International Conference on Virtual and Augmented Reality Simulations
     Proceedings of the Fifth Biennial African Human-Computer Interaction Conference
     Adjunct Proceedings of the 2022 Nordic Human-Computer Interaction Conference
     Companion Proceedings of the 22nd International Conference on Intelligent User Interfaces
     Proceedings of the 27th International Conference on Multimodal Interaction
-    Proceedings of the 32nd ACM SIGSOFT International Symposium on Software Testing and Analysis
     Proceedings of the 2020 The 2nd World Symposium on Software Engineering
     2021 4th International Conference on Information Systems and Computer Aided Education
-    Proceedings of the 2025 International Conference on Artificial Intelligence and Computational Intelligence
-    Proceedings of the 2nd Guangdong-Hong Kong-Macao Greater Bay Area Education Digitalization and Computer Science International Conference
-    Proceedings of the 2025 9th International Conference on Education and E-Learning
     Proceedings of the first symposium on Virtual reality modeling language - VRML '95
-    Proceedings of the 2025 9th International Conference on Education and Multimedia Technology
-    Proceedings of the Extended Abstracts of the CHI Conference on Human Factors in Computing Systems
     (empty)
     (empty)
     Proceedings of the 8th ACM International Conference on PErvasive Technologies Related to Assistive Environments
     The 24th International Conference on 3D Web Technology
     Proceedings of the 7th International Conference on PErvasive Technologies Related to Assistive Environments
     Designing Interactive Systems Conference
-    SIGGRAPH ASIA 2016 Virtual Reality meets Physical Reality: Modelling and Simulating Virtual Humans and Environments
     Proceedings of the 15th ACM SIGGRAPH Conference on Virtual-Reality Continuum and Its Applications in Industry - Volume 1
     Proceedings of the Virtual Reality International Conference - Laval Virtual
     SIGGRAPH ASIA 2016 Symposium on Education: Talks
@@ -104,7 +113,15 @@
     Proceedings of the ACM conference on Hypertext
     ACM SIGGRAPH 2018 Computer Animation Festival
     (empty)
-    ... and 9036 more
+    ACM SIGCSE Bulletin
+    ACM SIGGRAPH 98 Conference abstracts and applications
+    Proceedings of the 2018 ACM Symposium on Eye Tracking Research &amp; Applications
+    Proceedings of the twelfth ACM SIGACT-SIGMOD-SIGART symposium on Principles of database systems - PODS '93
+    2021 4th International Conference on Control and Computer Vision
+    Proceedings of the 24th annual conference on Computer graphics and interactive techniques - SIGGRAPH '97
+    Proceedings of the 2025 2nd International Conference on Virtual Reality, Image and Signal Processing
+    Proceedings of the 13th ACM SIGPLAN International Workshop on Virtual Machines and Intermediate Languages
+    ... and 3067 more
 
   Included output -> step2_rank_included.csv
   Excluded output -> step2_rank_excluded.csv
@@ -113,92 +130,94 @@
   PHASE 3: KEYWORD EXCLUSION
 ========================================================================
 
-  Input records   :    4,025
+  Input records   :    1,167
   Title column    : 'Title'
   Abstract column : 'Abstract Note'
 
-  Included        :    2,659  (66.1 %)
-  Excluded        :    1,366  (33.9 %)
+  Included        :      784  (67.2 %)
+  Excluded        :      383  (32.8 %)
 
   --- By Category ---
-       568  Cat1 [Not VR / Out of Scope]
-       113  Cat2 [Tech / Non-Empirical]
-       775  Cat3 [Clinical / Medical]
+       119  Cat1 [Not VR / Out of Scope]
+        24  Cat2 [Tech / Non-Empirical]
+       263  Cat3 [Clinical / Medical]
 
   --- By Keyword (top hits) ---
   +-- Cat1 [Not VR / Out of Scope]
-  |     278  \baugmented reality\b
-  |     278  \bar\b
-  |     113  \bmixed reality\b
-  |      59  \bmr\b
-  |      48  \bsmartphone\b
-  |      24  \btablet(?:\s+computer)?\b
-  |      20  \b360[- ]?(?:degree[s]?\s+)?video\b
-  |       6  \bflat[- ]screen\b
-  |       5  \bcomputer monitor\b
-  |       5  \bmobile phone\b
-  |       4  \bcave automatic virtual\b
-  |       3  \bdesktop monitor\b
-  |       3  \bcave system\b
-  |       2  \bflat panel\b
-  |       2  \b2d display\b
-  |       1  \bpanoramic video\b
+  |      51  \baugmented reality\b
+  |      50  \bar\b
+  |      25  \bmixed reality\b
+  |      14  \bmr\b
+  |       9  \bsmartphone\b
+  |       6  \btablet(?:\s+computer)?\b
+  |       4  \bflat[- ]screen\b
+  |       2  \bcomputer monitor\b
+  |       2  \b360[- ]?(?:degree[s]?\s+)?video\b
+  |       2  \bmobile phone\b
+  |       2  \bcave system\b
+  |       1  \bdesktop monitor\b
   |
   +-- Cat2 [Tech / Non-Empirical]
-  |      23  \bpoint\s+cloud\b
-  |      18  \bgpu\b
-  |      14  \bframe\s+rate\b
-  |      11  \brendering\s+(?:algorithm|engine|pipeline|technique|performance)\b
-  |      10  \breal[- ]?time\s+rendering\b
-  |       8  \boptimiz(?:ation|ing)\s+algorithm\b
-  |       8  \bsystem\s+architecture\b
-  |       5  \bdepth\s+camera\b
-  |       5  \bsegmentation\s+algorithm\b
-  |       4  \brefresh\s+rate\b
-  |       4  \bsoftware\s+(?:framework|architecture|library)\b
-  |       2  \bshader\b
-  |       2  \bmotion[- ]to[- ]photon\b
-  |       2  \btracking\s+algorithm\b
-  |       1  \bstereo\s+reconstruction\b
-  |       1  \btechnical\s+report\b
+  |       4  \breal[- ]?time\s+rendering\b
+  |       4  \bpoint\s+cloud\b
+  |       3  \bframe\s+rate\b
+  |       3  \bsegmentation\s+algorithm\b
+  |       2  \bgpu\b
+  |       2  \bdepth\s+camera\b
+  |       2  \bsystem\s+architecture\b
+  |       1  \brendering\s+(?:algorithm|engine|pipeline|technique|performance)\b
+  |       1  \brefresh\s+rate\b
+  |       1  \boptimiz(?:ation|ing)\s+algorithm\b
+  |       1  \bsoftware\s+(?:framework|architecture|library)\b
   |
   +-- Cat3 [Clinical / Medical]
-  |     520  \bpatient[s]?\b
-  |     305  \brehabilitation\b
-  |      96  \bsurgery\b
-  |      78  \bclinical\s+(?:trial|study|outcome|setting|population)\b
-  |      43  \bphysical\s+therapy\b
-  |      27  \bschizophrenia\b
-  |      22  \bstroke\s+(?:patient|rehabilitation|survivor|recovery)\b
-  |      22  \bdementia\b
-  |      21  \bexposure\s+therapy\b
-  |      20  \bautism\s+spectrum\b
-  |      18  \bchronic\s+pain\b
-  |      17  \bsurgical\s+(?:training|simulation|procedure|planning)\b
-  |      16  \bcognitive\s+(?:behavioural|behavioral)\s+therapy\b
-  |      16  \bpain\s+management\b
-  |      11  \bneurological\s+(?:disorder|condition|rehabilitation|disease)\b
-  |      10  \bminimally\s+invasive\b
-  |      10  \bphobia\b
-  |       8  \balzheimer\b
-  |       8  \bpsychosis\b
-  |       7  \bptsd\b
-  |       6  \blaparoscop\w+\b
-  |       6  \bpain\s+relief\b
-  |       4  \boccupational\s+therapy\b
-  |       4  \btherapeutic\s+intervention\b
-  |       4  \bpost[- ]traumatic\s+stress\b
-  |       1  \bpsychiatric\s+(?:disorder|treatment|patient)\b
+  |     173  \bpatient[s]?\b
+  |      92  \brehabilitation\b
+  |      35  \bsurgery\b
+  |      26  \bclinical\s+(?:trial|study|outcome|setting|population)\b
+  |      13  \bchronic\s+pain\b
+  |      12  \bschizophrenia\b
+  |      11  \bexposure\s+therapy\b
+  |      10  \bpain\s+management\b
+  |       9  \bphysical\s+therapy\b
+  |       9  \bcognitive\s+(?:behavioural|behavioral)\s+therapy\b
+  |       9  \bautism\s+spectrum\b
+  |       8  \bphobia\b
+  |       7  \bdementia\b
+  |       6  \bpsychosis\b
+  |       5  \bstroke\s+(?:patient|rehabilitation|survivor|recovery)\b
+  |       3  \btherapeutic\s+intervention\b
+  |       3  \bminimally\s+invasive\b
+  |       3  \bptsd\b
+  |       3  \bpain\s+relief\b
+  |       2  \boccupational\s+therapy\b
+  |       2  \bsurgical\s+(?:training|simulation|procedure|planning)\b
+  |       2  \blaparoscop\w+\b
+  |       2  \bpost[- ]traumatic\s+stress\b
+  |       2  \balzheimer\b
+  |       2  \bneurological\s+(?:disorder|condition|rehabilitation|disease)\b
   |
 
   --- Silent Patterns (zero hits) ---
   Cat1 [Not VR / Out of Scope]
     \bdesktop display\b
+    \bflat panel\b
+    \b2d display\b
     \bspherical video\b
+    \bpanoramic video\b
     \bomnidirectional video\b
     \bprojection mapping\b
     \bprojected display\b
+    \bcave automatic virtual\b
     \bcave display\b
+  Cat2 [Tech / Non-Empirical]
+    \bshader\b
+    \bstereo\s+reconstruction\b
+    \bmotion[- ]to[- ]photon\b
+    \btracking\s+algorithm\b
+    \btechnical\s+report\b
+  Cat3 [Clinical / Medical]
+    \bpsychiatric\s+(?:disorder|treatment|patient)\b
 
   Included output -> step3_kw_included.csv
   Excluded output -> step3_kw_excluded.csv
@@ -209,8 +228,9 @@
 
   Original records   :   26,434
   After dedup (P1)   :   18,342  (-8,092)
-  After CORE  (P2)   :    4,025  (-14,317)
-  After keywords (P3):    2,659  (-1,366)
+  After filter (P1.5):    6,317  (-12,025)
+  After CORE  (P2)   :    1,167  (-5,150)
+  After keywords (P3):      784  (-383)
 
   Output files:
     step1_dedup.csv

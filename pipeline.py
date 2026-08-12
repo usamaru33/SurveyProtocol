@@ -606,6 +606,73 @@ def resolve_venue(raw_venue: str, core: dict, sjr: dict, issn: str = "",
     return out(None, None, None, "unmatched", note)
 
 
+# ---------------------------------------------------------------------------
+# Rev.13: フィルタ層(Phase 1.5) — 取得後に正規化クエリを一律再適用する
+#
+# 【なぜ必要か】DB ごとに検索の当たり方が違う。実測で判明しているだけでも
+#   - 第1波 Scopus は TITLE-ABS-KEY、第2波は TITLE-ABS(scope が違う)
+#   - 第1波 IEEE はより広いフィールド指定(1,077件が第2波に現れず、
+#     そのうち TA で3群成立するのは 4.7% だけ)
+#   - ACM 第2波は Title 検索と Abstract 検索の和集合(フィールド横断の一致を落とす)
+# このまま統合すると「どの DB で拾われたか」によって適格性が変わってしまう。
+# 取得後に**同じクエリを全レコードへ1回だけ**適用して、この差を吸収する。
+# (methodology_decision_Rev7.md 方針3。Zhou et al. 2025 と同じ発想)
+#
+# 【選定基準より前に置く理由】これは「取得の差を均す処理」であって
+# 「適格性で落とす処理」ではない。Venue ランク(Phase 2)やキーワード除外(Phase 3a)
+# より前に置き、PRISMA でも別の段として報告する。
+#
+# 【重複削除より後に置く理由】同じ論文の ACM コピーと Scopus コピーで判定が割れる。
+# マージ後の1レコードに対して1回だけ適用する。
+#
+# 【フェイルセーフ(必須)】要旨が無いレコードは**判定不能であって不適格ではない**。
+# タイトルのみで判定すると要旨欠落567件のうち566件が落ちるが、これは中身ではなく
+# メタデータ品質による除外であり正当化できない。判定不能は保留し人手へ送る。
+# gold set 12件での検証: 本設計での脱落は 0件(タイトルのみ判定だと4件が落ちる)。
+# ---------------------------------------------------------------------------
+
+QUERY_CONCEPT_GROUPS_TA = [
+    ("G1 没入環境", re.compile(
+        r"\b(virtual realit\w*|vr|hmds?|head[- ]mounted displays?"
+        r"|virtual environment\w*|immersive virtual)\b", re.I)),
+    ("G2 身体表象", re.compile(
+        r"\b(avatars?|bod(?:y|ies|ily)|embodiment|embodied)\b", re.I)),
+    ("G3 スケール知覚", re.compile(
+        r"\b(sizes?|scal\w*|heights?|distances?)\b", re.I)),
+]
+
+# 重複グループ間で補完するフィールド(Rev.13)。
+#
+# **Venue 名(Publication Title)は絶対にマージしない。** DB ごとに表記が違い、
+# 「長い方が良い」わけではないため。実際に一度マージしたところ、gold #11 の venue が
+# IEEE 表記から Scopus 表記
+# ('25th IEEE Conference on Virtual Reality and 3D User Interfaces, VR 2018 - Proceedings')
+# に置き換わり、CORE A* に照合できなくなって step2 recall が 3/12 → 2/12 に落ちた。
+# Venue 表記の統一はエイリアス表と正規化(Rev.12)の担当であって、マージの仕事ではない。
+#
+#   MERGE_LONGEST : 値が長い方を採る(切り詰められた要旨があるため)
+#   MERGE_IF_EMPTY: 空のときだけ埋める(識別子は上書きしてはならない)
+MERGE_LONGEST = ["Abstract Note"]
+MERGE_IF_EMPTY = ["DOI", "ISSN"]
+MERGE_FIELDS = MERGE_LONGEST + MERGE_IF_EMPTY
+
+
+def filter_layer_verdict(title: str, abstract: str) -> tuple[str, str]:
+    """(verdict, reason) を返す。verdict は 'pass' / 'fail' / 'hold'。
+
+    - 要旨あり: Title+Abstract に3概念群すべてが成立すれば pass、欠ければ fail
+    - 要旨なし: **hold**(判定不能。除外せず人手スクリーニングへ)
+    """
+    abstract = (abstract or "").strip()
+    if not abstract:
+        return "hold", "要旨なしのため判定不能(フェイルセーフで保留)"
+    text = f"{title or ''} {abstract}"
+    missing = [name for name, rx in QUERY_CONCEPT_GROUPS_TA if not rx.search(text)]
+    if missing:
+        return "fail", "概念群が不成立: " + " / ".join(missing)
+    return "pass", ""
+
+
 def compile_exclusions(cats):
     return [(lbl, [(p, re.compile(p, re.IGNORECASE)) for p in pats])
             for lbl, pats in cats]
@@ -651,6 +718,9 @@ def phase1_dedup(rows: list[dict], fieldnames: list[str],
     seen_title: dict[str, int] = {}
     seen_key: dict[str, int]   = {}
 
+    index_of_kept: dict[int, dict] = {}   # Rev.13: 採用行への参照(フィールド補完用)
+    merged_counts: dict[str, int] = {}
+
     dedup: list[dict] = []
     dup_doi_count   = 0
     dup_title_count = 0
@@ -673,17 +743,44 @@ def phase1_dedup(rows: list[dict], fieldnames: list[str],
             dup_reason = f"Duplicate Title (first seen at row {seen_title[title]})"
 
         if dup_reason:
+            # Rev.13: 重複を捨てる前に、**残す側に欠けているフィールドを補う**。
+            # 旧実装は先出コピーをそのまま採用して残りを捨てていたため、
+            # 「ACM(要旨なし)が Scopus(要旨あり)より先に並んでいる」というだけの理由で
+            # 要旨を捨てていた。実測では欠落7,375件のうち3,439件が、
+            # 同じ論文の別コピーに要旨を持っていた(外部API不要で回収できる)。
+            # 判定は決定論的(値が空でないもの/より長いものを採る)。
+            keep_idx = (seen_doi.get(doi) if doi and doi in seen_doi else
+                        seen_key.get(key) if key and key in seen_key else
+                        seen_title.get(title))
+            if keep_idx is not None:
+                kept = index_of_kept.get(keep_idx)
+                if kept is not None:
+                    for col in MERGE_FIELDS:
+                        cur = (kept.get(col) or "").strip()
+                        new = (row.get(col) or "").strip()
+                        if not new:
+                            continue
+                        take = (len(new) > len(cur)) if col in MERGE_LONGEST else (not cur)
+                        if take:
+                            kept[col] = new
+                            merged_counts[col] = merged_counts.get(col, 0) + 1
             continue
 
         if doi:   seen_doi[doi]     = i
         if key:   seen_key[key]     = i
         if title: seen_title[title] = i
+        index_of_kept[i] = row
         dedup.append(row)
 
     removed = len(rows) - len(dedup)
     log_lines.append(f"  Removed by DOI match   : {dup_doi_count:>8,}")
     log_lines.append(f"  Removed by Key match   : {dup_key_count:>8,}")
     log_lines.append(f"  Removed by Title match : {dup_title_count:>8,}")
+    if merged_counts:
+        log_lines.append("")
+        log_lines.append("  --- Field merge from duplicates (Rev.13) ---")
+        for col, cnt in sorted(merged_counts.items(), key=lambda x: -x[1]):
+            log_lines.append(f"    {col:<22}: {cnt:>8,} 件を重複コピーから補完")
     log_lines.append(f"  Total removed          : {removed:>8,}")
     log_lines.append(f"  Records after dedup    : {len(dedup):>8,}")
     log_lines.append("")
@@ -708,6 +805,68 @@ def phase1_dedup(rows: list[dict], fieldnames: list[str],
 # ---------------------------------------------------------------------------
 # Phase 2: CORE Rank Filtering (A / A* only)
 # ---------------------------------------------------------------------------
+
+def phase1_5_filter(rows: list[dict], fieldnames: list[str],
+                    outdir: Path, log_lines: list[str]) -> list[dict]:
+    """Phase 1.5: フィルタ層。取得後に正規化クエリを一律再適用する(Rev.13)。
+
+    設計理由は `filter_layer_verdict` の直上のコメントを参照。
+    保留(hold)は**除外しない**。pass と hold を次段へ通す。
+    """
+    SEP = "=" * 72
+    log_lines += [SEP, "  PHASE 1.5: FILTER LAYER (normalized query re-application)",
+                  SEP, ""]
+    title_col = resolve_col(fieldnames, TITLE_ALIASES)
+    abs_col = resolve_col(fieldnames, ABSTRACT_ALIASES)
+
+    kept, dropped = [], []
+    n_pass = n_hold = 0
+    miss_counter: dict[str, int] = {}
+    for row in rows:
+        verdict, reason = filter_layer_verdict(
+            row.get(title_col, "") if title_col else "",
+            row.get(abs_col, "") if abs_col else "")
+        row["Filter_Layer"] = verdict
+        row["Filter_Layer_Reason"] = reason
+        if verdict == "fail":
+            dropped.append(row)
+            for g in reason.replace("概念群が不成立: ", "").split(" / "):
+                miss_counter[g] = miss_counter.get(g, 0) + 1
+        else:
+            kept.append(row)
+            if verdict == "pass":
+                n_pass += 1
+            else:
+                n_hold += 1
+
+    log_lines.append(f"  Input records   : {len(rows):>8,}")
+    log_lines.append(f"  Pass (3 groups) : {n_pass:>8,}")
+    log_lines.append(f"  Hold (要旨なし) : {n_hold:>8,}   ← 判定不能。除外せず人手へ")
+    log_lines.append(f"  Fail (excluded) : {len(dropped):>8,}")
+    log_lines.append(f"  Records kept    : {len(kept):>8,}")
+    if miss_counter:
+        log_lines.append("")
+        log_lines.append("  --- 不成立だった概念群(重複計上) ---")
+        for g, c in sorted(miss_counter.items(), key=lambda x: -x[1]):
+            log_lines.append(f"    {g:<20}: {c:>8,}")
+    log_lines.append("")
+
+    out_fields = fieldnames + ["Filter_Layer", "Filter_Layer_Reason"]
+    write_csv(outdir / "step1_5_filter_included.csv", kept, out_fields)
+    write_csv(outdir / "step1_5_filter_excluded.csv", dropped, out_fields)
+    log_lines.append("  Included output -> step1_5_filter_included.csv")
+    log_lines.append("  Excluded output -> step1_5_filter_excluded.csv")
+    log_lines.append("")
+
+    print(f"\n{'='*60}")
+    print(f"  PHASE 1.5: Filter Layer (Rev.13)")
+    print(f"{'='*60}")
+    print(f"  Input     : {len(rows):,}")
+    print(f"  Pass      : {n_pass:,}   Hold(要旨なし): {n_hold:,}")
+    print(f"  Excluded  : {len(dropped):,}")
+    print(f"  Remaining : {len(kept):,}")
+    return kept
+
 
 def phase2_core(rows: list[dict], fieldnames: list[str],
                 core: dict, sjr: dict, outdir: Path, log_lines: list[str],
@@ -1052,12 +1211,16 @@ def main(argv=None):
     # ── Phase 1 ──────────────────────────────────────────────
     after_p1 = phase1_dedup(rows, fieldnames, args.outdir, log_lines)
 
+    # ── Phase 1.5(Rev.13): 取得の差を均す。選定基準(P2/P3)より前に置く ──
+    after_p15 = phase1_5_filter(after_p1, fieldnames, args.outdir, log_lines)
+    fieldnames_f = fieldnames + ["Filter_Layer", "Filter_Layer_Reason"]
+
     # ── Phase 2 ──────────────────────────────────────────────
-    after_p2 = phase2_core(after_p1, fieldnames, core, sjr, args.outdir, log_lines,
+    after_p2 = phase2_core(after_p15, fieldnames_f, core, sjr, args.outdir, log_lines,
                            aliases=aliases)
 
     # ── Phase 3 ──────────────────────────────────────────────
-    after_p3 = phase3_keywords(after_p2, fieldnames, args.outdir, log_lines)
+    after_p3 = phase3_keywords(after_p2, fieldnames_f, args.outdir, log_lines)
 
     # Summary
     SEP = "=" * 72
@@ -1065,7 +1228,8 @@ def main(argv=None):
         SEP, "  PIPELINE SUMMARY", SEP, "",
         f"  Original records   : {len(rows):>8,}",
         f"  After dedup (P1)   : {len(after_p1):>8,}  (-{len(rows)-len(after_p1):,})",
-        f"  After CORE  (P2)   : {len(after_p2):>8,}  (-{len(after_p1)-len(after_p2):,})",
+        f"  After filter (P1.5): {len(after_p15):>8,}  (-{len(after_p1)-len(after_p15):,})",
+        f"  After CORE  (P2)   : {len(after_p2):>8,}  (-{len(after_p15)-len(after_p2):,})",
         f"  After keywords (P3): {len(after_p3):>8,}  (-{len(after_p2)-len(after_p3):,})",
         "",
         "  Output files:",
