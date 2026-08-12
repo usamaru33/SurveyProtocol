@@ -92,11 +92,55 @@ def landis_koch(k: float) -> str:
     return "almost perfect"
 
 
-def load_sheet(path: Path) -> dict[str, dict]:
-    if not path.exists():
-        return {}
+def _load_csv(path: Path) -> dict[str, dict]:
     with path.open(encoding="utf-8-sig", newline="", errors="replace") as f:
         return {r["record_id"]: r for r in csv.DictReader(f) if r.get("record_id")}
+
+
+def _load_xlsx(path: Path) -> dict[str, dict]:
+    """Excel 版の判定シートを読む。
+
+    評価者が実際に記入するのは xlsx(`make_screening_xlsx.py` 製)なので、
+    集計はそちらを正として読めなければならない。表示名の見出し
+    (「判定」「除外理由」…)を CSV の列名(decision/reason/…)へ戻して扱う。
+    """
+    try:
+        from openpyxl import load_workbook
+    except ImportError:
+        sys.exit("[ERROR] xlsx を読むには openpyxl が必要:  pip install openpyxl")
+
+    from make_screening_xlsx import COLUMNS
+    label2key = {label: key for key, label, *_ in COLUMNS}
+
+    wb = load_workbook(path, read_only=True, data_only=True)
+    ws = wb["判定"] if "判定" in wb.sheetnames else wb[wb.sheetnames[-1]]
+    it = ws.iter_rows(values_only=True)
+    header = [(str(h).strip() if h is not None else "") for h in next(it, [])]
+    keys = [label2key.get(h, h) for h in header]
+
+    out: dict[str, dict] = {}
+    for values in it:
+        row = {k: ("" if v is None else str(v).strip())
+               for k, v in zip(keys, values)}
+        rid = row.get("record_id", "")
+        if rid:
+            out[rid] = row
+    wb.close()
+    return out
+
+
+def load_sheet(path: Path) -> dict[str, dict]:
+    """判定シートを読む。**同名の .xlsx があればそちらを優先**する。
+
+    評価者は xlsx で作業し、CSV は生成時の雛形として残るため、
+    CSV を先に読むと「未記入」と誤判定してしまう。
+    """
+    xlsx = path.with_suffix(".xlsx")
+    if xlsx.exists():
+        return _load_xlsx(xlsx)
+    if path.exists():
+        return _load_csv(path)
+    return {}
 
 
 def main() -> None:

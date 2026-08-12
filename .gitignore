@@ -22,3 +22,4 @@ raw/IEEE2/
 # (独立性はその時点で問題にならず、公開義務だけが残るため)。
 # 割当表・協議リスト・最終判定は最初から追跡する。
 screening/sheet_*.csv
+screening/sheet_*.xlsx
