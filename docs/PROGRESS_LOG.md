@@ -37,13 +37,13 @@
 
 ## 完了していること
 
-### 1. プロトコル（Rev.9 まで確定）
+### 1. プロトコル（Rev.13 まで確定）
 - **DB構成: 3DB（ACM DL / IEEE Xplore / Scopus）**。PubMed は Rev.8 で不使用に確定、PsycINFO はアクセス制約で不使用。
 - **判定に AI/LLM は不使用**（Rev.2）。Phase 3a は決定論的キーワード除外、Phase 3b/4 は人手。
 - **Venue 基準: CORE A*/A のみ + SJR Q1 のみ**（Rev.4）。Q2脱落826件は Threats で報告。
-- **検索 scope: TA（Title-Abstract）**（Rev.7/8）。
+- **検索 scope: TA（Title-Abstract）**（Rev.10 で最終確定）。第1波のみ scope が異なる（Scopus=TAK / IEEE=広域、Rev.11）。
 - **評価者3名のペア分担 + ペアワイズ Cohen's κ の平均**（Rev.9）。
-- 変更履歴は `docs/protocol_changelog.md`。**`rule.md` 本文は Rev.9 分のみ反映済みで、Rev.8 分は未反映。**
+- 変更履歴は `docs/protocol_changelog.md`。**`rule.md` 本文は Rev.11 までを反映済み（2026-08-11）。**
 
 ### 2. 検索データ
 
@@ -55,26 +55,37 @@
 | 第1波 | ~~PubMed~~ | 781（Rev.8 で不使用） | `raw/PubMed.csv` |
 | **第2波** | **Scopus** | **2,542** | `raw/scopus_wave2_20260730.csv` |
 | **第2波** | **ACM DL** | **9,630** | `raw/acm_wave2_20260803.csv` |
-| 第2波 | IEEE Xplore | 379（**未取得**） | — |
+| **第2波** | **IEEE Xplore** | **361** | `raw/ieee_wave2_20260810.csv` |
 
 - 第2波は Rev.6 の G1拡張クエリ。ACM は **title検索 6,013 + abstract検索 8,331 の和集合**（`docs/search_strings.md` にスライス内訳）。
-- Zotero 往復の無損失を2例で実測（Scopus 2,542 / ACM 9,630 とも完全一致）。
+- Zotero 往復の無損失を3例で実測（Scopus 2,542 / ACM 9,630 / IEEE 361 とも一致）。
+- **統合生データ `ResearchVR4.csv` = 26,434件**（`scripts/merge_raw.py`、Source_DB 列つき、PubMed 除外）。
 
-### 3. スクリーニング Phase 1〜3（**第1波データでの結果。凍結中**）
+### 3. スクリーニング Phase 1〜3（**Rev.12 公式再実行済み・凍結解除**）
 
 ```
-14,682 件（ResearchVR3.csv）
-  → Phase 1 重複削除        : -2,139 → 12,543 件
-  → Phase 2 Venueランク      : -9,634 →  2,909 件
-  → Phase 3 キーワード除外    : -1,082 →  1,827 件（step3_kw_included.csv ★最終候補）
+26,434 件（ResearchVR4.csv = 3DB × 第1波+第2波）
+  → Phase 1   重複削除        : -8,092  → 18,342 件（+ 重複コピーからのフィールドマージ）
+  → Phase 1.5 フィルタ層      : -12,025 →  6,317 件（pass 2,610 / hold 3,707）
+  → Phase 2   Venueランク      : -5,150  →  1,167 件
+  → Phase 3a  キーワード除外    : -383    →    784 件（step3_kw_included.csv ★最終候補）
 ```
 
-- **この step ファイルは 2026-07-17 15:06 の実行結果**で、同日追加の Venue エイリアス表を通していない。
-  第2波統合後に正規化改修とあわせて公式再実行する方針。
+- **2026-08-12 に正規化改修（Rev.12）を適用して公式再実行**。2026-07-17 15:06 以来の凍結を解除した。
+  旧値（14,682→12,543→2,909→1,827）は第1波・4DB 前提であり**以後は使用しない**。
+- Phase 3a 内訳: Cat1 非没入 112 / Cat2 技術・非実証 24 / Cat3 臨床・医療 262。
+- **Phase 1.5 フィルタ層（Rev.13）**: 取得後に正規化クエリを一律再適用し、DB間の検索scope差を吸収する。
+  要旨が無いレコードは判定不能として `hold`（除外せず人手へ）。gold set の脱落は 0 件。
+- Phase 1 で重複コピーから **Abstract 4,172件 / ISSN 1,474件** を補完（外部API不要）。
+- Phase 2 出力に `Match_Stage` / `Match_Guard_Note` を追加（誤照合を可視化する監査列）。
+  unmatched 9,066件のうちガード起因は 865件（9.5%）。
+- **Phase 3b の工数は 3名ペア分担で約 523件/人**（784×2÷3）。
 
 ### 4. 検証基盤
-- **Known-Item Test**（`scripts/known_item_test.py`）: gold set = `self_scale_references.csv`（in-scope 13件）。
-  現在 step0 **69.23%**（目標 ≥80%）→ step2 23.08%。脱落分析は `known_item_analysis.md` に自動生成。
+- **Known-Item Test**（`scripts/known_item_test.py`）: gold set = `self_scale_references.csv`（in-scope 12件）。
+  現在 step0 **66.67%**（8/12、目標 ≥80%）→ step2 **25.00%**（Rev.12 再実行後も同値）。
+  **Rev.12 で脱落の性質が変わった**: venue 脱落5件の内訳が「照合漏れ3件」→「照合漏れ1件（#7のみ）/
+  ランク不足3件」へ。#8・#13 は正しく照合したうえで CORE B・C だった。脱落分析は `known_item_analysis.md` に自動生成。
 - **エクスポート完全性の監査**（`scripts/export_completeness_audit.py`）: 打ち切り検出・重複・
   期待件数との突き合わせ・gold set 照合（HIT/SUSPECT/MISS）。ACM の1,000件打ち切りを検出した実績あり。
 - **統合生データの生成**（`scripts/merge_raw.py`）: `Source_DB` 列を付与。PubMed は既定で除外。
@@ -85,7 +96,7 @@
 ### 5. API 検索の自動化
 - `scripts/db_search_scopus.py`（**稼働中**）/ `scripts/db_search_ieee.py`（403 で停止中）/
   `scripts/api_search_common.py`（クエリ生成・polite_get・RIS出力・.env読み込み）。
-- `scripts/snowball_search.py`（S2 引用探索、**未実行**）、`scripts/enrich_abstracts.py`（Abstract補完、少数件試験のみ）。
+- `scripts/snowball_search.py`（S2 引用探索、**1ホップ実行済み** 1,854行/新規1,433件。列追加のため要再実行）、`scripts/enrich_abstracts.py`（Abstract補完、少数件試験のみ）。
 
 ### 6. 関連ツール `../docs-system`（Next.js、別リポジトリ相当）
 - Semantic Scholar 検索 → 引用ネットワーク可視化（D3）→ Supabase + R2。**サーベイ本体とは未接続。**
@@ -110,9 +121,15 @@
 
 ### C. スクリーニング本体
 7. **Phase 3b: Title/Abstract 二重スクリーニング** — 評価者3名のペア分担、各文献を2名が独立評価、
-   ペアごとの Cohen's κ の平均を報告（Rev.9）。工数は約1,218件/人（1,827件×2÷3、再実行後に変動）。
-   - 判定シート様式（文献ID・**担当ペア**・両評価者の判定・最終判定・協議メモ）が**未作成**
+   ペアごとの Cohen's κ の平均を報告（Rev.9）。工数は **約523件/人**（784件×2÷3）。
+   - ~~判定シート様式が**未作成**~~ → **作成済み（2026-08-12）**。
+     `scripts/make_screening_sheets.py`（生成）/ `scripts/score_screening.py`（κ算出・協議リスト）/
+     `docs/screening_protocol.md`（運用手順）。**評価者ごとに別ファイル**にして独立性を担保。
+     ブロック割当は決定論的（キーの MD5 mod 3）。**Excel版（.xlsx）も生成済みで記入待ち**
+     （ブロック1 240件 / 2 261件 / 3 283件）
    - キーワードスコアは読む順序のトリアージにのみ使用可。自動除外はしない
+   - ~~要旨欠落の扱い~~ → **解決（Rev.13）**。重複コピーからのマージで大幅に回収し、
+     残る要旨なしは Phase 1.5 で `hold` として保留（除外しない）。最終784件中の要旨なしは **170件**
 8. **Phase 4: 全文適格性評価** — PICOS基準。体制は Phase 3b と同一。
    **除外理由（PICOS のどの基準に抵触したか）を1件ずつ記録**すること
 9. **Taxonomy コーディング** — 採択文献への3軸分類の付与
@@ -169,9 +186,14 @@
   **他の項目にも同種の誤りが残っている可能性がある。** in-scope を拡充する際は
   DOI・年・掲載誌・著者の整合を確認すること。検出には `export_completeness_audit.py` の
   SUSPECT 判定（タイトル一致だが DOI 不一致）が使える。
-- **`known_item_test.py` はタイトル一致の偽陽性を検出できない** — DOI が両方にあって食い違う場合でも
-  タイトルが一致すれば「捕捉」と判定する。gold set #13 の誤りを見逃した原因。
-  `export_completeness_audit.py` 側では対応済みだが、**本体は未修正**。
+- ~~**`known_item_test.py` はタイトル一致の偽陽性を検出できない**~~ → **解決済み（2026-08-12）**。
+  両方向の偽陽性を検出するようにした:
+  ① タイトル一致だが DOI 食い違い → `SUSPECT`（捕捉と数えない）
+  ② **DOI 一致だがタイトルが別物** → `SUSPECT`（gold set の DOI 誤記で実在する別論文を掴む case。#13 の実例）
+  ③ DOI 一致でタイトルに表記差 → `DOI(表記差)` として recall には算入しつつ `[METADATA]` 警告
+  判定境界 `DOI_TITLE_SUSPECT_THRESHOLD = 0.60` は実測で決定（同一論文の表記差 0.736 /
+  誤DOIによる別論文 0.330）。導入時に **gold set #6 のタイトル誤記を新たに検出**し修正した。
+  `export_completeness_audit.py` と結果が一致することを確認済み（HIT 8/12・SUSPECT 0）。
 - Windows での実行は `python -X utf8` を付けること（文字化け防止）。
 
 ---

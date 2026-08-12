@@ -1,0 +1,785 @@
+﻿record_id,block,reviewer_a,reviewer_b,key,title,doi
+Rc10960687,2,author,watanabe,10.1145/3700297.3700322,A Systematic Review on Integration and Innovation of Virtual Reality (VR) Technology in Higher Art Education,10.1145/3700297.3700322
+R5de1055be,1,author,kataoka,10.1145/3171221.3171242,The Peculiarities of Robot Embodiment (EmCorp-Scale),10.1145/3171221.3171242
+R673ddb387,2,author,watanabe,10.1145/3586183.3606797,V-DAT (Virtual Reality Data Analysis Tool): Supporting Self-Awareness for Autistic People from Multimodal VR Sensor Data,10.1145/3586183.3606797
+R3c16dea5f,3,kataoka,watanabe,10.1145/237170.237302,Virtual reality and mental disorders (panel),10.1145/237170.237302
+R135375140,1,author,kataoka,10.1145/3517428.3550378,College Students’ and Campus Counselors’ Attitudes Toward Teletherapy and Adopting Virtual Reality (Preliminary Exploration) for Campus Counseling Services,10.1145/3517428.3550378
+R9dfb50243,3,kataoka,watanabe,10.1145/3463499,CoolMoves,10.1145/3463499
+R474abd39e,2,author,watanabe,10.1145/3345554,Redirected Smooth Mappings for Multiuser Real Walking in Virtual Reality,10.1145/3345554
+Ra4024860c,2,author,watanabe,10.1145/3332165.3347874,Pull-Ups: Enhancing Suspension Activities in Virtual Reality with Body-Scale Kinesthetic Force Feedback,10.1145/3332165.3347874
+Rf2cf439af,3,kataoka,watanabe,10.1145/3517428.3544821,VRBubble: Enhancing Peripheral Awareness of Avatars for People with Visual Impairments in Social Virtual Reality,10.1145/3517428.3544821
+R19f59c7e6,1,author,kataoka,10.1145/2764463,Area of Simulation,10.1145/2764463
+R0cebdb990,3,kataoka,watanabe,10.1145/3544548.3581230,VR Almost There: Simulating Co-located Multiplayer Experiences in Social Virtual Reality,10.1145/3544548.3581230
+Rdb89a6c36,2,author,watanabe,10.1145/3581641.3584044,VR-LENS: Super Learning-based Cybersickness Detection and Explainable AI-Guided Deployment in Virtual Reality,10.1145/3581641.3584044
+R82d1c9e0e,3,kataoka,watanabe,10.1145/2984751.2984788,Asymmetric Design Approach and Collision Avoidance Techniques For Room-scale Multiplayer Virtual Reality,10.1145/2984751.2984788
+R638735bb5,1,author,kataoka,10.1145/3746058.3758999,Demonstration of EarPressure VR: Ear Canal Pressure Feedback for Enhancing Environmental Presence in Virtual Reality,10.1145/3746058.3758999
+R560bea33d,2,author,watanabe,10.1145/3706598.3714041,Estimating Detection Thresholds of Being Looked at in Virtual Reality for Avatar Redirection,10.1145/3706598.3714041
+R045ace006,2,author,watanabe,10.1145/3706598.3713891,SkinHaptics: Exploring Skin Softness Perception and Virtual Body Embodiment Techniques to Enhance Self-Haptic Interactions,10.1145/3706598.3713891
+R5d6a4d1c5,2,author,watanabe,10.1145/3313831.3376652,"""In VR, everything is possible!"": Sketching and Simulating Spatially-Aware Interactive Spaces in Virtual Reality",10.1145/3313831.3376652
+R1d8e44f48,3,kataoka,watanabe,10.1145/3445814.3446715,Q-VR: system-level design for future mobile collaborative virtual reality,10.1145/3445814.3446715
+Ra02d11570,3,kataoka,watanabe,10.1145/3491102.3517626,"Super Size Me: Interface Size, Identity and Embodiment in Digital Musical Instrument Design",10.1145/3491102.3517626
+Ref12a2f7f,1,author,kataoka,10.1145/3251729,Session details: HMDs in Augmented &amp; Virtual Reality,10.1145/3251729
+Rdf46e96d1,1,author,kataoka,10.1145/3706598.3713607,The Body as Its Own Best Sensor - An Autoethnographic Study of the Sensitivities of the Body in Long-Distance Running,10.1145/3706598.3713607
+R47897fcaf,2,author,watanabe,10.1145/3526114.3558689,Puppeteer: Manipulating Human Avatar Actions with Intuitive Hand Gestures and Upper-Body Postures,10.1145/3526114.3558689
+Rc4932e410,1,author,kataoka,10.1145/3672539.3686754,SoundModVR: Sound Modifications in Virtual Reality for Sound Accessibility,10.1145/3672539.3686754
+R79b2dd788,1,author,kataoka,10.1145/3373625.3418042,Teaching ASL Signs using Signing Avatars and Immersive Learning in Virtual Reality,10.1145/3373625.3418042
+Rb5b9ab6aa,2,author,watanabe,10.1145/3613904.3642069,InflatableBots: Inflatable Shape-Changing Mobile Robots for Large-Scale Encountered-Type Haptics in VR,10.1145/3613904.3642069
+Rb072e240d,3,kataoka,watanabe,10.1145/3379337.3415891,CoVR: A Large-Scale Force-Feedback Robotic Interface for Non-Deterministic Scenarios in VR,10.1145/3379337.3415891
+R79d20fb83,1,author,kataoka,10.1145/3672539.3686316,FisheyeVR: Extending the Field of View by Dynamic Zooming in Virtual Reality,10.1145/3672539.3686316
+Rf3b0ed060,3,kataoka,watanabe,10.1145/3618260.3649783,Almost Linear Size Edit Distance Sketch,10.1145/3618260.3649783
+R2b1f12a6c,1,author,kataoka,10.1145/3491102.3502119,Meander Coil++: A Body-scale Wireless Power Transmission Using Safe-to-body and Energy-efficient Transmitter Coil,10.1145/3491102.3502119
+R974330ea0,2,author,watanabe,10.1145/3313831.3376523,RoomShift: Room-scale Dynamic Haptics for VR with Furniture-moving Swarm Robots,10.1145/3313831.3376523
+Rf1c691809,1,author,kataoka,10.1145/133994.134039,High resolution virtual reality,10.1145/133994.134039
+Ra1dfbd440,3,kataoka,watanabe,10.1145/2544172,Virtual reality redux,10.1145/2544172
+R923ec818a,3,kataoka,watanabe,10.1145/229459.229467,Virtual reality in scientific visualization,10.1145/229459.229467
+R74351707b,3,kataoka,watanabe,10.1145/3313831.3376562,Do You Feel Like Passing Through Walls?: Effect of Self-Avatar Appearance on Facilitating Realistic Behavior in Virtual Environments,10.1145/3313831.3376562
+R425e78a8e,1,author,kataoka,10.1145/166117.166172,Virtual reality and computer graphics programming,10.1145/166117.166172
+Rf5a0f9b04,3,kataoka,watanabe,10.1145/3613904.3642905,"Join Me Here if You Will: Investigating Embodiment and Politeness Behaviors When Joining Small Groups of Humans, Robots, and Virtual Characters",10.1145/3613904.3642905
+Rafdfb6bbb,2,author,watanabe,10.1145/2754393,Virtual reality in your living room,10.1145/2754393
+R2f4cbe8aa,1,author,kataoka,10.1145/260750.260768,Medical applications of virtual reality,10.1145/260750.260768
+Rbd706e525,1,author,kataoka,10.1145/229459.229468,Virtual reality for driving simulation,10.1145/229459.229468
+Ra5cfb588c,1,author,kataoka,10.1145/3251761,Session details: Augmented &amp; Virtual Reality in the Real World,10.1145/3251761
+R96d9df599,2,author,watanabe,10.1145/3722237.3722286,Research on Virtual Simulation Teaching of Ideological and Political Theory Course in Colleges and Universities under VR Technology,10.1145/3722237.3722286
+R4b045ae78,3,kataoka,watanabe,10.1145/3663548.3688525,Supporting Sound Accessibility by Exploring Sound Augmentations in Virtual Reality,10.1145/3663548.3688525
+R2dc73c8b6,2,author,watanabe,10.1145/263407.263409,Immersion in desktop virtual reality,10.1145/263407.263409
+R8408b38c2,1,author,kataoka,10.1145/3636534.3696212,Cross-content User Authentication in Virtual Reality,10.1145/3636534.3696212
+Rebf069c73,3,kataoka,watanabe,10.1145/3613904.3642189,People with Disabilities Redefining Identity through Robotic and Virtual Avatars: A Case Study in Avatar Robot Cafe,10.1145/3613904.3642189
+R962700ab3,2,author,watanabe,10.1145/3511430.3511452,Enhancing Configurable Limitless Paths in Virtual Reality Environments,10.1145/3511430.3511452
+R992ba45dc,3,kataoka,watanabe,10.1145/192844.193054,Multiparty videoconferencing at virtual social distance,10.1145/192844.193054
+R3dff80b66,1,author,kataoka,10.1145/237170.237289,The future of virtual reality,10.1145/237170.237289
+Rcd397138e,2,author,watanabe,10.1145/3672539.3686327,TeleHand: Hand-only Teleportation for Distant Object Pointing in Virtual Reality,10.1145/3672539.3686327
+R8f3ba8c18,2,author,watanabe,10.1145/3544548.3580736,FingerMapper: Mapping Finger Motions onto Virtual Arms to Enable Safe Virtual Reality Interaction in Confined Spaces,10.1145/3544548.3580736
+R1907f1152,2,author,watanabe,10.1145/120782.120784,On temporal-spatial realism in the virtual reality environment,10.1145/120782.120784
+R045b2da29,3,kataoka,watanabe,10.1145/3775073.3775127,Virtual Reality Enhanced Online Learning Attention Artificial Intelligence Prediction Method,10.1145/3775073.3775127
+R4cba8adef,1,author,kataoka,10.1145/3173574.3174221,Selection-based Text Entry in Virtual Reality,10.1145/3173574.3174221
+Rc1b85bf71,1,author,kataoka,10.1145/159161.159160,Virtual reality for palmtop computers,10.1145/159161.159160
+R9adcc567e,3,kataoka,watanabe,10.1145/3474349.3480227,Continuous Travel In Virtual Reality Using a 3D Portal,10.1145/3474349.3480227
+R3dbb07a35,1,author,kataoka,10.1145/3379337.3415846,View-Dependent Effects for 360° Virtual Reality Video,10.1145/3379337.3415846
+Rbb2b82062,2,author,watanabe,10.1145/3474349.3480221,Multi-Window Web Browser with History Tree Visualization for Virtual Reality Environment,10.1145/3474349.3480221
+R7d616de2c,2,author,watanabe,10.1145/3411764.3445474,Exploring Text Revision with Backspace and Caret in Virtual Reality,10.1145/3411764.3445474
+R6852e4c16,2,author,watanabe,10.1145/3524273.3532907,A virtual reality volumetric music video,10.1145/3524273.3532907
+R4269f5e23,1,author,kataoka,10.1145/3706598.3713231,Haptic Biosignals Affect Proxemics Toward Virtual Reality Agents,10.1145/3706598.3713231
+R98db0c8b6,3,kataoka,watanabe,10.1145/3663548.3688492,Musical Performances in Virtual Reality with Spatial and View-Dependent Audio Descriptions for Blind and Low-Vision Users,10.1145/3663548.3688492
+Rc1f3a1953,3,kataoka,watanabe,10.1145/3447490.3447502,Application of Nonimmersive Virtual Reality Technology in an Environmental Design Course: A Study of Gender Difference,10.1145/3447490.3447502
+Rd74cd60a4,2,author,watanabe,10.1145/2815585.2817776,Creating a Mobile Head-mounted Display with Proprietary Controllers for Interactive Virtual Reality Content,10.1145/2815585.2817776
+R45698fde7,1,author,kataoka,10.1145/3290605.3300514,TutoriVR,10.1145/3290605.3300514
+Rc85b6399a,1,author,kataoka,10.1145/3025453.3025675,Vremiere,10.1145/3025453.3025675
+Ref4953c2b,3,kataoka,watanabe,10.1145/1143997.1144123,Multiobjective evolutionary optimization for visual data mining with virtual reality spaces,10.1145/1143997.1144123
+Rc86212d1a,1,author,kataoka,10.1145/3173574.3173815,VirtualSpace - Overloading Physical Space with Multiple Virtual Reality Users,10.1145/3173574.3173815
+R6ec21774f,3,kataoka,watanabe,10.1145/3526114.3558625,Demonstrating the Integration of Real-World Distractions in Virtual Reality,10.1145/3526114.3558625
+Rdc854af5e,3,kataoka,watanabe,10.1145/3672539.3686742,Demonstration of JetUnit: Rendering Diverse Force Feedback in Virtual Reality Using Water Jets,10.1145/3672539.3686742
+R528d38350,2,author,watanabe,10.1145/3586182.3615818,FocusFlow: Leveraging Focal Depth for Gaze Interaction in Virtual Reality,10.1145/3586182.3615818
+R6bd37da19,3,kataoka,watanabe,10.1145/3587819.3592555,Adaptive streaming of 3D content for web-based virtual reality: an open-source prototype including several metrics and strategies,10.1145/3587819.3592555
+R897545071,3,kataoka,watanabe,10.1145/3266037.3271643,Collaborative Virtual Reality for Low-Latency Interaction,10.1145/3266037.3271643
+R60430e5cb,1,author,kataoka,10.1145/3313831.3376340,Improving Humans' Ability to Interpret Deictic Gestures in Virtual Reality,10.1145/3313831.3376340
+R8cbe156e7,2,author,watanabe,10.1145/3526113.3545628,Detecting Input Recognition Errors and User Errors using Gaze Dynamics in Virtual Reality,10.1145/3526113.3545628
+R621a31670,2,author,watanabe,10.1145/3706598.3713777,A Multimodal Approach for Targeting Error Detection in Virtual Reality Using Implicit User Behavior,10.1145/3706598.3713777
+R77e2566df,3,kataoka,watanabe,10.1145/3746058.3758399,Understanding Asymmetric Collaboration in Augmented and Virtual Reality Immersive Environments,10.1145/3746058.3758399
+R0e55abc3f,1,author,kataoka,10.1145/3544548.3581467,Investigating Eyes-away Mid-air Typing in Virtual Reality using Squeeze haptics-based Postural Reinforcement,10.1145/3544548.3581467
+R5accafec7,3,kataoka,watanabe,10.1145/3706598.3713507,Generative Role-Play Communication Training in Virtual Reality for Autistic Individuals: A Study on Job Coach Experiences in Vocational Training Programs,10.1145/3706598.3713507
+Re30f5bebf,1,author,kataoka,10.1145/2988287.2989163,Do LoRa Low-Power Wide-Area Networks Scale?,10.1145/2988287.2989163
+Rb9bed6214,2,author,watanabe,10.1145/3411764.3445671,"Understanding, Detecting and Mitigating the Effects of Coactivations in Ten-Finger Mid-Air Typing in Virtual Reality",10.1145/3411764.3445671
+Rdb27c4cc9,3,kataoka,watanabe,10.1145/2858036.2858140,Novel Optical Configurations for Virtual Reality,10.1145/2858036.2858140
+R398abee0d,3,kataoka,watanabe,10.1145/3643916.3644438,Immersive Software Archaeology: Collaborative Exploration and Note Taking in Virtual Reality,10.1145/3643916.3644438
+R43e1f6078,2,author,watanabe,10.1145/3643916.3644427,Collaborative Software Exploration with Multimedia Note Taking in Virtual Reality,10.1145/3643916.3644427
+Rf791968a7,2,author,watanabe,10.1145/3544548.3580707,Let’s Face It: Influence of Facial Expressions on Social Presence in Collaborative Virtual Reality,10.1145/3544548.3580707
+R2dcae5a59,3,kataoka,watanabe,10.1145/3654777.3676363,Flip-Pelt: Motor-Driven Peltier Elements for Rapid Thermal Stimulation and Congruent Pressure Feedback in Virtual Reality,10.1145/3654777.3676363
+R60dc2c0dc,1,author,kataoka,10.1145/3563359.3596991,Virtual Reality Health Education to Prevent Musculoskeletal Disorders and Chronic Low Back Pain in Formal and Informal Caregivers.,10.1145/3563359.3596991
+Re9ce36c74,2,author,watanabe,10.1145/2984751.2984772,Peripersonal Space in Virtual Reality,10.1145/2984751.2984772
+R2ef92a520,2,author,watanabe,10.1145/3083187.3083188,A Boundary and Texture Preserving Mesh Simplification Algorithm for Virtual Reality,10.1145/3083187.3083188
+R0f0d19bf7,3,kataoka,watanabe,10.1145/3526113.3545701,RIDS: Implicit Detection of a Selection Gesture Using Hand Motion Dynamics During Freehand Pointing in Virtual Reality,10.1145/3526113.3545701
+R128e80aee,1,author,kataoka,10.1145/3204949.3208118,"A QoE assessment method based on EDA, heart rate and EEG of a virtual reality assistive technology system",10.1145/3204949.3208118
+R1de86b33b,2,author,watanabe,10.1145/3025453.3025566,VRRRRoom,10.1145/3025453.3025566
+R7e6fb1d34,2,author,watanabe,10.1145/3626772.3657892,Unbiased Learning to Rank Meets Reality: Lessons from Baidu's Large-Scale Search Dataset,10.1145/3626772.3657892
+Rdfe109ea3,3,kataoka,watanabe,10.1145/3617232.3624860,Exploiting Human Color Discrimination for Memory- and Energy-Efficient Image Encoding in Virtual Reality,10.1145/3617232.3624860
+Rb3e1c94d5,3,kataoka,watanabe,10.1145/3636534.3697322,Experimenting with Adaptive Bitrate Algorithms for Virtual Reality Streaming over Wi-Fi,10.1145/3636534.3697322
+R6ad709e2d,1,author,kataoka,10.1145/3706598.3713877,Who Reaps All the Superchats? A Large-Scale Analysis of Income Inequality in Virtual YouTuber Livestreaming,10.1145/3706598.3713877
+R2f2e0948a,2,author,watanabe,10.1145/3586183.3606787,Turn-It-Up: Rendering Resistance for Knobs in Virtual Reality through Undetectable Pseudo-Haptics,10.1145/3586183.3606787
+R74ddbac05,3,kataoka,watanabe,10.1145/3706598.3713688,Raise Your Eyebrows Higher: Facilitating Emotional Communication in Social Virtual Reality Through Region-Specific Facial Expression Exaggeration,10.1145/3706598.3713688
+R4cbeea80d,3,kataoka,watanabe,10.1145/3132525.3134775,A Pilot Deployment of an Online Tool for Large-Scale Virtual Auditing of Urban Accessibility,10.1145/3132525.3134775
+Rf2dac71da,1,author,kataoka,10.1145/3746059.3747800,Imaginary Joint: Proprioceptive Feedback for Virtual Body Extensions via Skin Stretch,10.1145/3746059.3747800
+R695143d61,3,kataoka,watanabe,10.1145/3313831.3376574,Walking by Cycling: A Novel In-Place Locomotion User Interface for Seated Virtual Reality Experiences,10.1145/3313831.3376574
+Rf45f4aa12,2,author,watanabe,10.1145/3313831.3376748,"The Curious Case of the Transdiegetic Cow, or a Mission to Foster Other-Oriented Empathy Through Virtual Reality",10.1145/3313831.3376748
+Re875da7fd,2,author,watanabe,10.1145/3319921.3319961,A 3D Multi-scale Virtual Adversarial Network for False Positive Reduction in Pulmonary Nodule Detection,10.1145/3319921.3319961
+Rb49d48978,1,author,kataoka,10.1145/3586182.3616667,AwakenFlora: Exploring Proactive Smell Experience in Virtual Reality through Mid-Air Gestures,10.1145/3586182.3616667
+Ra96c8e44d,1,author,kataoka,10.1145/3313831.3376557,Virtually-Extended Proprioception: Providing Spatial Reference in VR through an Appended Virtual Limb,10.1145/3313831.3376557
+R664b0978c,2,author,watanabe,10.1145/3313831.3376865,Gaiters: Exploring Skin Stretch Feedback on Legs for Enhancing Virtual Reality Experiences,10.1145/3313831.3376865
+R138e9a408,1,author,kataoka,10.1145/3526113.3545646,Color-to-Depth Mappings as Depth Cues in Virtual Reality,10.1145/3526113.3545646
+Rc61ef6fb4,2,author,watanabe,10.1145/3570361.3613259,"Virtual Device Farms for Mobile App Testing at Scale: A Pursuit for Fidelity, Efficiency, and Accessibility",10.1145/3570361.3613259
+R943e87fe7,3,kataoka,watanabe,10.1145/2815585.2817802,MetaSpace,10.1145/2815585.2817802
+R6aa7a794d,1,author,kataoka,10.1145/215585.215647,The virtual tricorder,10.1145/215585.215647
+R7e885c2b9,2,author,watanabe,10.1145/2702123.2702344,The Virtual Meditative Walk,10.1145/2702123.2702344
+Rd4d9545d8,1,author,kataoka,10.1145/315762.315775,Distributed mission training,10.1145/315762.315775
+R7c364aa6a,3,kataoka,watanabe,10.1145/3524273.3532903,Virtual visits,10.1145/3524273.3532903
+Re9aaa489a,3,kataoka,watanabe,10.1145/2984751.2984760,AquaCAVE,10.1145/2984751.2984760
+Radeb3054b,1,author,kataoka,10.1145/3517745.3561417,Are we ready for metaverse?,10.1145/3517745.3561417
+Rc614e735a,3,kataoka,watanabe,10.1145/237170.237257,Disney's Aladdin,10.1145/237170.237257
+R23f6d2659,2,author,watanabe,10.1145/3613904.3642844,From Real to Virtual: Exploring Replica-Enhanced Environment Transitions along the Reality-Virtuality Continuum,10.1145/3613904.3642844
+Rb47e4852d,2,author,watanabe,10.1145/3290605.3300921,Virtual Objects in the Physical World,10.1145/3290605.3300921
+R910bb968e,3,kataoka,watanabe,10.1145/2858036.2858226,Haptic Retargeting,10.1145/2858036.2858226
+R3683c0520,3,kataoka,watanabe,10.1145/3173574.3173660,Haptic Revolver,10.1145/3173574.3173660
+R115985ef4,1,author,kataoka,10.1145/3313831.3376601,Closer Object Looks Smaller,10.1145/3313831.3376601
+R1ef514029,1,author,kataoka,10.1145/3568162.3576972,Crossing Reality: Comparing Physical and Virtual Robot Deixis,10.1145/3568162.3576972
+Rc388d3a76,2,author,watanabe,10.1145/3332165.3347919,Mise-Unseen,10.1145/3332165.3347919
+R07a1f1df7,3,kataoka,watanabe,10.1145/2507924.2507925,APDV,10.1145/2507924.2507925
+R7445474de,1,author,kataoka,10.1145/2068897.2068925,GDE,10.1145/2068897.2068925
+R1458c7600,2,author,watanabe,10.1145/3209978.3210179,Minority Report by Lemur,10.1145/3209978.3210179
+R2bf697b33,1,author,kataoka,10.1145/3636534.3697438,Multi-Client Searchable Encryption with Granular Access Control for Cloud-Assisted IoT,10.1145/3636534.3697438
+Rfac7c7373,1,author,kataoka,10.1145/166117.166133,The nanomanipulator,10.1145/166117.166133
+R5019fc88f,1,author,kataoka,10.1145/3266037.3271642,The Immersive Bubble Chart,10.1145/3266037.3271642
+Rd05bcd724,1,author,kataoka,10.1145/3117811.3117815,Furion,10.1145/3117811.3117815
+R8508bcbed,2,author,watanabe,10.1145/3304109.3323831,Exploring New York in 8K,10.1145/3304109.3323831
+R6a64dcae5,2,author,watanabe,10.1145/3613904.3642536,AirPush: A Pneumatic Wearable Haptic Device Providing Multi-Dimensional Force Feedback on a Fingertip,10.1145/3613904.3642536
+Rfff035478,3,kataoka,watanabe,10.1145/2387238.2387269,RVIP,10.1145/2387238.2387269
+Rf4398083c,1,author,kataoka,10.1145/3266037.3271637,HoloRoyale,10.1145/3266037.3271637
+R00a89fade,2,author,watanabe,10.1145/3706598.3714179,HaloTouch: Using IR Multi-Path Interference to Support Touch Interactions with General Surfaces,10.1145/3706598.3714179
+R7da14d6ab,3,kataoka,watanabe,10.1145/3290605.3300464,"""What's Happening at that Hip?""",10.1145/3290605.3300464
+Ra3fe11d7d,1,author,kataoka,10.1145/3772318.3790511,JourneyVR: Designing for continuous workflow experience in virtual reality,10.1145/3772318.3790511
+R59f2ecccf,2,author,watanabe,10.1145/3772318.3790746,Hitchhiking hands: Enabling “virtually direct” VR manipulation by switching multiple hand avatars with gaze,10.1145/3772318.3790746
+Rf69e94a8c,1,author,kataoka,10.1145/3772318.3790443,The wetland quest: Fostering empathy and literacy for urban herpetofauna through VR wetland exploration,10.1145/3772318.3790443
+R0cd49be3e,3,kataoka,watanabe,10.1145/3687974,VOODOO XP: Expressive one-shot head reenactment for VR telepresence,10.1145/3687974
+R47b24451c,1,author,kataoka,10.1145/3491102.3517706,Beyond being real: a sensorimotor control perspective on interactions in virtual reality,10.1145/3491102.3517706
+R907e48397,2,author,watanabe,10.1145/3550454.3555522,The continuity of locomotion: Rethinking conventions for locomotion and its visualization in shared virtual reality spaces,10.1145/3550454.3555522
+Re85d1fb8f,3,kataoka,watanabe,10.1145/3411764.3445759,Ninja hands: Using many hands to improve target selection in VR,10.1145/3411764.3445759
+R5332e2331,2,author,watanabe,10.1145/3290605.3300752,I'm a giant: Walking in large virtual environments at high speed gains,10.1145/3290605.3300752
+R6cda28ebd,2,author,watanabe,10.1145/3178876.3186034,Web-based VR experiments powered by the crowd,10.1145/3178876.3186034
+R84111befe,2,author,watanabe,10.1145/3290605.3300413,The role of physical props in VR climbing environments,10.1145/3290605.3300413
+R2f8904aac,3,kataoka,watanabe,10.1145/3126594.3126645,NaviFields: Relevance fields for adaptive VR navigation,10.1145/3126594.3126645
+Rbc16604ed,3,kataoka,watanabe,10.1145/2984751.2985714,Facial expression mapping inside head mounted display by embedded optical sensors,10.1145/2984751.2985714
+R57e122318,3,kataoka,watanabe,10.1145/2702123.2702188,"Personalized, wearable control of a head-mounted display for users with upper body motor impairments",10.1145/2702123.2702188
+Ra47993f84,3,kataoka,watanabe,10.1145/379300.379322,Collaborative virtual environments,10.1145/379300.379322
+R38a2c6f51,3,kataoka,watanabe,10.1145/276609.276620,The virtual reality modeling language and Java,10.1145/276609.276620
+R4c85e06c2,1,author,kataoka,10.1145/280814.280933,Techniques for handling video in virtual environments,10.1145/280814.280933
+R69d1ff33c,2,author,watanabe,10.1145/237170.237294,Global multi-user virtual environments (panel),10.1145/237170.237294
+R66ac6b17d,3,kataoka,watanabe,10.1145/311535.311590,Real-time acoustic modeling for distributed virtual environments,10.1145/311535.311590
+Rf5bb3e18b,1,author,kataoka,10.1145/311535.311589,"Walking &gt; walking-in-place &gt; flying, in virtual environments",10.1145/311535.311589
+R2dfd09921,3,kataoka,watanabe,10.1145/311535.311591,Creating a live broadcast from a virtual environment,10.1145/311535.311591
+Rad153e786,2,author,watanabe,10.1145/263407.263504,Worldlets—3D thumbnails for wayfinding in virtual environments,10.1145/263407.263504
+Rfeab737b9,3,kataoka,watanabe,10.1145/166117.166124,Autocalibration for virtual environments tracking hardware,10.1145/166117.166124
+R059903685,3,kataoka,watanabe,10.1145/229459.229465,A geometric modeling and animation system for virtual reality,10.1145/229459.229465
+R6d9ee3d4c,3,kataoka,watanabe,10.1145/168642.168658,A toolset for navigation in virtual environments,10.1145/168642.168658
+R8a61cdab4,3,kataoka,watanabe,10.1145/218380.218526,Aesthetics &amp; tools in the virtual environment (panel session),10.1145/218380.218526
+R009810b7c,2,author,watanabe,10.1145/280814.280818,A beam tracing approach to acoustic modeling for interactive virtual environments,10.1145/280814.280818
+Rdebb15a7d,2,author,watanabe,10.1145/218380.218405,Multi-level direction of autonomous creatures for real-time virtual environments,10.1145/218380.218405
+R2fd107fb8,2,author,watanabe,10.1145/289444.289496,Fragmented interaction: establishing mutual orientation in virtual environments,10.1145/289444.289496
+Ra2c4ac519,2,author,watanabe,10.1145/240080.240349,Practically accomplishing immersion: cooperation in and for virtual environments,10.1145/240080.240349
+R31f43832b,3,kataoka,watanabe,10.1145/258734.258747,Moving objects in space: exploiting proprioception in virtual-environment interaction,10.1145/258734.258747
+Rdfdfbb255,3,kataoka,watanabe,10.1145/229459.229466,The HoloSketch VR sketching system,10.1145/229459.229466
+R5f3968b4f,2,author,watanabe,10.1145/289444.289513,Representing fieldwork and articulating requirements through VR,10.1145/289444.289513
+Raa59596fd,1,author,kataoka,10.1145/257874.257882,Health and safety issues for VR,10.1145/257874.257882
+Rc3a805d85,3,kataoka,watanabe,10.1145/3772318.3790426,"A design space of virtual bodies: Their types, effects, and theoretical foundations",10.1145/3772318.3790426
+Rf4151e203,1,author,kataoka,10.1145/3746058.3758459,Exploring on-body haptic systems through HCI methods: From perception to hardware and application innovation,10.1145/3746058.3758459
+R84ad90d1b,1,author,kataoka,10.1145/3757733,A comprehensive review of real-time multi-view multi-person markerless motion capture,10.1145/3757733
+Rc9d3f6b9a,1,author,kataoka,10.1145/3746059.3747738,"Texergy: Textile-based harvesting, storing, and releasing of mechanical energy for passive on-body actuation",10.1145/3746059.3747738
+Rd7f420532,3,kataoka,watanabe,10.1145/3706598.3714273,VibraForge: a scalable prototyping toolkit for creating spatialized vibrotactile feedback systems,10.1145/3706598.3714273
+R54cc011ca,1,author,kataoka,10.1145/3746059.3747619,HeatFlow: a thermal-tactile display for dynamic 2D thermal movements,10.1145/3746059.3747619
+Rfaf404f2a,3,kataoka,watanabe,10.1145/3712011,Generating high-fidelity clothed human dynamics with temporal diffusion,10.1145/3712011
+R3b8ba0b13,1,author,kataoka,10.1145/3613904.3642483,Haptic source-effector: Full-body haptics via non-invasive brain stimulation,10.1145/3613904.3642483
+Racf965f9c,3,kataoka,watanabe,10.1145/3625468.3647626,How do users experience asynchrony between visual and haptic information?,10.1145/3625468.3647626
+R66ed5e4c8,1,author,kataoka,10.1145/3544548.3580727,Generating haptic motion effects for multiple articulated bodies for improved 4D experiences: a camera space approach,10.1145/3544548.3580727
+R396fc20bd,3,kataoka,watanabe,10.1109/taslp.2021.3061939,Mixed source sound field translation for virtual binaural application with perceptual validation,10.1109/taslp.2021.3061939
+R0604f5f4f,3,kataoka,watanabe,10.1145/2980179.2980235,EgoCap: egocentric marker-less motion capture with two fisheye cameras,10.1145/2980179.2980235
+R7f3cade38,1,author,kataoka,10.1145/3272127.3275075,paGAN: real-time avatars using dynamic textures,10.1145/3272127.3275075
+R4e05529c2,1,author,kataoka,10.1145/1576246.1531361,Eye-catching crowds: saliency based selective variation,10.1145/1576246.1531361
+Rb60c64f56,3,kataoka,watanabe,10.1145/3379337.3415832,Iteratively adapting avatars using task-integrated optimisation,10.1145/3379337.3415832
+Rbcf3b0a19,3,kataoka,watanabe,10.1145/3386569.3392493,The eyes have it: an integrated eye and face model for photorealistic facial animation,10.1145/3386569.3392493
+R020e8b273,2,author,watanabe,10.1145/3290605.3300718,"Springlets: Expressive, flexible and silent on-skin tactile interfaces",10.1145/3290605.3300718
+R34667b116,3,kataoka,watanabe,10.1145/3386569.3392482,HeadBlaster: a wearable approach to simulating motion perception using head-mounted air propulsion jets,10.1145/3386569.3392482
+Rf803feb18,1,author,kataoka,10.1145/588272.588280,Continuous contact simulation for smooth surfaces,10.1145/588272.588280
+Rb8717fcb6,3,kataoka,watanabe,10.1109/vr.2018.8446318,Object size perception in immersive virtual reality: Avatar realism affects the way we perceive,10.1109/vr.2018.8446318
+R226c03515,2,author,watanabe,10.1109/vrw52623.2021.00239,Exploring body gestures for small object selection in dense environment in HMD VR for data visualization applications,10.1109/vrw52623.2021.00239
+Rd94c9acae,1,author,kataoka,10.1109/vr.2019.8798040,Virtual hand realism affects object size perception in body-based scaling,10.1109/vr.2019.8798040
+R9357114e9,2,author,watanabe,10.1109/tvcg.2025.3549894,Does hand size matter? The effect of avatar hand size on non-verbal communication in virtual reality,10.1109/tvcg.2025.3549894
+R61cafb0ec,1,author,kataoka,10.1109/vrw62533.2024.00225,Towards an altered body image through the exposure to a modulated self in virtual reality,10.1109/vrw62533.2024.00225
+R660200c24,1,author,kataoka,10.1109/vr.2010.5444802,Avatar self-embodiment enhances distance perception accuracy in non-photorealistic immersive virtual environments,10.1109/vr.2010.5444802
+R13e2704b2,2,author,watanabe,10.1109/vr46266.2020.00063,Virtual big heads: Analysis of human perception and comfort of head scales in social virtual reality,10.1109/vr46266.2020.00063
+Rde71d642e,3,kataoka,watanabe,10.1109/ismar-adjunct68609.2025.00112,Customizing stylized avatars for self-compassion: Design impacts in virtual reality therapy,10.1109/ismar-adjunct68609.2025.00112
+Rf452f9e1c,3,kataoka,watanabe,10.1109/tvcg.2020.3023603,Construction of the virtual embodiment questionnaire (VEQ),10.1109/tvcg.2020.3023603
+R615dd75d5,2,author,watanabe,10.1109/access.2025.3570166,"Immersive multiplayer VR: Unreal engine’s strengths, limitations, and future prospects",10.1109/access.2025.3570166
+Rb3c541a72,3,kataoka,watanabe,10.1109/vr46266.2020.00073,Comparative evaluation of viewing and self-representation on passability affordances to a realistic sliding doorway in real and immersive virtual environments,10.1109/vr46266.2020.00073
+Reb24ebdd1,3,kataoka,watanabe,10.1109/vrw52623.2021.00124,Personal space evaluation and protection in social VR,10.1109/vrw52623.2021.00124
+R4ce2892e6,2,author,watanabe,10.1109/vr.2019.8798348,Individual differences in embodied distance estimation in virtual reality,10.1109/vr.2019.8798348
+Rdf3e2d120,2,author,watanabe,10.1109/vr.2019.8797787,The effect of hand size and interaction modality on the virtual hand illusion,10.1109/vr.2019.8797787
+Rac3d456a4,1,author,kataoka,10.1109/vr.2018.8446495,Head-to-body-pose classification in no-pose VR tracking systems,10.1109/vr.2018.8446495
+R3e43cc2af,2,author,watanabe,10.1109/vr59515.2025.00057,Daddy long legs: a scale and speed up virtual reality locomotion technique for medium-scale scenarios,10.1109/vr59515.2025.00057
+Rdc2c7cf74,2,author,watanabe,10.1109/tvcg.2021.3083423,Did I hit the door? Effects of self-avatars and calibration in a person-plus-virtual-object system on perceived frontal passability in VR,10.1109/tvcg.2021.3083423
+Rf35edd175,3,kataoka,watanabe,10.1109/vr50410.2021.00106,Revisiting distance perception with scaled embodied cues in social virtual reality,10.1109/vr50410.2021.00106
+R354b15132,1,author,kataoka,10.1109/vrw66409.2025.00158,Exploring the effects of self-avatars on virtual reality-based reminiscence therapy for young adults,10.1109/vrw66409.2025.00158
+R438f1a41a,3,kataoka,watanabe,10.1109/ismar62088.2024.00039,Big feet for little people: Scaling gap affordance judgments of children and adults with virtual feet,10.1109/ismar62088.2024.00039
+Rf32e5c627,1,author,kataoka,10.1109/vr55154.2023.00046,Empirically evaluating the effects of eye height and self-avatars on dynamic passability affordances in virtual reality,10.1109/vr55154.2023.00046
+R8e7027329,3,kataoka,watanabe,10.1109/vrw55335.2022.00238,Interpersonal distance to a speaking avatar: Loudness matters irrespective of contents,10.1109/vrw55335.2022.00238
+R6a5b5ce26,1,author,kataoka,10.1109/vr.2018.8446480,Social VR: How personal space is affected by virtual agents' emotions,10.1109/vr.2018.8446480
+Rea00bfc8d,2,author,watanabe,10.1109/tvcg.2019.2898748,The virtual caliper: Rapid creation of metrically accurate avatars from 3D measurements,10.1109/tvcg.2019.2898748
+R870d0977e,3,kataoka,watanabe,10.1109/tvcg.2025.3616829,An empirical evaluation of how virtual hand visibility affects near-field size perception and reporting of tangible objects in virtual reality,10.1109/tvcg.2025.3616829
+R5a06bae06,1,author,kataoka,10.1109/vr50410.2021.00063,Using virtual reality to support acting in motion capture with differently scaled characters,10.1109/vr50410.2021.00063
+R767febf10,3,kataoka,watanabe,10.1109/ismar67309.2025.00133,"Exploring the influence of crowd size across different tasks on user performance, experience and social presence in shared virtual environments",10.1109/ismar67309.2025.00133
+Rdf0b960d1,1,author,kataoka,10.1109/tvcg.2025.3549884,Influence of haptic feedback on perception of threat and peripersonal space in social VR,10.1109/tvcg.2025.3549884
+R79a600c2e,2,author,watanabe,10.1109/vr.2019.8798139,"Human, virtual human, bump! A preliminary study on haptic feedback",10.1109/vr.2019.8798139
+R7ea952169,1,author,kataoka,10.1109/vr51125.2022.00076,Temporal effects in motion behavior for virtual reality (VR) biometrics,10.1109/vr51125.2022.00076
+R553bc37b1,1,author,kataoka,10.1109/ismar59233.2023.00041,An exploration of the effects of head-centric rest frames on egocentric distance judgments in VR,10.1109/ismar59233.2023.00041
+R4525cca6b,3,kataoka,watanabe,10.1109/vrw55335.2022.00019,Asymmetric normalization in social virtual reality studies,10.1109/vrw55335.2022.00019
+R157aaa021,1,author,kataoka,10.1109/vr51125.2022.00039,Body warping versus change blindness remapping: a comparison of two approaches to repurposing haptic proxies for virtual reality,10.1109/vr51125.2022.00039
+Rdee8df532,2,author,watanabe,10.1109/vr.2019.8798132,Avatars for co-located collaborations in HMD-based virtual environments,10.1109/vr.2019.8798132
+R56e3a6cc2,2,author,watanabe,10.1109/vrw66409.2025.00143,Shape shifters: Does body shape change the perception of small-scale crowd motions?,10.1109/vrw66409.2025.00143
+Rc9d8a0a04,3,kataoka,watanabe,10.1109/vrw50115.2020.00036,Walk this way: Evaluating the effect of perceived gender and attractiveness of motion on proximity in virtual reality,10.1109/vrw50115.2020.00036
+R278cc675a,2,author,watanabe,10.1109/tvcg.2022.3169222,Effects of transfer functions and body parts on body-centric locomotion in virtual reality,10.1109/tvcg.2022.3169222
+R1e88c28ce,3,kataoka,watanabe,10.1109/vrw50115.2020.00200,Omnidirectional motion input: The basis of natural interaction in room-scale virtual reality,10.1109/vrw50115.2020.00200
+R648f4d6c4,1,author,kataoka,10.1109/ismar-adjunct.2019.00027,A user experience study of locomotion design in virtual reality between adult and minor users,10.1109/ismar-adjunct.2019.00027
+Re223ccc3f,2,author,watanabe,10.1109/vr51125.2022.00103,Tangiball: Foot-enabled embodied tangible interaction with a ball in virtual reality,10.1109/vr51125.2022.00103
+R08c0516e5,2,author,watanabe,10.1109/vrw62533.2024.00043,Virtual reality-based donning and doffing simulator,10.1109/vrw62533.2024.00043
+Rfb4b73910,3,kataoka,watanabe,10.1109/ismar-adjunct64951.2024.00136,Inner child: The role of VR child avatars in improving adult language learning,10.1109/ismar-adjunct64951.2024.00136
+R00997bcd2,1,author,kataoka,10.1109/iros60139.2025.11247610,VRobotix: a scalable and cost-effective virtual-reality-based robotic manipulation dataset generation framework,10.1109/iros60139.2025.11247610
+R57660016f,3,kataoka,watanabe,10.1109/vr46266.2020.00060,Take a look around – the impact of decoupling gaze and travel-direction in seated and ground-based virtual reality utilizing torso-directed steering,10.1109/vr46266.2020.00060
+Raea86147c,3,kataoka,watanabe,10.1109/tvcg.2021.3067773,Floor-vibration VR: Mitigating cybersickness using whole-body tactile stimuli in highly realistic vehicle driving experiences,10.1109/tvcg.2021.3067773
+R75b89f17e,1,author,kataoka,10.1109/tvcg.2023.3247067,Can I squeeze through? Effects of self-avatars and calibration in a person-plus-virtual-object system on perceived lateral passability in VR,10.1109/tvcg.2023.3247067
+Rc4b638677,1,author,kataoka,10.1109/vr50410.2021.00057,Spherical world in miniature: Exploring the tiny planets metaphor for discrete locomotion in virtual reality,10.1109/vr50410.2021.00057
+R8cc9dc4dd,3,kataoka,watanabe,10.1109/vr.2019.8798323,“Ready player one”: Enhancing omnidirectional treadmills for use in virtual environments,10.1109/vr.2019.8798323
+Rd716a5d10,1,author,kataoka,10.1109/vr.2010.5444801,Can you help me concentrate room?,10.1109/vr.2010.5444801
+R94e6fe8b9,3,kataoka,watanabe,10.1109/tvcg.2021.3085407,UNOC: Understanding occlusion for embodied presence in virtual reality,10.1109/tvcg.2021.3085407
+R3c7194e99,2,author,watanabe,10.1109/tvcg.2025.3640239,Visual and somatosensory integration with higher sitting posture enhances the sense of standing and self-motion in seated VR,10.1109/tvcg.2025.3640239
+R574bfd9d8,1,author,kataoka,10.1109/tvcg.2025.3550231,The impact of navigation on proxemics in an immersive virtual environment with conversational agents,10.1109/tvcg.2025.3550231
+R2e40c1848,1,author,kataoka,10.1109/vr.2018.8446153,The effect of haptic prediction accuracy on presence,10.1109/vr.2018.8446153
+R47c50908b,3,kataoka,watanabe,10.1109/vr.2018.8446539,Investigating the effects of anthropomorphic fidelity of self-avatars on near field depth perception in immersive virtual environments,10.1109/vr.2018.8446539
+R232765c61,2,author,watanabe,10.1109/vr.2008.4480749,Using an eye-tracking system to improve camera motions and depth-of-field blur effects in virtual environments,10.1109/vr.2008.4480749
+Rfe3e556c2,1,author,kataoka,10.1109/vr55154.2023.00025,An EEG-based experiment on VR sickness and postural instability while walking in virtual environments,10.1109/vr55154.2023.00025
+R6162d7f6d,3,kataoka,watanabe,10.1109/vr59515.2025.00074,Presenting tingling aftereffects using vibro-thermal feedback to enhance impact sensation in virtual reality,10.1109/vr59515.2025.00074
+R9be7d714c,2,author,watanabe,10.1109/vr55154.2023.00056,A large-scale study of proxemics and gaze in groups,10.1109/vr55154.2023.00056
+R4674d12c6,2,author,watanabe,10.1109/tvcg.2025.3549844,Don't they really hear us? A design space for private conversations in social virtual reality,10.1109/tvcg.2025.3549844
+R78980b3ff,2,author,watanabe,10.1109/tii.2020.3016591,Learning to estimate the body shape under clothing from a single 3-D scan,10.1109/tii.2020.3016591
+Ref004d2f8,1,author,kataoka,10.1109/access.2018.2878237,Walking simulation for VR game character using remote sensoring device based on AHRS-motion recognition,10.1109/access.2018.2878237
+R08e464e89,3,kataoka,watanabe,10.1109/ismar67309.2025.00029,Comparing hand and controller avatars with hand tracking and controller-based interaction,10.1109/ismar67309.2025.00029
+R66a8553c8,1,author,kataoka,10.1162/jocn_a_01653,An important step toward understanding the role of body-based cues on human spatial memory for large-scale environments,10.1162/jocn_a_01653
+R393b95ac8,2,author,watanabe,10.1109/ismar.2015.57,[POSTER] maintaining appropriate interpersonal distance using virtual body size,10.1109/ismar.2015.57
+Rd9e7e9deb,3,kataoka,watanabe,10.1109/vrw55335.2022.00279,Creating 3D personal avatars with high quality facial expressions for telecommunication and telepresence,10.1109/vrw55335.2022.00279
+R6e7e0f506,3,kataoka,watanabe,10.1109/vr46266.2020.00080,Dyadic acquisition of survey knowledge in a shared virtual environment,10.1109/vr46266.2020.00080
+Rdf19c5eb5,3,kataoka,watanabe,10.1109/access.2024.3424930,Automated classification of virtual reality user motions using a motion atlas and machine learning approach,10.1109/access.2024.3424930
+R853563e54,3,kataoka,watanabe,10.1109/ismar50242.2020.00047,Haptic handshank – a handheld multimodal haptic feedback controller for virtual reality,10.1109/ismar50242.2020.00047
+R3dc0bc9a7,3,kataoka,watanabe,10.1109/tlt.2023.3319628,"Collaborative virtual reality in higher education: Students' perceptions on presence, challenges, affordances, and potential",10.1109/tlt.2023.3319628
+Rd7ecda066,2,author,watanabe,10.1109/ismar67309.2025.00016,Three techniques for enhancing emotional expression on embodied avatar face in VR,10.1109/ismar67309.2025.00016
+Rd0c227f87,3,kataoka,watanabe,10.1109/vr55154.2023.00072,Exploring the social influence of virtual humans unintentionally conveying conflicting emotions,10.1109/vr55154.2023.00072
+Rc4b34f828,1,author,kataoka,10.1109/access.2020.2983608,Real-time recognition of facial expressions using facial electromyograms recorded around the eyes for social virtual reality applications,10.1109/access.2020.2983608
+Ra83d77788,3,kataoka,watanabe,10.1109/vr.2019.8798070,User-centered extension of a locomotion typology: Movement-related sensory feedback and spatial learning,10.1109/vr.2019.8798070
+R48f07dc0c,1,author,kataoka,10.1109/access.2022.3191644,Dense-Pose2SMPL: 3D human body shape estimation from a single and multiple images and its performance study,10.1109/access.2022.3191644
+R4b2c930da,3,kataoka,watanabe,10.1109/tvcg.2023.3247041,How virtual hand representations affect the perceptions of dynamic affordances in virtual reality,10.1109/tvcg.2023.3247041
+Rbcfb5b7de,3,kataoka,watanabe,10.1109/vr51125.2022.00080,TimeTables: Embodied exploration of immersive spatio-temporal data,10.1109/vr51125.2022.00080
+R12624d2c7,1,author,kataoka,10.1109/vrw52623.2021.00114,Effects of virtual environments and self-representations on redirected jumping,10.1109/vrw52623.2021.00114
+Reb4e5e08f,1,author,kataoka,10.1109/tvcg.2013.38,Personified and multistate camera motions for first-person navigation in desktop virtual reality,10.1109/tvcg.2013.38
+Rff5ed709a,1,author,kataoka,10.1109/iros55552.2023.10342522,Attention-based VR facial animation with visual mouth camera guidance for immersive telepresence avatars,10.1109/iros55552.2023.10342522
+R533795cbd,3,kataoka,watanabe,10.1109/tmm.2003.808822,An omnidirectional stroll-based virtual reality interface and its application on overhead crane training,10.1109/tmm.2003.808822
+R126f73017,1,author,kataoka,10.1109/access.2023.3285398,Emotion recognition for affective human digital twin by means of virtual reality enabling technologies,10.1109/access.2023.3285398
+Rfcb2f2a9c,3,kataoka,watanabe,10.1109/access.2020.3020591,Key algorithm for human motion recognition in virtual reality video sequences based on hidden markov model,10.1109/access.2020.3020591
+Re4de219d7,2,author,watanabe,10.1109/vrw66409.2025.00146,Evaluating CrowdSplat: Perceived level of detail for gaussian crowds,10.1109/vrw66409.2025.00146
+R8edd9653f,2,author,watanabe,10.1109/iccv.2009.5459306,Efficient human pose estimation via parsing a tree structure based human model,10.1109/iccv.2009.5459306
+R29626322c,3,kataoka,watanabe,10.1109/ismar-adjunct68609.2025.00173,Going and returning: Lakota travel verbs in virtual reality,10.1109/ismar-adjunct68609.2025.00173
+R87868e4b9,3,kataoka,watanabe,10.1109/tpami.2021.3102128,Detailed avatar recovery from single image,10.1109/tpami.2021.3102128
+R13e02d4e8,1,author,kataoka,10.1109/lcomm.2019.2892738,DoA-based rigid body localization adopting single base station,10.1109/lcomm.2019.2892738
+R97c81be34,1,author,kataoka,10.1109/ismar-adjunct68609.2025.00036,Differential physiological responses to proxemic and facial threats in virtual avatar interactions,10.1109/ismar-adjunct68609.2025.00036
+R30e555047,2,author,watanabe,10.1109/vr.2011.5759454,Velocity-dependent dynamic curvature gain for redirected walking,10.1109/vr.2011.5759454
+R717c6a4b9,3,kataoka,watanabe,10.1109/access.2022.3222804,Mouth-in-the-door: The effect of a sound image of an avatar intruding on personal space that deviates in position from the visual image,10.1109/access.2022.3222804
+Rffa21d85b,2,author,watanabe,10.1109/tvcg.2018.2865945,Joint action in a virtual environment: Crossing roads with risky vs. safe human and agent partners,10.1109/tvcg.2018.2865945
+Rd30fd88b9,3,kataoka,watanabe,10.1109/ismar-adjunct68609.2025.00147,Lights-out factories – hands-on control: Haptic teleoperation of a robotic arm through virtual reality,10.1109/ismar-adjunct68609.2025.00147
+R9a141098e,1,author,kataoka,10.1109/tpel.2009.2021608,Evaluation of self-driven schemes for a 12-V self-driven voltage regulator,10.1109/tpel.2009.2021608
+R1b23e086e,1,author,kataoka,10.1109/tvcg.2023.3247060,CrowbarLimbs: a fatigue-reducing virtual reality text entry metaphor,10.1109/tvcg.2023.3247060
+R237cfecd5,3,kataoka,watanabe,10.1109/tsmc.2013.2280438,Human pose estimation and tracking via parsing a tree structure based human model,10.1109/tsmc.2013.2280438
+R8da000183,3,kataoka,watanabe,10.1109/access.2025.3641607,Motion capture using GCN and multi-scale features in virtual human animation,10.1109/access.2025.3641607
+Ra5a5d6c99,2,author,watanabe,10.1109/tvcg.2025.3549171,The impact of avatar retargeting on pointing and conversational communication,10.1109/tvcg.2025.3549171
+Ref87b5421,1,author,kataoka,10.1109/access.2020.3035850,Maximum likelihood estimators for three-dimensional rigid body localization in internet of things environments,10.1109/access.2020.3035850
+R32b3fe45b,2,author,watanabe,10.1109/tvcg.2021.3106429,AgentDress: Realtime clothing synthesis for virtual agents using plausible deformations,10.1109/tvcg.2021.3106429
+Rcb3e43f3e,2,author,watanabe,10.1109/vrw62533.2024.00366,[DC] precise hand tracking using multiple optical sensors,10.1109/vrw62533.2024.00366
+R86fd1427d,1,author,kataoka,10.1109/mcom.001.2300746,Effects of small-scale user mobility on highly directional XR communications,10.1109/mcom.001.2300746
+R90f67fb34,2,author,watanabe,10.1109/tvcg.2025.3569923,Interactive rendering of relightable and animatable gaussian avatars,10.1109/tvcg.2025.3569923
+R2856d16e3,1,author,kataoka,10.1109/access.2024.3501394,AF-cpacnet: AnchorFree crowd parsing attention-based characteristic segmentation network,10.1109/access.2024.3501394
+Rccc7682a0,3,kataoka,watanabe,10.1109/tpel.2005.850924,A self-driven soft-switching voltage regulator for future microprocessors,10.1109/tpel.2005.850924
+Rceea5cd57,1,author,kataoka,10.1109/cvpr46437.2021.01308,"S3: Neural shape, skeleton, and skinning fields for 3D human modeling",10.1109/cvpr46437.2021.01308
+Re72f03d1a,3,kataoka,watanabe,10.1109/jsen.2019.2947612,Evaluation of hand-tracking systems in teleoperation and virtual dexterous manipulation,10.1109/jsen.2019.2947612
+R17d828f5f,2,author,watanabe,10.1109/ismar-adjunct.2018.00114,"A low-latency, high-precision handheld perspective corrected display",10.1109/ismar-adjunct.2018.00114
+R47ef64c6b,1,author,kataoka,10.1109/tvcg.2017.2718514,Collision avoidance behavior between walkers: Global and local motion cues,10.1109/tvcg.2017.2718514
+R8b0f046e8,1,author,kataoka,10.1109/lra.2022.3151614,Learn to predict how humans manipulate large-sized objects from interactive motions,10.1109/lra.2022.3151614
+Rde0f56e4e,1,author,kataoka,10.1109/tvcg.2012.46,Haptic palpation for medical simulation in virtual environments,10.1109/tvcg.2012.46
+Rad71b808f,1,author,kataoka,10.1109/cvpr52729.2023.00439,High-fidelity 3D face generation from natural language descriptions,10.1109/cvpr52729.2023.00439
+Rac942fce2,3,kataoka,watanabe,10.1109/access.2024.3390042,Quantum reinforcement learning for spatio-temporal prioritization in metaverse,10.1109/access.2024.3390042
+R1837916c9,1,author,kataoka,10.1109/tip.2020.3029901,Hier r-CNN: Instance-level human parts detection and a new benchmark,10.1109/tip.2020.3029901
+Rbc4f0a8ad,1,author,kataoka,10.1109/wacv61042.2026.00805,Mem-MLP: Real-time 3D human motion generation from sparse inputs,10.1109/wacv61042.2026.00805
+R13a021efd,2,author,watanabe,10.1109/tvcg.2025.3631385,Quality assessment of 3D human animation: Subjective and objective evaluation,10.1109/tvcg.2025.3631385
+R55d6a7352,1,author,kataoka,10.1109/tvcg.2025.3549869,PantographHaptics: a technique for large-surface passive haptic interactions using pantograph mechanisms,10.1109/tvcg.2025.3549869
+R7615e7e59,1,author,kataoka,10.1109/vrw70859.2026.00092,"Zero-shot and foundation model performance on face emotion recognition for avatars in XR – challenges, limitations, and potentials",10.1109/vrw70859.2026.00092
+R05452c964,1,author,kataoka,10.1109/vrw66409.2025.00141,Crack-free multi-resolution dynamic volume refinement for physics-based bone drilling and shaving in arthroscopic procedures,10.1109/vrw66409.2025.00141
+R6cc51f8cf,3,kataoka,watanabe,10.1109/iccv51701.2025.01226,Align your rhythm: Generating highly aligned dance poses with gating-enhanced rhythm-aware feature representation,10.1109/iccv51701.2025.01226
+R8f43c45bd,2,author,watanabe,10.1109/jsen.2025.3624143,Surface-aligned 3-D human shape estimation via gaussian curvature structure learning,10.1109/jsen.2025.3624143
+Re55ac473b,1,author,kataoka,10.1109/tetci.2025.3607392,3DMM-GAN: Multi-modal alignment with adversarial learning for compositional 3D human image synthesis,10.1109/tetci.2025.3607392
+Rff49c9add,3,kataoka,watanabe,10.1109/wacv61041.2025.00580,Social EgoMesh estimation,10.1109/wacv61041.2025.00580
+R5937165e9,3,kataoka,watanabe,10.1109/iccv51701.2025.01217,Capturing head avatar with hand contacts from a monocular video,10.1109/iccv51701.2025.01217
+R01ecda72e,3,kataoka,watanabe,10.1109/tmm.2026.3655480,MGHead: Motion-aware animated gaussian head avatars with anchored skeletal structures,10.1109/tmm.2026.3655480
+R332dbb655,1,author,kataoka,10.1109/iccv51701.2025.00948,Towards immersive human-x interaction: a real-time framework for physically plausible motion synthesis,10.1109/iccv51701.2025.00948
+R8d07df5d9,1,author,kataoka,10.1109/vrw70859.2026.00139,Real-time dynamic digital twin generation using multiple first-person views,10.1109/vrw70859.2026.00139
+R4bb71a7d6,3,kataoka,watanabe,10.1109/mic.2025.3649567,Toward smart and green energy stations: a cognitive digital twin framework for intelligent management,10.1109/mic.2025.3649567
+R95e9cd69d,1,author,kataoka,10.1109/vr67842.2026.00024,Anchor-based haptics: Portable interfaces leveraging real surfaces to display grounded forces for 3D shape simulation in VR,10.1109/vr67842.2026.00024
+Rb6d5ad485,1,author,kataoka,10.1109/tvcg.2026.3680710,LIVE-GS: LLM powers interactive VR experience with physics-aware gaussian splatting,10.1109/tvcg.2026.3680710
+R12416cd36,2,author,watanabe,10.1109/tvcg.2026.3680686,Telling us what you experience: Effects of questionnaire interface design on subjective measurements in virtual reality,10.1109/tvcg.2026.3680686
+R3a0adb51c,3,kataoka,watanabe,10.1109/access.2026.3696348,A unified perceptual–physical framework for real-time underwater motion simulation of immersive agents and large-scale crowds,10.1109/access.2026.3696348
+R8b85bfd76,1,author,kataoka,10.1109/vrw70859.2026.00059,Demographic influences on balance-based locomotion in virtual reality,10.1109/vrw70859.2026.00059
+Rd868c0bf8,2,author,watanabe,10.1109/iccvw69036.2025.00668,DNF-avatar: Distilling neural fields for real-time animatable avatar relighting,10.1109/iccvw69036.2025.00668
+R4e0697c1a,3,kataoka,watanabe,10.1109/vrw70859.2026.00225,Symmetrical reality-based large-scale simulation of embodied agents for the evolutionary virtual world,10.1109/vrw70859.2026.00225
+R42f9bb5fa,1,author,kataoka,10.1109/tnsre.2026.3708538,Effects of task-driven head orientations on gait and balance during walking in virtual reality,10.1109/tnsre.2026.3708538
+Rc7aca8124,3,kataoka,watanabe,10.1109/tnsre.2026.3702775,Hybrid kinematic and muscular null space for simultaneous control of natural and extra degrees of freedom,10.1109/tnsre.2026.3702775
+R3784f566f,1,author,kataoka,10.1109/tvcg.2026.3679892,U-NEXT: a user-centered new prototype for walking excavator simulator,10.1109/tvcg.2026.3679892
+R40cbed0ec,3,kataoka,watanabe,10.1109/vrw70859.2026.00069,"I like to move it, move it - non-intrusive full body tracking for caves",10.1109/vrw70859.2026.00069
+R1fa7a6838,3,kataoka,watanabe,10.1109/tvcg.2026.3679093,Toward multimodal privacy in XR: Design and evaluation of composite privatization methods for gaze and body tracking data,10.1109/tvcg.2026.3679093
+R45e6b1eda,2,author,watanabe,10.1109/access.2026.3658879,Design and evaluation of a physically synchronized virtual therapist avatar to improve trust in a single-arm massage robot incorporating skilled massage techniques,10.1109/access.2026.3658879
+Rf2e0eabf5,1,author,kataoka,10.1109/tvcg.2026.3680715,What makes a virtual celebrity agent trustworthy in VR? Exploring the role of stylization and voice,10.1109/tvcg.2026.3680715
+Reddad7d05,3,kataoka,watanabe,10.1109/lra.2026.3710366,CWI: Composite humanoid whole-body imitation system for loco-manipulation,10.1109/lra.2026.3710366
+Re67a71405,1,author,kataoka,10.1109/vrw70859.2026.00112,Acceptance of simulated body-proximate technologies in XR: a transhumanist perspective,10.1109/vrw70859.2026.00112
+Rbfa8a9de5,2,author,watanabe,10.1109/vrw70859.2026.00103,Virtual prejudice in childhood: Impulsive avoidance toward racial out-group avatars,10.1109/vrw70859.2026.00103
+R6d607949e,2,author,watanabe,10.1109/tvcg.2026.3651382,Generating distance-aware human-to-human interaction motions from text guidance,10.1109/tvcg.2026.3651382
+R25fb13753,3,kataoka,watanabe,10.1109/jsen.2026.3657180,Assessing the 6-DoF accuracy and robustness of the HTC VIVE ultimate stand-alone inside-out motion tracker: a robot-driven evaluation,10.1109/jsen.2026.3657180
+Ra4db28b47,1,author,kataoka,10.1109/vrw70859.2026.00133,Exploring proprioception and spatial awareness during auditory and visual feet guidance in bouldering,10.1109/vrw70859.2026.00133
+R991b89637,3,kataoka,watanabe,10.1109/vrw70859.2026.00110,Multimodal integration of visual masking and phantom sensation for 3D object interaction in hand projection,10.1109/vrw70859.2026.00110
+Ree0ec06e1,1,author,kataoka,10.1109/vr67842.2026.00059,AniXDim: Integrating cross-dimensional interaction into desktop character animation workflows,10.1109/vr67842.2026.00059
+Re06bf4a0e,3,kataoka,watanabe,10.1109/tvcg.2026.3679092,Influence of avatar appearance and target distance on locomotion method selection in virtual reality,10.1109/tvcg.2026.3679092
+R3fa8f9720,1,author,kataoka,10.1109/tvcg.2026.3679904,Beyond the self: Avatar anthropomorphic fidelity and calibration effects on judging others' interpersonal horizontal reachability in VR,10.1109/tvcg.2026.3679904
+Ra0269c870,2,author,watanabe,10.1109/tvcg.2026.3680575,How harassment shapes self-perception and well-being in social VR: Evidence from a controlled lab study,10.1109/tvcg.2026.3680575
+R9dadc7e35,1,author,kataoka,10.1109/tvcg.2026.3680618,EgoPoseVR: Spatiotemporal multi-modal reasoning for egocentric full-body pose in virtual reality,10.1109/tvcg.2026.3680618
+Rc8f13044f,3,kataoka,watanabe,10.1109/tvcg.2026.3679873,Slightly stretching your arm's reach may improve VR interaction: The optimal interaction zone in a memory task,10.1109/tvcg.2026.3679873
+R30e281391,1,author,kataoka,10.1109/tvcg.2026.3679112,"User-articulated associations in VR: a co-occurrence network map of presence, realism, agency, and time",10.1109/tvcg.2026.3679112
+Rb1b8efe29,2,author,watanabe,10.1109/vrw70859.2026.00324,Mapping action space via psychophysiological responses in virtual reality,10.1109/vrw70859.2026.00324
+R3ad43eac8,1,author,kataoka,10.1109/tvcg.2026.3679062,TerraFirma: a low-cost and effective 360 VR extension for viewpoint translation and collaboration,10.1109/tvcg.2026.3679062
+Ree9fad12a,3,kataoka,watanabe,10.1109/tpami.2020.3029700,SelfPose: 3D egocentric pose estimation from a headset mounted camera,10.1109/tpami.2020.3029700
+Rda5bb73ca,2,author,watanabe,10.1109/access.2023.3316226,Proposal for a distraction technique using two-screen projection for stress relief in children with medical complexity,10.1109/access.2023.3316226
+R8e8fbb17c,3,kataoka,watanabe,10.1109/vrw62533.2024.00112,Design and implementation of agent apis for large-scale social VR platforms,10.1109/vrw62533.2024.00112
+Rc000383e0,1,author,kataoka,10.1162/jocn_a_01635,Current promises and limitations of combined virtual reality and functional magnetic resonance imaging research in humans: a commentary on huffman and ekstrom (2019),10.1162/jocn_a_01635
+Rbd48e8de7,2,author,watanabe,10.1109/tvcg.2018.2794072,Locomotive recalibration and prism adaptation of children and teens in immersive virtual environments,10.1109/tvcg.2018.2794072
+R7a776ad50,2,author,watanabe,10.1109/vrw50115.2020.00116,[DC] the modulation of peripersonal space boundaries in immersive virtual environments,10.1109/vrw50115.2020.00116
+Rf341fd0bc,1,author,kataoka,10.1109/tdsc.2026.3667573,A mercurial-based secure authentication and reputation framework for the multi-context metaverse,10.1109/tdsc.2026.3667573
+R52e593b2b,2,author,watanabe,10.1109/cvpr.2019.00462,Detailed human shape estimation from a single image by hierarchical mesh deformation,10.1109/cvpr.2019.00462
+R092c22176,1,author,kataoka,10.1016/j.cell.2025.11.030,Mapping cellular targets of covalent cancer drugs in the entire mammalian body,10.1016/j.cell.2025.11.030
+Rdf44d92b2,3,kataoka,watanabe,10.1007/s10055-025-01138-9,Levitation experience in virtual reality,10.1007/s10055-025-01138-9
+R4cafebd66,3,kataoka,watanabe,10.1038/s41598-025-31146-3,Embodying an avatar with a dissimilar appearance enhances insight problem solving,10.1038/s41598-025-31146-3
+Rb1704d118,2,author,watanabe,10.1007/s42241-026-0010-4,Passive bio-inspired flow sensing for autonomous underwater vehicles: A digital twin framework for object detection and localisation,10.1007/s42241-026-0010-4
+Rfa6460f42,2,author,watanabe,10.1152/ajpheart.00413.2025,One surface fits all: validating the venous return model across species and scales in circulatory equilibrium,10.1152/ajpheart.00413.2025
+R105932875,1,author,kataoka,10.1057/s41599-025-06043-9,"Virtual Reality (VR) InducE Well-being (VIEW): a Scoping Review of VR Design, Mechanisms, and Well-being Outcomes",10.1057/s41599-025-06043-9
+R2bcb2bc88,2,author,watanabe,10.1249/mss.0000000000003666,Physical Work in Humid Heat Impairs Postural Balance during Simulated Construction Tasks at Height,10.1249/mss.0000000000003666
+R264653be2,3,kataoka,watanabe,10.1097/aud.0000000000001825,Motion-Steered Noise Management in Hearing Aids Reduces Listening Effort and Stress Indexed by Pupil Size and Heart Rate,10.1097/aud.0000000000001825
+Rb11e4e5cb,2,author,watanabe,10.1016/j.jestch.2025.102026,Swarm intelligence driven inverse design of slot patterns for sub-6 GHz 5G MIMO antennas in virtual reality applications,10.1016/j.jestch.2025.102026
+Rdc66cdea9,3,kataoka,watanabe,10.1016/j.robot.2025.105129,Unconventional grasping in multi-limb humanoid robot using fuzzy logic intelligence,10.1016/j.robot.2025.105129
+R044248468,1,author,kataoka,10.1002/adfm.202513802,Self-Decoupled 3D Motion Sensors for Body-Posture Reconstruction,10.1002/adfm.202513802
+Rcf557daf2,3,kataoka,watanabe,10.1016/j.ijnaoe.2025.100719,Anti-swing overhead crane control algorithm based on multi-body dynamics using reinforcement learning,10.1016/j.ijnaoe.2025.100719
+R84def5576,3,kataoka,watanabe,10.1038/s41598-026-45811-8,It is a matter of size—manipulating body size with virtual reality modulates reward sensitivity,10.1038/s41598-026-45811-8
+Raf7d8ac5a,2,author,watanabe,10.3390/children12060796,Movement Variability and Perceived Motor Competence in Children with High or Low Risk Willingness in a Virtual Playground,10.3390/children12060796
+Rc40c1cbca,2,author,watanabe,10.1109/tmm.2026.3668541,MambaGesture2: Co-Speech Gesture Generation via Hierarchical Fusion and Spatiotemporal Aggregation,10.1109/tmm.2026.3668541
+R749d7d7ee,1,author,kataoka,10.1371/journal.pgph.0004081,A mixed-method study of feasibility and acceptability of the Dapivirine vaginal ring among adolescent girls and young women (AGYW) in selected Zimbabwean districts,10.1371/journal.pgph.0004081
+Rbf00818c9,2,author,watanabe,10.1177/13548565251320727,Narrative virtual reality as a memory machine,10.1177/13548565251320727
+R7a1d3aee5,3,kataoka,watanabe,10.2196/93060,Authors’ Reply: Enhancing Team-Based Learning in Virtual Environments: The Role of Avatar Agency and Immersive Social Presence,10.2196/93060
+Rcb6a7ada2,2,author,watanabe,10.1016/j.afres.2025.101558,Mechanistic insight into the sensory acceptance of coconut water drinks fortified with α-tocopherol/tocotrienol in nanostructured lipid carriers (NLC) in an immersive beach-like setting,10.1016/j.afres.2025.101558
+R6e84934a6,3,kataoka,watanabe,10.3390/s25195998,Visuomotor Control Accuracy of Circular Tracking Movement According to Visual Information in Virtual Space,10.3390/s25195998
+R607e98b5b,3,kataoka,watanabe,10.1007/s10055-026-01320-7,Blowing into immersion: the effect of wind stimulation on different body areas in a VR motorcycle game,10.1007/s10055-026-01320-7
+Rbbee26553,2,author,watanabe,10.1007/s00426-025-02125-0,Assessing visuospatial perception in clinical and healthy populations: Test–retest reliability and smallest real difference of hill steepness estimation and the distance-on-hill task in virtual reality,10.1007/s00426-025-02125-0
+R8c912eb06,2,author,watanabe,10.1016/j.schres.2025.11.004,Impact of avatar features and presence on treatment outcomes in virtual reality-assisted therapy for auditory hallucinations,10.1016/j.schres.2025.11.004
+Re72fa85ee,3,kataoka,watanabe,10.1002/rob.22524,Development of a Telerobotic Target-Specific Pesticide Applicator: An Intervention for Enhanced Safety and Efficiency,10.1002/rob.22524
+Rf62e900ad,2,author,watanabe,10.1038/s41562-025-02216-3,Five canonical findings from 30 years of psychological experimentation in virtual reality,10.1038/s41562-025-02216-3
+R89c84162c,2,author,watanabe,10.1007/s10055-025-01122-3,"The affordances and constraints of mathematics tutoring in immersive, collaborative, and dynamic virtual reality environments",10.1007/s10055-025-01122-3
+R470e6426a,2,author,watanabe,10.1016/j.neubiorev.2026.106565,Your brain on nature: A scoping review of the neuroscience of nature exposure,10.1016/j.neubiorev.2026.106565
+R337bed604,3,kataoka,watanabe,10.1016/j.jhazmat.2026.141354,Assessing and projecting the potential cumulative risks of heavy metal dispersion (PCR-HMD) from lead-zinc mines in China: Impacts of soil water erosion and climate change,10.1016/j.jhazmat.2026.141354
+R88f1811d1,3,kataoka,watanabe,10.1016/j.actpsy.2026.106390,"Psychological benefits of aerobic, resistance, mind-body exercises, and HIIT for enhancing athlete well-being and performance",10.1016/j.actpsy.2026.106390
+R27f28f449,1,author,kataoka,10.2196/79147,Automated Inference of Social Anxiety From Behavior in Social Virtual Reality: Cross-Sectional Observational Study,10.2196/79147
+Rea2b5d9b3,1,author,kataoka,10.3389/fpsyg.2025.1649698,"Examining the distinctiveness of body image and self-related constructs in eating disorders using virtual reality: the role of shape concerns, physical self-worth, and global self-worth",10.3389/fpsyg.2025.1649698
+R436075cdc,3,kataoka,watanabe,10.1016/j.jvcir.2026.104784,SS3DFR : Semi-supervised 3D face reconstruction from single face image,10.1016/j.jvcir.2026.104784
+R77582405b,2,author,watanabe,10.1111/dom.70318,Evaluating the use of virtual reality for weight management: A systematic review and meta-analysis,10.1111/dom.70318
+R0c3393e7e,1,author,kataoka,10.1016/j.ajp.2025.104634,Therapeutic applications of 3D printing in psychiatry: Current status and future possibilities,10.1016/j.ajp.2025.104634
+R0cc010100,1,author,kataoka,10.1016/j.cognition.2025.106358,Naturalistic movements enrich episodic memories but not their spatiotemporal structure,10.1016/j.cognition.2025.106358
+R89e526363,2,author,watanabe,10.1016/j.oceaneng.2025.122255,Virtual reality-based experimental investigation of evacuation characteristics in ship fire scenarios with limited visibility,10.1016/j.oceaneng.2025.122255
+R8e27811c7,2,author,watanabe,10.1037/pag0000927,Age differences in spatial navigation stem from a preference for familiar routes rather than impaired landmark-dependent strategies,10.1037/pag0000927
+R2e77e37e8,3,kataoka,watanabe,10.1080/09613218.2025.2544706,Technology integration in India’s real estate sector: measuring awareness of virtual reality and closed-loop marketing,10.1080/09613218.2025.2544706
+Re43678c90,1,author,kataoka,10.3390/educsci15080959,Bridging Theory and Practice with Immersive Virtual Reality: A Study on Transfer Facilitation in VET,10.3390/educsci15080959
+R352efcd2c,2,author,watanabe,10.1016/j.cortex.2026.03.003,From bodies to spaces: A neurocognitive/neuropsychological perspective on body–space interactions,10.1016/j.cortex.2026.03.003
+R3219ab0ae,1,author,kataoka,10.2196/92366,Enhancing Team-Based Learning in Virtual Environments: The Role of Avatar Agency and Immersive Social Presence,10.2196/92366
+Re3a50c4ba,1,author,kataoka,10.1111/psyp.70280,Spatial Distance and Temporal Attentional Focus Modulate Voluntary Action Preparation and Awareness,10.1111/psyp.70280
+R51cabd000,2,author,watanabe,10.1038/s41598-025-22694-9,"The threat of an embodied virtual belly affects gastric feelings depending on somatic, interoceptive and alexithymic characteristics of healthy women",10.1038/s41598-025-22694-9
+Ra828c6b72,1,author,kataoka,10.1017/ehs.2025.5,"Social comfort and attractiveness perception: impact of prosthetics, physical disability and comfort distance on interpersonal interactions",10.1017/ehs.2025.5
+R1f047b9e5,1,author,kataoka,10.1007/s10980-025-02272-0,Roads as dynamic stressors: physiological response of mule deer to roads differs during range residency and migration,10.1007/s10980-025-02272-0
+R71e1c1fa9,3,kataoka,watanabe,10.1021/accountsmr.4c00207,Use of Materials Science to Understand Haptic Perception,10.1021/accountsmr.4c00207
+Rdc8e0d552,2,author,watanabe,10.3389/frvir.2025.1718198,“Did she just tap me?“: qualifying multisensory feedback for social touch during human-agent interaction in virtual reality,10.3389/frvir.2025.1718198
+Ra3f1e3e62,3,kataoka,watanabe,10.1016/j.edurev.2025.100730,A meta-analysis of Richard Mayer's multimedia learning research: Searching for boundary conditions of design principles across multiple media types,10.1016/j.edurev.2025.100730
+R2719e7447,3,kataoka,watanabe,10.3389/frvir.2025.1699143,Assessing and enhancing the ecological validity of human locomotion in virtual reality,10.3389/frvir.2025.1699143
+R0e3a33a8b,3,kataoka,watanabe,10.1061/jcemd4.coeng-16567,Drone Flights and Worker Visual Attention: A Quantitative Study of Distraction and Hazard Awareness,10.1061/jcemd4.coeng-16567
+R17ee59059,1,author,kataoka,10.7717/peerj.20946,Effects of physical activity on fundamental motor skills and body composition in children and adolescents with intellectual and developmental disabilities: a systematic review and meta-analysis,10.7717/peerj.20946
+R6b99fd687,2,author,watanabe,10.1007/s44212-025-00081-z,Sidewalk2Synth: generating synthetic embodied locomotion from real-world streetscapes,10.1007/s44212-025-00081-z
+R04ad7a330,3,kataoka,watanabe,10.3390/buildings16020250,The Role of VR in Supporting Body-Centered Phenomenology in Interior Design Education,10.3390/buildings16020250
+R977524289,1,author,kataoka,10.1371/journal.pone.0321799,Correction: Feeling connected but dissimilar to one's future self reduces the intention-behavior gap (PLoS ONE (2024) 19:7 (e0305815) DOI: 10.1371/journal.pone.0305815),10.1371/journal.pone.0321799
+Rf80ff1a2f,1,author,kataoka,10.1007/s10055-025-01134-z,Virtual reality-enhanced interventions to improve weight control and body image in overweight and obese adults: a systematic review and meta-analysis,10.1007/s10055-025-01134-z
+R20d267c3d,2,author,watanabe,10.1038/s41366-025-01776-8,Consumption of a diet high in fat and sugar is associated with worse spatial navigation ability in a virtual environment,10.1038/s41366-025-01776-8
+R7ed1c3443,1,author,kataoka,10.1016/j.msard.2025.106796,"Therapeutic exercise in multiple sclerosis: Mechanisms of neuroprotection, modality-specific benefits, and technology-enhanced delivery frameworks",10.1016/j.msard.2025.106796
+R6a9d70da3,1,author,kataoka,10.1016/j.dib.2025.111827,Multimodal cross-system virtual reality (VR) ball throwing dataset for VR biometrics,10.1016/j.dib.2025.111827
+R4f9698dbf,1,author,kataoka,10.1109/jsac.2023.3345389,Spatio-Temporal Identity Multi-Graph Convolutional Network for Traffic Prediction in the Metaverse,10.1109/jsac.2023.3345389
+Rf7c19aec6,3,kataoka,watanabe,10.1177/21582440251357150,Promoting Thinking skills and Inventive Problem-Solving Skills Through Cybergogy Approach for TVET Learners,10.1177/21582440251357150
+Rc2cb13faa,2,author,watanabe,10.1109/mnet.2025.3597127,"Large Model Empowered Metaverse: State-of-the-Art, Challenges and Opportunities",10.1109/mnet.2025.3597127
+R70372c2f1,2,author,watanabe,10.1080/01441647.2025.2494021,Perceptual-motor skills in cycling: towards an affordance-based control approach,10.1080/01441647.2025.2494021
+Rb59c3c889,2,author,watanabe,10.3389/fpsyt.2024.1455495,Borders of physical self in virtual reality: a systematic review of virtual hand position discrepancy detection,10.3389/fpsyt.2024.1455495
+R3062b906e,2,author,watanabe,10.3390/rel15040487,How to Worship in the Metaverse: Religious Experience and the Affordances of a New Medium,10.3390/rel15040487
+R7db7051a5,3,kataoka,watanabe,10.1016/j.ymssp.2024.111793,Determinants of pedestrian mediolateral foot placement in walking on laterally-oscillating structures and their consequences for structural stability,10.1016/j.ymssp.2024.111793
+R068313da9,3,kataoka,watanabe,10.1126/sciadv.adq3438,Multiscale crack trapping for programmable adhesives,10.1126/sciadv.adq3438
+R07d10325c,3,kataoka,watanabe,10.1007/978-3-031-75095-3_52,A Study of Entrepreneurial Opportunities in Metaverse: Navigating the Virtual Frontier,10.1007/978-3-031-75095-3_52
+R628149ba1,1,author,kataoka,10.2196/75777,Effects of an Immersive Virtual Reality–Based Exercise Intervention on Psychological and Physiological Outcomes in College Students: Randomized Controlled Trial,10.2196/75777
+Rb69b7471d,2,author,watanabe,10.1186/s12984-023-01299-1,Immediate application of low-intensity electrical noise reduced responses to visual perturbations during walking in individuals with cerebral palsy,10.1186/s12984-023-01299-1
+R2bc2509b2,3,kataoka,watanabe,10.1016/j.actpsy.2024.104386,Gender differences in bodily experience: Insights from virtual reality body illusion,10.1016/j.actpsy.2024.104386
+R256ef7590,2,author,watanabe,10.3389/fpsyg.2024.1390677,Psychophysiological insights and user perspectives: enhancing police de-escalation skills through full-body VR training,10.3389/fpsyg.2024.1390677
+Rb602489d2,2,author,watanabe,10.2196/66593,Physical Activity and Enjoyment in Active Virtual Reality Games in Youth: Comparative Analysis of Gorilla Tag and Beat Saber,10.2196/66593
+R23194e06b,2,author,watanabe,10.1016/j.compbiomed.2024.108778,A novel virtual robotic platform for controlling six degrees of freedom assistive devices with body-machine interfaces,10.1016/j.compbiomed.2024.108778
+Ra2a5805dd,3,kataoka,watanabe,10.3390/biomedicines12112453,Cellular Characteristics and Protein Signatures of Human Adipose Tissues from Donors With or Without Advanced Coronary Artery Disease,10.3390/biomedicines12112453
+Ra0df1df6d,2,author,watanabe,10.1038/s41598-024-61253-6,Developmental changes of bodily self-consciousness in adolescent girls,10.1038/s41598-024-61253-6
+Rce302736c,2,author,watanabe,10.1016/j.imavis.2024.105144,GAN-BodyPose: Real-time 3D human body pose data key point detection and quality assessment assisted by generative adversarial network,10.1016/j.imavis.2024.105144
+R4f0934072,3,kataoka,watanabe,10.3758/s13414-024-02983-7,Can the left hand benefit from being right? The influence of body side on perceived grasping ability,10.3758/s13414-024-02983-7
+Ra6d6fda7c,3,kataoka,watanabe,10.3389/fnhum.2025.1668123,Editorial: Impact of virtual reality on sensory neuroscience: delving into body ownership and agency,10.3389/fnhum.2025.1668123
+R0877910b9,1,author,kataoka,10.1016/j.chb.2024.108376,Shaping health behaviors beyond reality: A full body illusion to experience the consequences of unhealthy snacking,10.1016/j.chb.2024.108376
+R96bfc880e,3,kataoka,watanabe,10.1093/scan/nsaf020,The contribution of body perception to self-identity: an event-related potential study,10.1093/scan/nsaf020
+R472491f11,1,author,kataoka,10.3389/fnhum.2025.1468947,Evidence of a hierarchical representation in bodily self-consciousness: the neural correlates of embodiment and presence in virtual worlds,10.3389/fnhum.2025.1468947
+R939f0c472,1,author,kataoka,10.3389/fdgth.2025.1530131,Self-initiated humour protocol: a pilot study with an AI agent,10.3389/fdgth.2025.1530131
+Re39c06eb5,3,kataoka,watanabe,10.1002/ece3.10949,Predicting the current habitat refugia of Himalayan Musk deer (Moschus chrysogaster) across Nepal,10.1002/ece3.10949
+Re507495ac,3,kataoka,watanabe,10.1111/cgf.15057,DivaTrack: Diverse Bodies and Motions from Acceleration-Enhanced Three-Point Trackers,10.1111/cgf.15057
+R1895850b6,1,author,kataoka,10.1007/s00426-023-01877-x,Perceived spatial presence and body orientation affect the recall of out-of-sight places in an immersive sketching experiment,10.1007/s00426-023-01877-x
+Rc6cc8431c,2,author,watanabe,10.1016/j.comnet.2024.110792,Comparison of energy conservation strategies for 5G NR RedCap service in industrial environment,10.1016/j.comnet.2024.110792
+R082a333ea,2,author,watanabe,10.1177/16094069251350311,A Framework for Qualitative Analysis of Non-fiction Virtual Reality Storyworlds,10.1177/16094069251350311
+R4f590e591,3,kataoka,watanabe,10.1038/s41526-024-00376-6,The effects of long-term exposure to microgravity and body orientation relative to gravity on perceived traveled distance,10.1038/s41526-024-00376-6
+R4f230b7fb,1,author,kataoka,10.1080/10494820.2022.2146140,Virtual reality learning environments: using high-fidelity avatars to enhance distance learning experience,10.1080/10494820.2022.2146140
+R102735db7,2,author,watanabe,10.1080/0144929x.2025.2457563,"You look so young, you look so cute. The relationship between physical appearance, age and mental abilities in social robots",10.1080/0144929x.2025.2457563
+R430cccbb0,1,author,kataoka,10.1007/s12671-024-02373-y,Does Virtual Reality Training Increase Mindfulness in Aboriginal Out-of-Home Care Children?,10.1007/s12671-024-02373-y
+Rec7c8ff7f,3,kataoka,watanabe,10.1016/j.jobe.2024.109199,Generating trajectory data without behavior modeling: An online virtual reality method in wayfinding performance evaluation for buildings,10.1016/j.jobe.2024.109199
+R7603e24f2,2,author,watanabe,10.1186/s12984-024-01323-y,Characterizing the supraspinal sensorimotor control of walking using MRI-compatible system: a systematic review,10.1186/s12984-024-01323-y
+Rd8d4b42b7,1,author,kataoka,10.1002/casp.2879,The virtual cure for real-world prejudice? Secondary transfer effects of intergroup contact in virtual reality,10.1002/casp.2879
+R247a1be9c,3,kataoka,watanabe,10.20668/adada.29.s1_29,Effects of Avatar Identity (AI or Human) and Conversation on Personal Space in Virtual Reality,10.20668/adada.29.s1_29
+R0c2b6c079,2,author,watanabe,10.1016/j.jobe.2024.111127,Evaluating Biophilic Design strategies in Immersive Virtual Indoor Environments: A systematic review on the implications for buildings occupants,10.1016/j.jobe.2024.111127
+Rc4274e858,2,author,watanabe,10.1038/s41598-024-53239-1,Manipulating objects during learning shrinks the global scale of spatial representations in memory: a virtual reality study,10.1038/s41598-024-53239-1
+Ra4ffdfa9c,3,kataoka,watanabe,10.1523/eneuro.0244-23.2024,Experiencing an Elongated Limb in Virtual Reality Modifies the Tactile Distance Perception of the Corresponding Real Limb,10.1523/eneuro.0244-23.2024
+R3678b3b4e,3,kataoka,watanabe,10.1080/10447318.2024.2351719,VR-Grasp: A Human Grasp Taxonomy for Virtual Reality,10.1080/10447318.2024.2351719
+R9f01b6a51,3,kataoka,watanabe,10.1007/s11524-024-00863-x,Actual and Virtual Parks Benefit Quality of Life and Physical Activity: A Cluster Trial,10.1007/s11524-024-00863-x
+Rde59e9fcd,3,kataoka,watanabe,10.1080/01587919.2024.2351929,Enhancing distance learning with virtual reality: investigating learners’ engagement and outcomes,10.1080/01587919.2024.2351929
+Red6a9ad5f,3,kataoka,watanabe,10.1111/eje.12910,"Impact of a virtual prosthetic case planning environment on perceived immersion, cognitive load, authenticity and learning motivation in dental students",10.1111/eje.12910
+Rb753674d2,3,kataoka,watanabe,10.3389/frvir.2025.1655545,The impact of audience avatar movements on presence in virtual live events,10.3389/frvir.2025.1655545
+R314127cbe,3,kataoka,watanabe,10.3389/frvir.2025.1519409,Reducing foreign language anxiety through repeated exposure to a customizable VR public speaking application,10.3389/frvir.2025.1519409
+Rd7aadd900,1,author,kataoka,10.1038/s41598-024-61409-4,The proteus effect on human pain perception through avatar muscularity and gender factors,10.1038/s41598-024-61409-4
+R55f538418,2,author,watanabe,10.1213/ane.0000000000006611,Teaching Airway Management Using Virtual Reality: A Scoping Review,10.1213/ane.0000000000006611
+Rca8b4a29c,3,kataoka,watanabe,10.3389/fspor.2025.1520068,Effectiveness and acceptance of virtual reality vs. traditional exercise in obese adults: a pilot randomized trial,10.3389/fspor.2025.1520068
+R042418337,1,author,kataoka,10.1002/fsn3.4042,Effect on blood lipids and body composition of a high-fat (MUFA) and high-fiber diet: A case–control study,10.1002/fsn3.4042
+Rd3a79eca6,3,kataoka,watanabe,10.1016/j.cub.2024.11.024,"Memory-based predictions prime perceptual judgments across head turns in immersive, real-world scenes",10.1016/j.cub.2024.11.024
+R4296155fc,1,author,kataoka,10.1038/s41598-024-70450-2,Examining the Proteus effect on misogynistic behavior induced by a sports mascot avatar in virtual reality,10.1038/s41598-024-70450-2
+Rd43b4372b,1,author,kataoka,10.1109/te.2024.3378103,Impact of NEWTON Technology-Enhanced Learning Solutions on Knowledge Acquisition in Pilots Involving Students With Hearing Impairments,10.1109/te.2024.3378103
+R78cc0101c,2,author,watanabe,10.1080/15391523.2025.2520214,"Assessing high school students’ perceptions of virtual reality in independent learning: development, network analysis and validation of the Independent Learning and Cognitive Empowerment Scale in Virtual Reality (ILCE-VR Scale)",10.1080/15391523.2025.2520214
+R7e604e4d5,2,author,watanabe,10.1016/j.kint.2023.10.018,KDIGO 2024 Clinical Practice Guideline for the Evaluation and Management of Chronic Kidney Disease,10.1016/j.kint.2023.10.018
+Rd6afedf91,2,author,watanabe,10.1177/13548565221129530,"Stretching immersion in virtual reality: How glitches reveal aspects of presence, interactivity and plausibility",10.1177/13548565221129530
+R3ef7752d3,1,author,kataoka,10.3389/frvir.2024.1445725,Height of the first-person perspective affects the out-of-body experience illusion,10.3389/frvir.2024.1445725
+Rd3af92019,1,author,kataoka,10.3389/frvir.2024.1250618,The cat is out of the bag: the effect of virtual characters and scale cues on physics coherence,10.3389/frvir.2024.1250618
+R5ed0f26b7,3,kataoka,watanabe,10.1016/j.cexr.2023.100020,Virtual reality in education: The impact of high-fidelity nonverbal cues on the learning experience,10.1016/j.cexr.2023.100020
+Ref981f4ad,3,kataoka,watanabe,10.1016/j.jenvp.2023.102106,Come in please: a virtual reality study on entrance design factors influencing the experience of hospitality,10.1016/j.jenvp.2023.102106
+Rb9e835542,1,author,kataoka,10.1177/00336882231167610,“Whoa! Incredible!:” Language Learning Experiences in Virtual Reality,10.1177/00336882231167610
+R56fef9b64,3,kataoka,watanabe,10.1007/s11042-022-13379-w,An augmented virtuality system facilitating learning through nature walk,10.1007/s11042-022-13379-w
+R183d1cde7,1,author,kataoka,10.1016/j.buildenv.2023.110833,Assessing a thermoelectric radiative cooling partition as a personalised comfort system using empirical experiments enhanced by digital shadow visualisation,10.1016/j.buildenv.2023.110833
+R3c39a876a,2,author,watanabe,10.1016/j.neunet.2023.08.034,A large-scale neurocomputational model of spatial cognition integrating memory with vision,10.1016/j.neunet.2023.08.034
+R526151b55,3,kataoka,watanabe,10.1155/2024/7316063,Playing with Spatial Frames: Altering the Body Matrix Through Multisensory Egocentric and Allocentric Body Illusions,10.1155/2024/7316063
+R69e84bb55,2,author,watanabe,10.1002/admt.202300242,Hydraulically Amplified Electrostatic Taxels (HAXELs) for Full Body Haptics,10.1002/admt.202300242
+Rc8531bbda,3,kataoka,watanabe,10.3389/fpsyg.2023.1195059,Effects of appearance and gender on pre-touch proxemics in virtual reality,10.3389/fpsyg.2023.1195059
+R5b11af3b8,2,author,watanabe,10.1016/j.lithos.2023.107329,"Parent magma of the Cretaceous Northern Kyushu batholith and heat source of large-scale igneous activity: Petrological constraints on magmatism of the Northeastern Asian continental margin in the Cretaceous period, example for the Kita-Taku mafic complex in northern Kyushu, SW Japan",10.1016/j.lithos.2023.107329
+Rda7354559,2,author,watanabe,10.1016/j.jenvp.2022.101944,Switching between body and environment: The selective effect of spatial misalignment,10.1016/j.jenvp.2022.101944
+R0048b229a,1,author,kataoka,10.1007/s10055-022-00669-9,Construction and effect of relationships with agents in a virtual reality environment,10.1007/s10055-022-00669-9
+Re35dd0b0a,1,author,kataoka,10.3389/fbinf.2023.1162723,The HRA Organ Gallery affords immersive superpowers for building and exploring the Human Reference Atlas with virtual reality,10.3389/fbinf.2023.1162723
+R9a75693b9,3,kataoka,watanabe,10.1542/hpeds.2022-006990,Impact of a Remote Virtual Reality Curriculum Pilot on Clinician Conflict Communication Skills,10.1542/hpeds.2022-006990
+Rc80aba0db,2,author,watanabe,10.3390/s23125482,Classification and Analysis of Human Body Movement Characteristics Associated with Acrophobia Induced by Virtual Reality Scenes of Heights,10.3390/s23125482
+R1d8c3afda,1,author,kataoka,10.1093/mnras/stac3529,A measurement of the distance to the Galactic centre using the kinematics of bar stars,10.1093/mnras/stac3529
+R25f36cbbe,3,kataoka,watanabe,10.1093/jcmc/zmac031,"People, places, and time: a large-scale, longitudinal study of transformed avatars and environmental context in group interaction in the metaverse",10.1093/jcmc/zmac031
+R57603c219,3,kataoka,watanabe,10.4108/airo.v2i1.3392,Immersive Horizons: Exploring the Transformative Power of Virtual Reality Across Economic Sectors,10.4108/airo.v2i1.3392
+Rcde7aa73c,2,author,watanabe,10.1093/mnras/stad2312,WALLABY pilot survey: The potential polar ring galaxies NGC 4632 and NGC 6156,10.1093/mnras/stad2312
+R51368b860,1,author,kataoka,10.1093/cercor/bhad156,Early threat perception is independent of later cognitive and behavioral control. A virtual reality-EEG-ECG study,10.1093/cercor/bhad156
+Rac5e61b7e,1,author,kataoka,10.1016/j.concog.2023.103547,"Visual perspective, distance, and felt presence of others in dreams",10.1016/j.concog.2023.103547
+R6248b30e7,1,author,kataoka,10.1016/j.chc.2022.08.014,"Complementary and Integrative Medicine and Eating Disorders in Youth: Traditional Yoga, Virtual Reality, Light Therapy, Neurofeedback, Acupuncture, Energy Psychology Techniques, Art Therapies, and Spirituality",10.1016/j.chc.2022.08.014
+R0fad20044,3,kataoka,watanabe,10.1007/s10055-023-00786-z,Sensory reweighting: a common mechanism for subjective visual vertical and cybersickness susceptibility,10.1007/s10055-023-00786-z
+R415cc360b,2,author,watanabe,10.3390/educsci13030228,Virtual Reality as the Catalyst for a Novel Partnership Model in Initial Teacher Education: ITE Subject Methods Tutors’ Perspectives on the Island of Ireland,10.3390/educsci13030228
+R2faee97dc,1,author,kataoka,10.2196/47617,Individualized Virtual Reality for Increasing Self-Compassion: Evaluation Study,10.2196/47617
+Raed845754,1,author,kataoka,T:remote keylogging attacks in multi user vr applications,Remote Keylogging Attacks in Multi-user VR Applications,
+R34c34d3a1,1,author,kataoka,10.3390/su15010147,"Multi-Objective Optimization Design of Geometric Parameters of Atrium in nZEB Based on Energy Consumption, Carbon Emission and Cost",10.3390/su15010147
+R9e3016bc7,3,kataoka,watanabe,10.1007/s10055-023-00821-z,Fitted avatars: automatic skeleton adjustment for self-avatars in virtual reality,10.1007/s10055-023-00821-z
+R6dc720196,3,kataoka,watanabe,10.1089/cyber.2022.0251,Feeling Small or Standing Tall? Height Manipulation Affects Speech Anxiety and Arousal in Virtual Reality,10.1089/cyber.2022.0251
+R2c381c867,2,author,watanabe,10.1016/j.ast.2023.108171,Numerical investigation on high-speed jet actuation for transient control of flow separation,10.1016/j.ast.2023.108171
+Re1ef3158f,1,author,kataoka,10.1007/s10055-022-00646-2,To social with social distance: a case study on a VR-enabled graduation celebration amidst the pandemic,10.1007/s10055-022-00646-2
+Rf80d00fec,2,author,watanabe,10.3389/frvir.2024.1347102,Decoupling the role of verbal and non-verbal audience behavior on public speaking anxiety in virtual reality using behavioral and psychological measures,10.3389/frvir.2024.1347102
+Rcf10e0ab5,3,kataoka,watanabe,10.4995/var.2024.19806,THINKING THROUGH THE TOOL: COLLABORATIVE ARCHAEOLOGICAL BODYWORK IN IMMERSIVE VIRTUAL REALITY; [PENSAR A TRAVÉS DE LA HERRAMIENTA: TRABAJO CORPORAL ARQUEOLÓGICO COLABORATIVO EN REALIDAD VIRTUAL INMERSIVA],10.4995/var.2024.19806
+Rb53e09d5a,1,author,kataoka,10.1007/s10055-022-00677-9,Effects of physical walking on eyes-engaged target selection with ray-casting pointing in virtual reality,10.1007/s10055-022-00677-9
+Rb23e3d6b9,3,kataoka,watanabe,10.1016/j.jenvp.2023.102085,A meta-analysis of physiological stress responses to natural environments: Biophilia and Stress Recovery Theory perspectives,10.1016/j.jenvp.2023.102085
+R85149823d,3,kataoka,watanabe,10.1038/s41598-024-52383-y,Reshaping the peripersonal space in virtual reality,10.1038/s41598-024-52383-y
+Rfd119dd92,2,author,watanabe,10.1093/gigascience/giae037,Unveiling vertebrate development dynamics in frog Xenopus laevis using micro-CT imaging,10.1093/gigascience/giae037
+R9481e082d,2,author,watanabe,10.1111/sms.14250,A multi-scale analysis of basketball throw in virtual reality for tracking perceptual-motor expertise,10.1111/sms.14250
+Raba71d321,2,author,watanabe,10.7717/peerj.16095,What I see and what I feel: the influence of deceptive visual cues and interoceptive accuracy on affective valence and sense of effort during virtual reality cycling,10.7717/peerj.16095
+Raa7cc326a,1,author,kataoka,10.1111/1744-7917.13181,Efficient visual learning by bumble bees in virtual-reality conditions: Size does not matter,10.1111/1744-7917.13181
+Rde13d3b06,1,author,kataoka,10.3390/s23177371,Measurement Accuracy of the HTC VIVE Tracker 3.0 Compared to Vicon System for Generating Valid Positional Feedback in Virtual Reality,10.3390/s23177371
+R1884a275e,1,author,kataoka,10.1093/pm/pnad066,The use of immersive audiovisual distraction with virtual reality during pain procedures: A randomized controlled trial,10.1093/pm/pnad066
+Rb95bd4ffb,1,author,kataoka,10.1016/j.appet.2023.107052,Portion size affects food selection in an immersive virtual reality buffet and is related to measured intake in laboratory meals varying in portion size,10.1016/j.appet.2023.107052
+R9b217661f,1,author,kataoka,10.1007/s00426-022-01675-x,Impact of an overweight body representation in virtual reality on locomotion in a motor imagery task,10.1007/s00426-022-01675-x
+Rc00ad1392,3,kataoka,watanabe,10.3389/fpsyg.2022.1003250,Sizing up the crowd: Assessing spatial integration difficulties in body size judgements across eating disorder symptomatology,10.3389/fpsyg.2022.1003250
+Rc9dd9d1ab,3,kataoka,watanabe,10.1016/j.ast.2023.108767,Perception-based noise assessment of a future blended wing body aircraft concept using synthesized flyovers in an acoustic VR environment—The ARTEM study,10.1016/j.ast.2023.108767
+R8289be191,1,author,kataoka,10.1080/10941665.2024.2350401,Metaverse and regenerative tourism: the role of avatars in promoting sustainable practices,10.1080/10941665.2024.2350401
+Rbcbd5b142,2,author,watanabe,10.1098/rstb.2021.0453,Enhanced efficiency in visually guided online motor control for actions redirected towards the body midline,10.1098/rstb.2021.0453
+Rf7ff6db45,1,author,kataoka,10.3758/s13423-022-02175-0,Implicit learning of regularities followed by realistic body movements in virtual reality,10.3758/s13423-022-02175-0
+R01dabd541,3,kataoka,watanabe,10.2196/58411,Effect of elastic resistance on exercise intensity and user satisfaction while playing the active video game boxvr in immersive virtual reality: Empirical study,10.2196/58411
+R1b67ef9ec,2,author,watanabe,10.1080/02699931.2023.2300748,Emotion in motion: perceiving fear in the behaviour of individuals from minimal motion capture displays,10.1080/02699931.2023.2300748
+R76f7df8d3,3,kataoka,watanabe,10.3389/frvir.2024.1383957,Investigating body perception of multiple virtual hands in synchronized and asynchronized conditions,10.3389/frvir.2024.1383957
+R57cc704cb,3,kataoka,watanabe,10.1016/j.chb.2021.106948,Humans adjust virtual comfort-distance towards an artificial agent depending on their sexual orientation and implicit prejudice against gay men,10.1016/j.chb.2021.106948
+R254a0305e,2,author,watanabe,10.1089/g4h.2021.0036,"Physical activity intensity, perceived exertion, and enjoyment during head-mounted display virtual reality games",10.1089/g4h.2021.0036
+R9244e981d,2,author,watanabe,10.3389/frvir.2022.989676,Identifying emotions toward an overweight avatar in Virtual Reality: The moderating effects of visuotactile stimulation and drive for thinness,10.3389/frvir.2022.989676
+Re1b87dc99,2,author,watanabe,10.1016/j.ijbiomac.2022.09.046,Sequestration and toxicological assessment of emerging contaminants with polypyrrole modified carboxymethyl cellulose (CMC/PPY): Case of ibuprofen pharmaceutical drug,10.1016/j.ijbiomac.2022.09.046
+R3b798f1ba,1,author,kataoka,10.1007/s10055-022-00651-5,Towards socialVR: evaluating a novel technology for watching videos together,10.1007/s10055-022-00651-5
+R26a7ac9f6,3,kataoka,watanabe,10.1186/s11556-022-00299-9,The effects of interventions to enhance cognitive and physical functions in older people with cognitive frailty: a systematic review and meta-analysis,10.1186/s11556-022-00299-9
+Rb5fb0dda4,2,author,watanabe,10.1038/s41598-022-21695-2,Ultrasound measurements for evaluation of changes in upper airway during anaesthesia induction and prediction difficult laryngoscopy: a prospective observational study,10.1038/s41598-022-21695-2
+R9865af17c,1,author,kataoka,10.3389/frvir.2022.1031093,Does distance matter? Embodiment and perception of personalized avatars in relation to the self-observation distance in virtual reality,10.3389/frvir.2022.1031093
+Ra25fcb8cd,1,author,kataoka,10.1016/j.jecp.2022.105518,Alice in Wonderland: The effects of body size and movement on children's size perception and body representation in virtual reality,10.1016/j.jecp.2022.105518
+R823f52a24,3,kataoka,watanabe,10.33271/mining16.02.064,Substantiation of mining systems for steeply dipping low-thickness ore bodies with controlled continuous stope extraction,10.33271/mining16.02.064
+R19542eda6,2,author,watanabe,10.1016/j.robot.2022.104100,A nonlinear state estimation framework for humanoid robots,10.1016/j.robot.2022.104100
+Rc5e542f0c,2,author,watanabe,10.1177/1461444821993121,"Virtual reality perspective-taking at scale: Effect of avatar representation, choice, and head movement on prosocial behaviors",10.1177/1461444821993121
+R6c4d4249c,1,author,kataoka,10.1038/s41598-022-12637-z,Group VR experiences can produce ego attenuation and connectedness comparable to psychedelics,10.1038/s41598-022-12637-z
+R8ed3134bb,3,kataoka,watanabe,10.3969/j.issn.1001-7003.2023.01.014,Multi-layer modular deconstruction and computer implementation of women' s clothing in the Southern Song Dynasty; [南宋女装的多层次模块化解构与计算机设计],10.3969/j.issn.1001-7003.2023.01.014
+Ra2009f64f,1,author,kataoka,10.1016/j.compedu.2022.104503,Class size affects preservice teachers’ physiological and psychological stress reactions: An experiment in a virtual reality classroom,10.1016/j.compedu.2022.104503
+Re2c50816d,2,author,watanabe,10.3390/ijerph19127237,"The Role of Personalization in the User Experience, Preferences and Engagement with Virtual Reality Environments for Relaxation",10.3390/ijerph19127237
+R93502f2e8,1,author,kataoka,10.3389/fspor.2021.729729,A Novel Approach to Assessment of Perceptual-Motor Efficiency and Training-Induced Improvement in the Performance Capabilities of Elite Athletes,10.3389/fspor.2021.729729
+R44ff5e26f,2,author,watanabe,10.1038/s41598-021-01397-x,Motion-in-depth effects on interceptive timing errors in an immersive environment,10.1038/s41598-021-01397-x
+R89affc247,3,kataoka,watanabe,10.1016/j.heliyon.2022.e12117,Evaluation of expert skills in refinery patrol inspection: visual attention and head positioning behavior,10.1016/j.heliyon.2022.e12117
+R525b9fa55,3,kataoka,watanabe,10.3389/frvir.2022.828553,"Embodied Gambling—Investigating the Influence of Level of Embodiment, Avatar Appearance, and Virtual Environment Design on an Online VR Slot Machine",10.3389/frvir.2022.828553
+Rf75745fc2,1,author,kataoka,10.3389/frvir.2022.971502,A new psychometric task measuring spatial perspective taking in ambulatory virtual reality,10.3389/frvir.2022.971502
+Rcf570eb49,3,kataoka,watanabe,10.3389/frvir.2022.869603,The Body Scaling Effect and Its Impact on Physics Plausibility,10.3389/frvir.2022.869603
+R9db22f3ff,3,kataoka,watanabe,10.1016/j.ecolind.2022.109615,Water View Imagery: Perception and evaluation of urban waterscapes worldwide,10.1016/j.ecolind.2022.109615
+Re439db412,3,kataoka,watanabe,10.3389/frvir.2022.954587,First insights in perception of feet and lower-body stimuli for proximity and collision feedback in 3D user interfaces,10.3389/frvir.2022.954587
+R50444e399,2,author,watanabe,10.1016/j.jep.2022.115065,The underlying rationality of Chinese medicine herb pair Coptis chinensis and Dolomiaea souliei: From the perspective of metabolomics and intestinal function,10.1016/j.jep.2022.115065
+Raaf90d501,3,kataoka,watanabe,10.1016/j.oregeorev.2021.104645,"Different characteristics of barren and W–Mo–productive Cretaceous granites in the Hwanggangri mineralized district, South Korea",10.1016/j.oregeorev.2021.104645
+R41be98931,2,author,watanabe,10.1016/j.ijinfomgt.2022.102542,"Metaverse beyond the hype: Multidisciplinary perspectives on emerging challenges, opportunities, and agenda for research, practice and policy",10.1016/j.ijinfomgt.2022.102542
+Rf5064924d,3,kataoka,watanabe,10.1109/thms.2021.3108962,Influencing Human Escape Maneuvers with Perceptual Cues in the Presence of a Visual Task,10.1109/thms.2021.3108962
+R082a7b803,3,kataoka,watanabe,10.1038/s41598-021-99578-1,Psychological and physiological evidence for an initial ‘Rough Sketch’ calculation of personal space,10.1038/s41598-021-99578-1
+R383e163ac,2,author,watanabe,10.3390/sports10110170,Effectiveness of Different Modalities of Remote Online Training in Young Healthy Males,10.3390/sports10110170
+R814991ec5,3,kataoka,watanabe,10.1038/s41598-021-03373-x,Self-observation of a virtual body-double engaged in social interaction reduces persecutory thoughts,10.1038/s41598-021-03373-x
+R61429b72e,2,author,watanabe,10.7717/peerj.14031,A novel virtual reality application for autonomous assessment of cervical range of motion: development and reliability study,10.7717/peerj.14031
+R4bfad15c9,2,author,watanabe,10.3390/buildings12091461,Scale Estimation for Design Decisions in Virtual Environments: Understanding the Impact of User Characteristics on Spatial Perception in Immersive Virtual Reality Systems,10.3390/buildings12091461
+R85c327975,3,kataoka,watanabe,10.1016/j.chbr.2022.100203,The effects of partial proxy embodiment on the awareness of linear distance in omnidirectional treadmill enabled immersive virtual environment,10.1016/j.chbr.2022.100203
+Rff4fa30ef,2,author,watanabe,10.1051/0004-6361/202141836,Chemo-kinematics of the Milky Way spiral arms and bar resonances: Connection to ridges and moving groups in the solar vicinity,10.1051/0004-6361/202141836
+R3cb99837e,1,author,kataoka,10.1038/s41598-022-10268-y,The effects of embodying wildlife in virtual reality on conservation behaviors,10.1038/s41598-022-10268-y
+R004cec426,2,author,watanabe,10.1007/s10943-019-00937-0,Using Neurology Sciences to Investigate the Color Component and Its Effect on Promoting the Sense of Spirituality in the Interior Space of the Vakil Mosque of Shiraz (Using Quantitative Electroencephalography Wave Recording),10.1007/s10943-019-00937-0
+R5f6bd5bb8,2,author,watanabe,10.3847/1538-3881/ac4bc9,Dynamical Implantation of Blue Binaries in the Cold Classical Kuiper Belt,10.3847/1538-3881/ac4bc9
+Rfe2567c59,3,kataoka,watanabe,10.1371/journal.pone.0258000,The effect of music on body sway when standing in a moving virtual environment,10.1371/journal.pone.0258000
+R6c5510843,2,author,watanabe,10.26830/symmetry_2023_1_107,GEOMETRY OF LIVING 1,10.26830/symmetry_2023_1_107
+R678e5f5d0,2,author,watanabe,10.1080/0361073x.2021.1943793,The Embodiment of an Older Avatar in a Virtual Reality Setting Impacts the Social Motivation of Young Adults,10.1080/0361073x.2021.1943793
+R25ea74ed0,1,author,kataoka,10.1111/cgf.14628,Combining Motion Matching and Orientation Prediction to Animate Avatars for Consumer-Grade VR Devices,10.1111/cgf.14628
+Re0d3a0231,3,kataoka,watanabe,10.1016/j.pecs.2021.100930,Progress in CFD Simulations of Fluidized Beds for Chemical and Energy Process Engineering,10.1016/j.pecs.2021.100930
+R68fd93386,1,author,kataoka,10.7717/peerj.12189,Bilateral back squat strength is increased during a 3-week undulating resistance training program with and without variable resistance in DIII collegiate football players,10.7717/peerj.12189
+R761e1712f,1,author,kataoka,10.1016/j.gaitpost.2022.02.006,Quantifying fear of falling by utilizing objective body sway measures: A 360° virtual video study,10.1016/j.gaitpost.2022.02.006
+R31b58d450,3,kataoka,watanabe,10.1016/j.chb.2022.107282,Learning with simulated virtual classmates: Effects of social-related configurations on students’ visual attention and learning experiences in an immersive virtual reality classroom,10.1016/j.chb.2022.107282
+R636dcbe14,1,author,kataoka,10.3389/fnhum.2021.773091,The Effects of Virtual Height Exposure on Postural Control and Psychophysiological Stress Are Moderated by Individual Height Intolerance,10.3389/fnhum.2021.773091
+R4bee113e8,3,kataoka,watanabe,10.3389/fpsyg.2022.790960,Top-Down Influence Leads to a Reduced Sense of Body Ownership in Individuals With Depersonalization Tendencies: A Focus on Full Body Illusion,10.3389/fpsyg.2022.790960
+R99046a018,2,author,watanabe,10.1080/17461391.2021.1975829,Analysis of sedentariness in women from a gender and equity perspective,10.1080/17461391.2021.1975829
+R12151b7b3,1,author,kataoka,10.1016/j.ijpsycho.2022.03.006,Detecting and predicting visually induced motion sickness with physiological measures in combination with machine learning techniques,10.1016/j.ijpsycho.2022.03.006
+Raee98aa5d,1,author,kataoka,10.1038/s41598-021-83988-2,Defensive functions provoke similar psychophysiological reactions in reaching and comfort spaces,10.1038/s41598-021-83988-2
+Rfd2773c9f,2,author,watanabe,10.3389/frvir.2022.976849,Action-control mappings of interfaces in virtual reality: A study of embodied interaction,10.3389/frvir.2022.976849
+Rea48eff20,2,author,watanabe,10.3389/frvir.2022.910434,Reducing Motion Sickness When Reading With Head-Mounted Displays By Using See-Through Background Images,10.3389/frvir.2022.910434
+Rb26c88a24,3,kataoka,watanabe,10.1371/journal.pdig.0000060,A pilot randomised trial of a brief virtual reality scenario in smokers unmotivated to quit: Assessing the feasibility of recruitment,10.1371/journal.pdig.0000060
+Ra078f798c,2,author,watanabe,10.1080/14626268.2020.1783321,From immersion to collaborative embodiment: extending collective interactivity in built environments through human-scale audiovisual immersive technologies,10.1080/14626268.2020.1783321
+R44d2f0090,2,author,watanabe,10.1371/journal.pone.0254653,Co-occurrence of pain and dyspnea in Veterans with COPD: Relationship to functional status and a pilot study of neural correlates using structural and functional magnetic resonance imaging,10.1371/journal.pone.0254653
+Ra7319233e,2,author,watanabe,10.1186/s13717-019-0183-7,Variable retention forestry in European boreal forests in Russia,10.1186/s13717-019-0183-7
+Ra7e5f5963,2,author,watanabe,10.1016/j.chb.2020.106431,What makes immersive virtual reality the ultimate empathy machine? Discerning the underlying mechanisms of change,10.1016/j.chb.2020.106431
+R7cfc6cfb5,2,author,watanabe,10.3389/fpsyg.2020.510787,Exploring the Effect of Cooperation in Reducing Implicit Racial Bias and Its Relationship With Dispositional Empathy and Political Attitudes,10.3389/fpsyg.2020.510787
+Rb46d9a7ec,2,author,watanabe,10.1177/2167702619869336,Interpersonal Distance Regulation and Approach-Avoidance Reactions Are Altered in Psychopathy,10.1177/2167702619869336
+R4e6bdaa8b,1,author,kataoka,10.1038/s41598-019-47971-2,Aging and spatial cues influence the updating of navigational memories,10.1038/s41598-019-47971-2
+R56390753f,3,kataoka,watanabe,10.1016/j.jbiomech.2021.110357,Obstacle avoidance training in virtual environments leads to limb-specific locomotor adaptations but not to interlimb transfer in healthy young adults,10.1016/j.jbiomech.2021.110357
+R455aac960,1,author,kataoka,10.1098/rsos.200622,Gait coordination in overground walking with a virtual reality avatar: Gait coordination in virtual walking,10.1098/rsos.200622
+Rf79bb8988,3,kataoka,watanabe,10.1002/erv.2715,Body image avoidance affects interpersonal distance perception: A virtual environment experiment,10.1002/erv.2715
+Rb0ace780a,3,kataoka,watanabe,10.1016/j.neuron.2019.08.012,A Modality-Independent Network Underlies the Retrieval of Large-Scale Spatial Environments in the Human Brain,10.1016/j.neuron.2019.08.012
+R4bc20015d,3,kataoka,watanabe,10.1111/bjet.13023,Effectiveness of immersive virtual reality using head-mounted displays on learning performance: A meta-analysis,10.1111/bjet.13023
+R218358960,1,author,kataoka,10.1016/j.autcon.2020.103271,Lift planning and optimization in construction: A thirty-year review,10.1016/j.autcon.2020.103271
+Ra1d7fe1a1,2,author,watanabe,10.1016/j.autcon.2019.103012,On-demand monitoring of construction projects through a game-like hybrid application of BIM and machine learning,10.1016/j.autcon.2019.103012
+R25b5bab30,2,author,watanabe,10.1089/cyber.2019.0136,Impact of Body Size Match to an Avatar on the Body Ownership Illusion and User's Subjective Experience,10.1089/cyber.2019.0136
+Rc41cf0d9e,2,author,watanabe,10.5817/cp2021-3-10,Exercise in virtual reality with a muscular avatar influences performance on a weightlifting exercise,10.5817/cp2021-3-10
+R72941dac3,3,kataoka,watanabe,10.1259/bjr.20200204,Diagnostic value and forensic relevance of a novel photorealistic 3D reconstruction technique in post-mortem CT,10.1259/bjr.20200204
+R440356dd4,2,author,watanabe,10.2196/17972,Results and guidelines from a repeated-measures design experiment comparing standing and seated full-body gesture-based immersive virtual reality exergames: Within-subjects evaluation,10.2196/17972
+Rff72093a0,3,kataoka,watanabe,10.3389/fpsyg.2021.675515,How Interpersonal Distance Between Avatar and Human Influences Facial Affect Recognition in Immersive Virtual Reality,10.3389/fpsyg.2021.675515
+R5f60b345b,3,kataoka,watanabe,10.1038/s41598-019-47897-9,Caloric vestibular stimulation has no effect on perceived body size,10.1038/s41598-019-47897-9
+R9ff9e4161,2,author,watanabe,10.1371/journal.pone.0243381,When gravity is not where it should be: How perceived orientation affects visual self-motion processing,10.1371/journal.pone.0243381
+R854db284c,3,kataoka,watanabe,10.1093/jcde/qwab010,Predicting cybersickness based on user's gaze behaviors in HMD-based virtual reality,10.1093/jcde/qwab010
+R744b8a459,1,author,kataoka,10.3389/frvir.2021.657638,Systematic Review and Meta-Analysis of Virtual Reality in Mental Healthcare: Effects of Full Body Illusions on Body Image Disturbance,10.3389/frvir.2021.657638
+R4314c5af1,2,author,watanabe,10.1073/pnas.1917762116,Multiscale porous elastomer substrates for multifunctional on-skin electronics with passive-cooling capabilities,10.1073/pnas.1917762116
+R172a6a0f0,2,author,watanabe,10.1016/j.autcon.2020.103143,Neurophysiological testing for assessing construction workers' task performance at virtual height,10.1016/j.autcon.2020.103143
+Ra14119ea0,1,author,kataoka,10.3389/frvir.2020.00013,Virtual Reality Body Image Training for Chronic Low Back Pain: A Single Case Report,10.3389/frvir.2020.00013
+Ra711ca52d,1,author,kataoka,10.7554/elife.52882,From behavior to circuit modeling of light-seeking navigation in zebrafish larvae,10.7554/elife.52882
+R9a826a14d,2,author,watanabe,10.1016/j.trf.2020.01.014,Pedestrians’ road crossing behaviour in front of automated vehicles: Results from a pedestrian simulation experiment using agent-based modelling,10.1016/j.trf.2020.01.014
+R5eea07d9d,1,author,kataoka,10.1016/j.apergo.2021.103400,User capabilities in eyes-free spatial target acquisition in immersive virtual reality environments,10.1016/j.apergo.2021.103400
+Rcaa177f6f,2,author,watanabe,10.1002/cae.22243,A review of the uses of virtual reality in engineering education,10.1002/cae.22243
+R004d88269,3,kataoka,watanabe,10.1089/g4h.2019.0045,Development of a Classifier to Determine Factors Causing Cybersickness in Virtual Reality Environments,10.1089/g4h.2019.0045
+Rdad205d95,1,author,kataoka,10.1016/j.autcon.2020.103136,How the completeness of spatial knowledge influences the evacuation behavior of passengers in metro stations: A VR-based experimental study,10.1016/j.autcon.2020.103136
+Rc90326019,2,author,watanabe,10.1172/jci.insight.139292,"COVID-19 in older adults: Clinical, psychosocial, and public health considerations",10.1172/jci.insight.139292
+R203a774fa,3,kataoka,watanabe,10.2196/15635,Virtual reality games and the role of body involvement in enhancing positive emotions and decreasing anxiety: Within-subjects pilot study,10.2196/15635
+R93ade90d6,2,author,watanabe,10.1080/00038628.2019.1669526,Virtual vs. actual body: applicability of anthropomorphic avatars to enhance exploratory creativity in architectural design education,10.1080/00038628.2019.1669526
+R056104a03,3,kataoka,watanabe,10.1080/14794713.2020.1770531,"New ways of seeing, feeling, being: intimate encounters in virtual reality performance",10.1080/14794713.2020.1770531
+R7156da041,1,author,kataoka,10.1002/cpp.2431,Subjective experience of paranoid ideation in a virtual reality social environment: A mixed methods cross-sectional study,10.1002/cpp.2431
+Rd614578df,3,kataoka,watanabe,10.1080/15213269.2019.1598435,Acting your avatar’s age: effects of virtual reality avatar embodiment on real life walking speed,10.1080/15213269.2019.1598435
+R8cfdc9389,3,kataoka,watanabe,10.1177/2056305121993765,Virtual Reality and Political Outgroup Contact: Can Avatar Customization and Common Ingroup Identity Reduce Social Distance?,10.1177/2056305121993765
+R182e606dc,2,author,watanabe,10.1007/s10055-020-00431-z,Tadpole VR: virtual reality visualization of a simulated tadpole spinal cord,10.1007/s10055-020-00431-z
+Ra5cc59800,1,author,kataoka,10.1089/g4h.2019.0102,Studying the Effect of Display Type and Viewing Perspective on User Experience in Virtual Reality Exergames,10.1089/g4h.2019.0102
+R34ca52b4b,2,author,watanabe,10.3758/s13423-020-01835-3,Context-dependent memory effects in two immersive virtual reality environments: On Mars and underwater,10.3758/s13423-020-01835-3
+Rf66443472,2,author,watanabe,10.1007/s10055-019-00402-z,Body size illusions influence perceived size of objects: a validation of previous research in virtual reality,10.1007/s10055-019-00402-z
+Rb267b9b13,3,kataoka,watanabe,10.1016/j.gaitpost.2020.05.028,Are avatars treated like human obstacles during aperture crossing in virtual environments?,10.1016/j.gaitpost.2020.05.028
+R1c398edc6,1,author,kataoka,10.17705/1jais.00674,"Have we crossed the uncanny valley? Understanding affinity, trustworthiness, and preference for realistic digital humans in immersive environments",10.17705/1jais.00674
+Rf3e7f0121,3,kataoka,watanabe,10.1029/2020wr027983,Flow and Entrainment Mechanisms Around a Freshwater Mussel Aligned With the Incoming Flow,10.1029/2020wr027983
+R2f6d8009c,1,author,kataoka,10.3390/su13116223,The drawing and perception of architectural spaces through immersive virtual reality,10.3390/su13116223
+R701917134,2,author,watanabe,10.1080/17461391.2019.1669715,Virtual cycling effort is dependent on power update rate,10.1080/17461391.2019.1669715
+R452edba3c,3,kataoka,watanabe,10.1016/j.cognition.2020.104445,Dissociating gait from static appearance: A virtual reality study of the role of dynamic identity signatures in person recognition,10.1016/j.cognition.2020.104445
+R607aa4334,3,kataoka,watanabe,10.1007/s40520-019-01219-1,Exercise with active video game or strength/balance training? Case reports comparing postural balance of older women,10.1007/s40520-019-01219-1
+R657cfbcd0,2,author,watanabe,10.1007/s00415-019-09370-5,Fear of heights in virtual reality saturates 20 to 40 m above ground,10.1007/s00415-019-09370-5
+Rc9674f361,3,kataoka,watanabe,10.1038/s41598-018-22731-w,Memory shapes visual search strategies in large-scale environments,10.1038/s41598-018-22731-w
+R4344474e0,2,author,watanabe,10.1016/j.cie.2017.10.023,A customized garment collaborative design process by using virtual reality and sensory evaluation on garment fit,10.1016/j.cie.2017.10.023
+Rc0d5c7853,3,kataoka,watanabe,10.11621/pir.2018.0102,The study of ethnic attitudes during interactions with avatars in virtual environments,10.11621/pir.2018.0102
+Ra3f61e703,2,author,watanabe,10.1038/s41598-018-33961-3,Peri-personal space as a prior in coupling visual and proprioceptive signals,10.1038/s41598-018-33961-3
+R043ec650d,2,author,watanabe,10.1038/s41562-019-0618-2,A social interaction field model accurately identifies static and dynamic social groupings,10.1038/s41562-019-0618-2
+R133512400,3,kataoka,watanabe,T:the impact of avatars social norms and copresence on the collaboration effectiveness of aec virtual teams,"The impact of avatars, social norms and copresence on the collaboration effectiveness of AEC virtual teams",
+Rbe24908b3,2,author,watanabe,10.1080/0144929x.2016.1275809,Effects of avatar character performances in virtual reality dramas used for teachers’ education,10.1080/0144929x.2016.1275809
+R9e7326238,2,author,watanabe,10.1016/j.healun.2018.12.014,Can virtual heart transplantation via 3-dimensional imaging increase the maximum acceptable donor size?,10.1016/j.healun.2018.12.014
+R4c8b35380,3,kataoka,watanabe,10.1016/s2215-0366(18)30226-8,"Automated psychological therapy using immersive virtual reality for treatment of fear of heights: a single-blind, parallel-group, randomised controlled trial",10.1016/s2215-0366(18)30226-8
+R0340e93be,2,author,watanabe,10.1016/j.concog.2019.05.006,Visuo-tactile congruency influences the body schema during full body ownership illusion,10.1016/j.concog.2019.05.006
+R87eff5bc5,1,author,kataoka,10.1177/2167702618788874,Psychopathy and the Regulation of Interpersonal Distance,10.1177/2167702618788874
+Rd3085f2d6,1,author,kataoka,10.1016/j.jcde.2018.05.006,"Navigation modes, operation methods, observation scales and background options in UI design for high learning performance in VR-based architectural applications",10.1016/j.jcde.2018.05.006
+Rb33ff668d,2,author,watanabe,10.1007/s00146-017-0766-8,Assistive Device Art: aiding audio spatial location through the Echolocation Headphones,10.1007/s00146-017-0766-8
+R74464a32d,3,kataoka,watanabe,10.1089/cyber.2018.0128,Factors Affecting Sense of Presence in a Virtual Reality Social Environment: A Qualitative Study,10.1089/cyber.2018.0128
+R194eaf9b8,3,kataoka,watanabe,10.2196/10522,Determining physiological and psychological predictors of time to task failure on a virtual reality sørensen test in participants with and without recurrent low back pain: Exploratory study,10.2196/10522
+R29cd4487f,3,kataoka,watanabe,10.23736/s1973-9087.18.05427-8,Is virtual reality effective in improving the motor performance of children with developmental coordination disorder? A systematic review,10.23736/s1973-9087.18.05427-8
+R24a7be9cf,3,kataoka,watanabe,10.1016/j.actpsy.2017.09.014,Calibration to tool use during visually-guided reaching,10.1016/j.actpsy.2017.09.014
+R1095e47cd,3,kataoka,watanabe,10.1007/s00426-016-0806-x,The effect of facial expressions on peripersonal and interpersonal spaces,10.1007/s00426-016-0806-x
+R5bfe1c64d,2,author,watanabe,10.1016/j.simpat.2018.07.014,Crowd evacuation simulation using active route choice model based on human characteristics,10.1016/j.simpat.2018.07.014
+Rb1494cd44,2,author,watanabe,10.1002/cae.21957,Applications of virtual reality in learning the photoelectric effect of liquid crystal display,10.1002/cae.21957
+R264331604,1,author,kataoka,10.1080/08824096.2018.1531212,Is Desirability of the Trait a Boundary Condition of the Proteus Effect? A Pilot Study,10.1080/08824096.2018.1531212
+R01614ff03,1,author,kataoka,10.1002/admt.201800487,Human–Machine Interfacing Enabled by Triboelectric Nanogenerators and Tribotronics,10.1002/admt.201800487
+Refa83046a,2,author,watanabe,10.1371/journal.pone.0213944,Visual perception of one’s own body under vestibular stimulation using biometric self-avatars in virtual reality,10.1371/journal.pone.0213944
+R292f71dbf,3,kataoka,watanabe,10.1371/journal.pone.0203358,Virtual mortality and near-death experience after a prolonged exposure in a shared virtual reality may lead to positive life-attitude changes,10.1371/journal.pone.0203358
+R852755dca,1,author,kataoka,10.1111/desc.12557,The development of bodily self-consciousness: changing responses to the Full Body Illusion in childhood,10.1111/desc.12557
+R9585b3d9a,2,author,watanabe,10.1007/s10549-019-05300-1,A review of the influence of mammographic density on breast cancer clinical and pathological phenotype,10.1007/s10549-019-05300-1
+R70b220228,2,author,watanabe,10.1051/0004-6361/201731529,Physical activity of the selected nearly isotropic comets with perihelia at large heliocentric distance,10.1051/0004-6361/201731529
+R6d187a366,3,kataoka,watanabe,10.1186/s12887-018-1381-7,Do video game interventions improve motor outcomes in children with developmental coordination disorder? A systematic review using the ICF framework,10.1186/s12887-018-1381-7
+Rc7ee3ec51,3,kataoka,watanabe,10.1007/s11948-018-0020-x,Human Decisions in Moral Dilemmas are Largely Described by Utilitarianism: Virtual Car Driving Study Provides Guidelines for Autonomous Driving Vehicles,10.1007/s11948-018-0020-x
+Rbfe49926b,1,author,kataoka,10.1038/s41598-017-09497-3,"Embodiment in a Child-Like Talking Virtual Body Influences Object Size Perception, Self-Identification, and Subsequent Real Speaking",10.1038/s41598-017-09497-3
+Rdef271dde,3,kataoka,watanabe,10.1051/matecconf/201821002050,Virtual reality environment to study the ergonomic features of firefighters' activity,10.1051/matecconf/201821002050
+Ra91aedf38,1,author,kataoka,10.1371/journal.pone.0203934,Lower limb sagittal kinematic and kinetic modeling of very slow walking for gait trajectory scaling,10.1371/journal.pone.0203934
+Reee198a85,2,author,watanabe,10.1016/j.actpsy.2018.09.009,Incongruent multisensory stimuli alter bodily self-consciousness: Evidence from a first-person perspective experience,10.1016/j.actpsy.2018.09.009
+R3b5e2b9a2,1,author,kataoka,10.1093/mnras/stz583,Footprints of the Sagittarius dwarf galaxy in the Gaia data set,10.1093/mnras/stz583
+Rcbecc3b41,3,kataoka,watanabe,10.1016/j.autcon.2019.03.009,Usability studies on building early stage architectural models in virtual reality,10.1016/j.autcon.2019.03.009
+Rda8225706,3,kataoka,watanabe,10.1089/cyber.2017.0453,Internet Versus Virtual Reality Settings for Genomics Information Provision,10.1089/cyber.2017.0453
+Rbe2e9ecd2,3,kataoka,watanabe,T:matec web of conferences,MATEC Web of Conferences,
+R32af74b79,3,kataoka,watanabe,10.1007/s10586-017-0815-6,Collision detection for virtual environment using particle swarm optimization with adaptive cauchy mutation,10.1007/s10586-017-0815-6
+R2b3ad1bfc,1,author,kataoka,10.1016/j.apacoust.2016.04.007,What do your footsteps sound like? An investigation on interactive footstep sounds adjustment,10.1016/j.apacoust.2016.04.007
+Rc715a1e3f,1,author,kataoka,10.1371/journal.pone.0168520,Short term motor-skill acquisition improves with size of self-controlled virtual hands,10.1371/journal.pone.0168520
+R138944bc2,2,author,watanabe,10.1016/j.jenvp.2016.01.004,Peripersonal and interpersonal space in virtual and real environments: Effects of gender and age,10.1016/j.jenvp.2016.01.004
+R581775bb4,3,kataoka,watanabe,10.1371/journal.pone.0103428,"Owning an overweight or underweight body: Distinguishing the physical, experienced and virtual body",10.1371/journal.pone.0103428
+Rf3a76d397,2,author,watanabe,10.1038/nn.3884,Impaired spatial selectivity and intact phase precession in two-dimensional virtual reality,10.1038/nn.3884
+Rf0ff11c0d,1,author,kataoka,10.1371/journal.pone.0166749,Framework for analyzing the whole body surface area from a single view,10.1371/journal.pone.0166749
+Rfb559e4b4,3,kataoka,watanabe,10.3389/fpsyg.2015.01659,The virtual hand illusion is moderated by context-induced spatial reference frames,10.3389/fpsyg.2015.01659
+Rc3c43e8fc,2,author,watanabe,10.1016/j.psychsport.2015.09.007,The effects of the presence of others during a rowing exercise in a virtual reality environment,10.1016/j.psychsport.2015.09.007
+Rba85014e7,2,author,watanabe,10.3389/fpsyg.2015.01969,Influence of music on anxiety induced by fear of heights in virtual reality,10.3389/fpsyg.2015.01969
+R55cbbb2b7,2,author,watanabe,10.1016/j.heliyon.2016.e00173,Sensorimotor body-environment interaction serves to regulate emotional experience and exploratory behavior,10.1016/j.heliyon.2016.e00173
+R5e1e8b7ac,1,author,kataoka,10.1093/mnras/stw006,The evolution of the Sun's birth cluster and the search for the solar siblings with Gaia,10.1093/mnras/stw006
+Rd70fe1d6d,3,kataoka,watanabe,10.1089/cyber.2015.0226,Body image and anti-fat attitudes: An experimental study using a haptic virtual reality environment to replicate human touch,10.1089/cyber.2015.0226
+R79ce47c97,3,kataoka,watanabe,10.1007/s11042-015-2681-7,The development of a clothing fit evaluation system under virtual environment,10.1007/s11042-015-2681-7
+Rfe5377340,1,author,kataoka,10.1007/s11199-015-0533-6,Objectification in Virtual Romantic Contexts: Perceived Discrepancies Between Self and Partner Ideals Differentially Affect Body Consciousness in Women and Men,10.1007/s11199-015-0533-6
+Rad0c1e682,2,author,watanabe,10.1016/j.psychres.2015.05.075,The influence of parent's body mass index on peer selection: An experimental approach using virtual reality,10.1016/j.psychres.2015.05.075
+R68d170fbe,2,author,watanabe,10.1111/jcc4.12173,Experiencing Nature: Embodying Animals in Immersive Virtual Environments Increases Inclusion of Nature in Self and Involvement With Nature,10.1111/jcc4.12173
+Rca12ed409,3,kataoka,watanabe,10.1371/journal.pone.0111511,Body space in social interactions: A comparison of reaching and comfort distance in immersive virtual reality,10.1371/journal.pone.0111511
+Rbd71ff9a0,3,kataoka,watanabe,10.1016/j.forsciint.2013.10.037,Sex determination using the probabilistic sex diagnosis (DSP: Diagnose sexuelle probabiliste) tool in a virtual environment,10.1016/j.forsciint.2013.10.037
+Rdd353bd23,1,author,kataoka,10.3389/fpsyg.2015.02008,The effect of distance on moral engagement: Event related potentials and alpha power are sensitive to perspective in a virtual shooting task,10.3389/fpsyg.2015.02008
+R70f315a56,1,author,kataoka,10.1371/journal.pone.0140158,Developing a novel measure of body satisfaction using virtual reality,10.1371/journal.pone.0140158
+Rb08b0adf1,1,author,kataoka,10.1007/s11042-015-2827-7,Bayesian tracking fusion framework with online classifier ensemble for immersive visual applications,10.1007/s11042-015-2827-7
+R449e99d18,2,author,watanabe,10.3389/fpsyg.2015.01944,Electroencephalographic correlates of sensorimotor integration and embodiment during the appreciation of virtual architectural environments,10.3389/fpsyg.2015.01944
+Rf2cda315d,3,kataoka,watanabe,10.1016/j.rehab.2016.10.002,Bodily illusions and weight-related disorders: Clinical insights from experimental research,10.1016/j.rehab.2016.10.002
+R02a50e6bb,2,author,watanabe,10.1016/j.vetmic.2016.03.002,Pathogenicity and genetic characteristics associated with cell adaptation of a virulent porcine reproductive and respiratory syndrome virus nsp2 DEL strain CA-2,10.1016/j.vetmic.2016.03.002
+R3b8a25e6e,2,author,watanabe,10.1371/journal.pone.0068594,Welcome to Wonderland: The Influence of the Size and Shape of a Virtual Hand On the Perceived Size and Shape of Virtual Objects,10.1371/journal.pone.0068594
+Re8385f04e,2,author,watanabe,10.1109/mra.2012.2201574,Artimetrics: Biometrics for artificial entities,10.1109/mra.2012.2201574
+Rf17e0b7c3,2,author,watanabe,10.1007/s11554-009-0141-1,IMMIView: A multi-user solution for design review in real-time,10.1007/s11554-009-0141-1
+R32f0f13a7,2,author,watanabe,10.1016/j.chb.2011.12.019,"Defining the virtual self: Personality, behavior, and the psychology of embodiment",10.1016/j.chb.2011.12.019
+R765687fd4,2,author,watanabe,10.3109/10641963.2010.531848,Blood pressure and circulatory relationships with physical activity level in young normotensive individuals: IPAQ validity and reliability considerations,10.3109/10641963.2010.531848
+R28c6e3441,3,kataoka,watanabe,10.2196/jmir.1917,"Using virtual reality to provide health care information to people with intellectual disabilities: Acceptability, usability, and potential utility",10.2196/jmir.1917
+R1762e7c03,3,kataoka,watanabe,10.1073/pnas.1306779110,Illusory ownership of a virtual child body causes overestimation of object sizes and implicit attitude changes,10.1073/pnas.1306779110
+R461b135cb,2,author,watanabe,10.1007/s10055-010-0169-3,Human interactions and personal space in collaborative virtual environments,10.1007/s10055-010-0169-3
+Rbf513f488,3,kataoka,watanabe,10.5697/oc.52-1.127,"Morphological, genetic, chemical and ecophysiological characterisation of two microcystis aeruginosa isolates from the Vistula Lagoon, southern Baltic",10.5697/oc.52-1.127
+Rd024a5b51,1,author,kataoka,10.1016/j.apergo.2010.10.002,Postural stability effects of random vibration at the feet of construction workers in simulated elevation,10.1016/j.apergo.2010.10.002
+R7e3b6818f,1,author,kataoka,10.1371/journal.pone.0051921,Virtually Naked: Virtual Environment Reveals Sex-Dependent Nature of Skin Disclosure,10.1371/journal.pone.0051921
+R673101162,3,kataoka,watanabe,10.1016/s1049-250x(08)00011-6,"Interactions Between Thermal Ground or Excited Atoms in the Vapor Phase: Many-Body Dipole-Dipole Effects, Molecular Dissociation, and Photoassociation Probed By Laser Spectroscopy",10.1016/s1049-250x(08)00011-6
+R0ef2dec62,3,kataoka,watanabe,10.1371/journal.pone.0040867,Extending body space in immersive virtual reality: A very long arm illusion,10.1371/journal.pone.0040867
+Rbfffb8e80,1,author,kataoka,10.1016/j.coal.2012.06.012,"BIB-SEM study of the pore space morphology in early mature Posidonia Shale from the Hils area, Germany",10.1016/j.coal.2012.06.012
+R51760e8da,3,kataoka,watanabe,10.1080/13506285.2013.840348,A behavioural experiment in virtual reality to verify the role of action function in space coding,10.1080/13506285.2013.840348
+R278a7287d,3,kataoka,watanabe,10.1089/cyber.2009.0432,"Virtual social interactions in social anxiety - The impact of sex, gaze, and interpersonal distance",10.1089/cyber.2009.0432
+Ra8fd8954b,2,author,watanabe,10.1111/j.1467-8535.2009.00962.x,Socialisation for learning at a distance in a 3-D multi-user virtual environment,10.1111/j.1467-8535.2009.00962.x
+R03e14cd53,1,author,kataoka,10.1016/j.compedu.2010.10.020,Educational virtual environments: A ten-year review of empirical research (1999-2009),10.1016/j.compedu.2010.10.020
+R5cd176249,2,author,watanabe,10.1016/j.jesp.2008.03.003,Virtual prejudice,10.1016/j.jesp.2008.03.003
+R995d82790,1,author,kataoka,10.1371/journal.pone.0016128,Multisensory stimulation can induce an illusion of larger belly size in immersive virtual reality,10.1371/journal.pone.0016128
+Rf72fc67d7,3,kataoka,watanabe,10.1386/jvap.10.1.83_1,How metaphor functions as a vehicle of thought: Creativity as a necessity for knowledge building and communication,10.1386/jvap.10.1.83_1
+Rd1dbd65ec,3,kataoka,watanabe,10.1007/s10055-013-0222-0,Fast and stable simulation of virtual water scenes with interactions,10.1007/s10055-013-0222-0
+R7aed93071,3,kataoka,watanabe,10.1177/193229681100500211,Extending the reach of health care for obesity and diabetes using virtual worlds,10.1177/193229681100500211
+R2a194d9fd,3,kataoka,watanabe,10.1089/cyber.2009.0263,Virtual-reality distraction and cold-pressor pain tolerance: Does avatar point of view matter?,10.1089/cyber.2009.0263
+Re7e07ce79,3,kataoka,watanabe,10.1371/journal.pone.0033843,The feasibility and impact of delivering a mind-body intervention in a virtual world,10.1371/journal.pone.0033843
+Rc2efa32b5,2,author,watanabe,10.1371/journal.pone.0048331,Beaming into the Rat World: Enabling Real-Time Interaction between Rat and Human Each at Their Own Scale,10.1371/journal.pone.0048331
+R7e1c6a64d,1,author,kataoka,10.1016/j.carpath.2004.12.003,Effects of the early administration of losartan on the functional and morphological aspects of postmyocardial infarction ventricular remodeling in rabbits,10.1016/j.carpath.2004.12.003
+Reb05cb793,2,author,watanabe,10.1518/001872098779591368,The influence of body movement on subjective presence in virtual environments,10.1518/001872098779591368
+R678352227,3,kataoka,watanabe,10.1016/j.chb.2004.10.041,Examining effective technology project leadership traits and behaviors,10.1016/j.chb.2004.10.041
+R2ff5320f9,2,author,watanabe,10.1016/0378-3782(87)90078-8,Quantitative aspects of perinatal lung growth,10.1016/0378-3782(87)90078-8
+Red1fff457,1,author,kataoka,10.1371/journal.pbio.0030171,Function of a fly motion-sensitive neuron matches eye movements during free flight,10.1371/journal.pbio.0030171
+R5b1bb4979,3,kataoka,watanabe,10.1108/eum0000000006553,Virtual bodies and virtual spaces,10.1108/eum0000000006553
+R313eec335,1,author,kataoka,10.1007/s10055-003-0116-7,Mediating the expression of emotion in educational collaborative virtual environments: An experimental study,10.1007/s10055-003-0116-7
+R651532cfd,3,kataoka,watanabe,10.1007/s10055-007-0074-6,Design evaluation and modification of mechanical systems in virtual environments,10.1007/s10055-007-0074-6
+R0b2a4c5b3,3,kataoka,watanabe,10.1111/j.1083-6101.2000.tb00349.x,Isn't that spatial?: Distance and communication in a 2-D virtual environment,10.1111/j.1083-6101.2000.tb00349.x
+R1850e46bd,3,kataoka,watanabe,10.1037/0033-3204.40.1-2.55,Virtual reality for psychotherapy: Current reality and future possibilities,10.1037/0033-3204.40.1-2.55
+R89eda5c6b,2,author,watanabe,10.1108/17415650480000025,A VR-based shared web system for distance education,10.1108/17415650480000025
+Rd53ae2e3f,3,kataoka,watanabe,10.1016/j.compind.2005.02.002,An online ergonomic evaluator for 3D product design,10.1016/j.compind.2005.02.002
+Rba2ecbb50,3,kataoka,watanabe,T:scalable transmission of avatar video streams in virtual environments,Scalable transmission of avatar video streams in virtual environments,
+R9bf6e0b39,3,kataoka,watanabe,10.1177/0146167203029007002,Interpersonal distance in immersive virtual environments,10.1177/0146167203029007002
+Rd218a66ce,2,author,watanabe,10.1038/s44184-026-00221-6,Reshaping restriction: virtual embodiment modulates eating biases in anorexia nervosa,10.1038/s44184-026-00221-6
+Rc49611ba4,2,author,watanabe,10.1186/s12877-026-07282-4,Effects of a virtual reality–based multimodal training program on cognitive and physical functions in community-dwelling adults aged 60 years and older: a randomized pre–post controlled study,10.1186/s12877-026-07282-4
+Rf4ef54b0c,3,kataoka,watanabe,10.1016/j.chb.2026.109036,"Avatars, embodiment, and virtual engagement: A large-scale study with young adults in Germany and the United States",10.1016/j.chb.2026.109036
+Rbf6ceaeaf,1,author,kataoka,10.1007/s10055-026-01368-5,Virtual reality alters perceived functional body size,10.1007/s10055-026-01368-5
+Reb4f4af27,2,author,watanabe,10.1002/acp.70234,Beyond Immersion: A System-Level Topological Stitching Model for Virtual Reality Place Reconstruction,10.1002/acp.70234
+R600653ebc,3,kataoka,watanabe,10.1061/jcemd4.coeng-17949,Impact of Age on Cognitive States Influencing Falling from Heights in High-Altitude Construction: Evidence from a Virtual Reality and Electroencephalogram Study,10.1061/jcemd4.coeng-17949
+Rb3ab1ad53,2,author,watanabe,10.1007/s00426-026-02291-9,Visual attention towards virtual humans as a function of spatial distance and emotional expression: an eye-tracking study,10.1007/s00426-026-02291-9
+R4bd1c2be9,1,author,kataoka,10.3390/bs16060865,Can Virtual Reality Change Minds?,10.3390/bs16060865
+Rde0258040,3,kataoka,watanabe,10.3389/fpsyg.2026.1792669,An examination of the psychological mechanisms underlying the social existence and cognitive investment of college students in an online learning environment,10.3389/fpsyg.2026.1792669
+R7242d0525,2,author,watanabe,10.3389/fpsyg.2026.1753676,From awe to anxiety: investigating art-induced self-transcendence using virtual reality,10.3389/fpsyg.2026.1753676
+R8e023ddd5,2,author,watanabe,10.17743/jaes.2022.0260,Evaluation and Prediction of Perceived Naturalness for Source Directivity With a Visible Virtual Source,10.17743/jaes.2022.0260
+R9ee5e8360,2,author,watanabe,10.1111/dme.70383,Piloting an immersive virtual reality 3D self-management education experience for adults with type 1 and type 2 diabetes mellitus: A qualitative study,10.1111/dme.70383
+R52ad50380,2,author,watanabe,10.3390/s26020372,A Waist-Mounted Interface for Mobile Viewpoint-Height Transformation Affecting Spatial Perception,10.3390/s26020372
+R0cd2ef104,3,kataoka,watanabe,10.1177/14614448251413691,Perceived realism in VR as a multifaceted concept: Insights from interviews and focus groups with experts and non-experts,10.1177/14614448251413691
+R7f9622f65,2,author,watanabe,10.1080/10615806.2026.2692913,"Anxiety predicts anticipatory emotional states, whereas fear predicts immediate responses: psychophysiological evidence from a virtual reality study",10.1080/10615806.2026.2692913
+R3a9efbbbd,1,author,kataoka,10.1177/13684302261445342,Reducing Implicit Prejudice Through Virtual Reality: The Impact of Partial Embodiment and Positive vs. Basic Intergroup Contact,10.1177/13684302261445342
+Rf4951c084,3,kataoka,watanabe,10.3389/fnagi.2026.1746016,"Distinct aging-related profiles of allocentric knowledge recall following navigation in an immersive, naturalistic, city-like environment",10.3389/fnagi.2026.1746016
+Rc467887da,2,author,watanabe,10.1123/jpah.2024-0571,Weight-Inclusive Physical Activity: A Systematic Evaluation of Virtual Resources,10.1123/jpah.2024-0571
+R8174bc989,2,author,watanabe,10.1007/s12369-024-01152-y,Intuitive and Interactive Robotic Avatar System for Tele-Existence: TEAM SNU in the ANA Avatar XPRIZE Finals,10.1007/s12369-024-01152-y
+R9d32c291f,2,author,watanabe,10.57019/jmv.1639701,"Metaverse Support Groups for LGBTQ+ Youth: An Observational Study on Safety, Self-Expression, and Early Intervention",10.57019/jmv.1639701
+R880b794fe,2,author,watanabe,10.1080/13506285.2026.2669902,When left is right: The perception of the action capabilities of mirrored hands,10.1080/13506285.2026.2669902
+R6028007cb,2,author,watanabe,10.1556/2006.2024.00059,From active escapism to virtual withdrawal: Validation of the Compensatory-Dissociative Online Gaming scales (C-DOGs),10.1556/2006.2024.00059
+R18c3edd1e,3,kataoka,watanabe,10.1371/journal.pcbi.1012529,Just-in-time: Gaze guidance in natural behavior,10.1371/journal.pcbi.1012529
+R4c3a8f797,3,kataoka,watanabe,10.32609/0042-8736-2024-4-148-158,Paradoxes of the digital ruble implementation in monetary turnover,10.32609/0042-8736-2024-4-148-158
+Rf37ff0853,2,author,watanabe,10.1038/s41598-023-41042-3,Empathic embarrassment towards non-human agents in virtual environments,10.1038/s41598-023-41042-3
+R518b1f4ea,2,author,watanabe,10.1007/s12144-022-03082-2,"No faces, just body movements—Effects of perceived emotional valence of body kinetics and psychological factors on interpersonal distance behavior within an immersive virtual environment",10.1007/s12144-022-03082-2
+R218d91dbb,3,kataoka,watanabe,10.1016/j.heliyon.2023.e17916,A novel approach in predicting virtual garment fitting sizes with psychographic characteristics and 3D body measurements using artificial neural network and visualizing fitted bodies using generative adversarial network,10.1016/j.heliyon.2023.e17916
+R5f5abee1a,2,author,watanabe,10.1037/tmb0000024,Racial Embodiment in Virtual Environments for Facilitating Students’ Understanding of Racism,10.1037/tmb0000024
+Re7b90f84d,1,author,kataoka,10.3389/feduc.2023.1179684,"Gamified dances, digital and socio-emotional skills in collaborative virtual environments of university students surviving the Covid-19 virus",10.3389/feduc.2023.1179684
+Raaaea24ec,3,kataoka,watanabe,10.3390/ijerph192316164,Examining Learning Experience and Satisfaction of Accounting Students in Higher Education before and amid COVID-19,10.3390/ijerph192316164
+R3dfe61f94,2,author,watanabe,10.1007/s00426-021-01609-z,"The effect of visually manipulating back size and morphology on back perception, body ownership, and attitudes towards self-capacity during a lifting task",10.1007/s00426-021-01609-z
+R9f3647095,3,kataoka,watanabe,10.3389/frvir.2021.656788,Experimental Induction of Micro- and Macrosomatognosia: A Virtual Hand Illusion Study,10.3389/frvir.2021.656788
+R5cf20a82b,1,author,kataoka,10.1371/journal.pone.0232290,The relationship between the body and the environment in the virtual world: The interpupillary distance affects the body size perception,10.1371/journal.pone.0232290
+Rca66392d9,3,kataoka,watanabe,10.1016/j.psychres.2018.12.106,Fear reactivity to head-mounted display perceptual illusion challenges is associated with suicidality,10.1016/j.psychres.2018.12.106
+R6e3a5fc9d,1,author,kataoka,10.1016/j.actpsy.2018.12.009,The shape of personal space,10.1016/j.actpsy.2018.12.009
+R7c79e0395,1,author,kataoka,10.1038/s41598-018-28487-7,Repetitive transcranial magnetic stimulation reveals a causal role of the human precuneus in spatial updating,10.1038/s41598-018-28487-7
+Rddf81debb,1,author,kataoka,10.1038/s41598-018-25951-2,Illusory body ownership of an invisible body interpolated between virtual hands and feet via visual-motor synchronicity /631/378/2649/1723 /631/477/2811 article,10.1038/s41598-018-25951-2
+R39146ea5f,3,kataoka,watanabe,10.1177/0956797618795679,Mind the Depth: Visual Perception of Shapes Is Better in Peripersonal Space,10.1177/0956797618795679
+Rfd5b5249c,3,kataoka,watanabe,10.1016/j.autcon.2018.01.008,Teleyes: A telepresence system based on stereoscopic vision and head motion tracking,10.1016/j.autcon.2018.01.008
+R07fffb87e,3,kataoka,watanabe,10.1007/s13369-016-2411-0,DCCD: Distributed N-Body Rigid Continuous Collision Detection for Large-Scale Virtual Environments,10.1007/s13369-016-2411-0
+R0538016cd,1,author,kataoka,10.1177/0735633115626881,Evaluation of a motion-based platform for practicing phonological awareness of preschool children,10.1177/0735633115626881
+Rad9882bec,2,author,watanabe,10.1515/sem-2016-0049,Size and shape depictions in the manual modality: A taxonomy of iconic devices in Adamorobe Sign Language,10.1515/sem-2016-0049
+R3261bd194,2,author,watanabe,10.3389/fpsyg.2015.01343,Soccer athletes are superior to non-athletes at perceiving soccer-specific and non-sport specific human biological motion,10.3389/fpsyg.2015.01343
+R968119ce3,1,author,kataoka,10.3389/fpsyg.2015.00216,Sequential egocentric navigation and reliance on landmarks in Williams syndrome and typical development,10.3389/fpsyg.2015.00216
+R6a2fd3b6b,2,author,watanabe,10.1111/desc.12176,Egocentric and allocentric navigation strategies in Williams syndrome and typical development,10.1111/desc.12176
+Ra62141e5e,1,author,kataoka,10.1002/ar.23046,Breathing Life Into Dinosaurs: Tackling Challenges of Soft-Tissue Restoration and Nasal Airflow in Extinct Species,10.1002/ar.23046
+R7392f8ec8,3,kataoka,watanabe,10.1039/c3fd00123g,A real-time proximity querying algorithm for haptic-based molecular docking,10.1039/c3fd00123g
+R187b7e797,1,author,kataoka,10.2196/games.3260,Diabetes island: Preliminary impact of a virtual world self-care educational intervention for african americans with type 2 diabetes,10.2196/games.3260
+R36d0a0077,2,author,watanabe,10.1371/journal.pone.0085773,Illusory changes in body size modulate body satisfaction in a way that is related to non-clinical eating disorder psychopathology,10.1371/journal.pone.0085773
+R116852789,3,kataoka,watanabe,10.1016/j.jnca.2013.08.011,Reducing view inconsistency by predicting avatars' motion in multi-server distributed virtual environments,10.1016/j.jnca.2013.08.011
+R9e808a10f,2,author,watanabe,10.1108/13685201211194745,An analysis of money laundering and terrorism financing typologies,10.1108/13685201211194745
+R620045c6c,2,author,watanabe,10.1108/09593841111109404,Do avatars dream of electronic picket lines?: The blurring of work and play in virtual environments,10.1108/09593841111109404
+Reee35f363,1,author,kataoka,10.3758/s13423-011-0134-5,Object-centered reference systems and human spatial memory,10.3758/s13423-011-0134-5
+R105725908,2,author,watanabe,10.1177/0093650208330254,The proteus effect: Implications of transformed digital self-representation on online and offline behavior,10.1177/0093650208330254
+R5a758d714,2,author,watanabe,10.1111/j.1468-2958.2007.00299.x,The proteus effect: The effect of transformed self-representation on behavior,10.1111/j.1468-2958.2007.00299.x
+R65818e549,1,author,kataoka,10.1007/s00146-005-0028-z,Should remote collaborators be represented by avatars? A matter of common ground for collective medical decision-making,10.1007/s00146-005-0028-z
+R71741ef46,2,author,watanabe,10.1016/j.intell.2005.09.005,Spatial abilities at different scales: Individual differences in aptitude-test performance and spatial-layout learning,10.1016/j.intell.2005.09.005

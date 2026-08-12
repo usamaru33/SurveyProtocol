@@ -7,11 +7,11 @@
 > **14,682 → 12,543 → 2,909 → 1,827件**。
 >
 > **⚠️ 本ドキュメントを読むときの前提（2026-07-30 時点）:**
-> 1. **プロトコルは Rev.8 まで進んでいるが、`step*.csv` は Rev.6 以前の状態**。公式再実行は
+> 1. **プロトコルは Rev.13 まで進んでいる。`step*.csv` は Rev.13 で再実行済み**。公式再実行は
 >    第2波再検索の完了待ち（§3・§6 の注記参照）。したがって §5〜§6 の数値は
 >    「Rev.6 以前のパイプラインによる現行値」であり、**最終稿の PRISMA 数値ではない**。
 > 2. **§7 の追加分析の表は旧データ（2026-05-25, 最終候補1,784件）時点**の集計。再実行で更新される。
-> 3. プロトコルの決定経緯・最新方針は `docs/protocol_changelog.md`（〜Rev.8）と
+> 3. プロトコルの決定経緯・最新方針は `docs/protocol_changelog.md`（〜Rev.13）と
 >    `docs/search_strings.md` が一次情報。本 README と食い違う場合は **docs/ 側が正**。
 
 ---
@@ -95,7 +95,7 @@ AND ("Size" OR "Scale" OR "Height" OR "Distance")
 > `"Size perception"` 等の複合語を含むもの）は**計画段階のものであり実行されていない**
 > （`docs/protocol_changelog.md` Rev.5 で訂正）。
 
-**Rev.6 改訂クエリ（第2波、G1のみ拡張。再検索は実施中）:**
+**Rev.6 改訂クエリ（第2波、G1のみ拡張。3DB分の再検索は完了 — ACM 9,630 / IEEE 361 / Scopus 2,542）:**
 
 ```
 ("Virtual Reality" OR "VR" OR "HMD" OR "head-mounted display"
@@ -144,6 +144,7 @@ SurveyProtocol/
 ├── raw/                         # ZoteroのDB別コレクションエクスポート（PRISMA上段の根拠）
 │   ├── acm.csv / ieee.csv / IEEE_2025-2026.csv / PubMed.csv / Scopus.csv  # 初回検索（第1波）
 │   ├── scopus_wave2_20260730.ris   # Rev.6第2波 Scopus API 生出力（2,542件）
+│   ├── acm_wave2_20260803.csv / ieee_wave2_20260810.csv  # 第2波 ACM 9,630 / IEEE 361
 │   └── scopus_wave2_20260730.csv   # ★上記RISのZotero取込→CSVエクスポート（2,542件, Abstract 100%）
 ├── CORE.csv                     # CORE学会ランキング（1,955エントリ）
 ├── scimagojr 2025.csv           # SJRジャーナルランキング（50,326エントリ）
@@ -178,13 +179,13 @@ SurveyProtocol/
 ├── .env                         # APIキー（**git管理外**。IEEE / Scopus / Semantic Scholar）
 ├── .env.example                 # 変数名テンプレート（コミット可・値は空）
 ├── venue_aliases.csv            # 著者確認済みVenueエイリアス表（Phase 2 の最優先照合）
-├── self_scale_references.csv    # ★正式 gold set（SearchScope列: in-scope 13件 / background 7件）
+├── self_scale_references.csv    # ★正式 gold set（SearchScope列: in-scope 12件 / background 8件）
 ├── known_items.md               # 拡充用の下書き（現在は有効行0のテンプレート、下記注参照）
 ├── known_item_analysis.md       # ★自動生成: 脱落分析（known_item_test.py が書く）
 ├── README.md                    # このファイル
 └── docs/                        # プロトコル文書（2026-07-21 集約）
-    ├── rule.md                  # 研究プロトコル・方針文書（※本文は Rev.8 未反映、下記注参照）
-    ├── protocol_changelog.md    # ★プロトコル変更履歴（〜Rev.8）— 方針の一次情報
+    ├── rule.md                  # 研究プロトコル・方針文書（Rev.8/10/11 を本文へ反映済み）
+    ├── protocol_changelog.md    # ★プロトコル変更履歴（〜Rev.13）— 方針の一次情報
     ├── PROGRESS_LOG.md          # ★進捗ログ（セッションログ・次回タスク）
     ├── methodology_decision_Rev7.md  # 検索方法論のデータ検証・確定（§Rev.8追記含む）
     ├── search_strings.md        # DB別検索式の記録（PRISMA Item #7）
@@ -323,7 +324,7 @@ recall を過大評価させる要因なので、`SUSPECT` は `HIT` として�
 > 公式な step ファイルの更新は、第2波再検索・正規化改修・エイリアス確定後の
 > **Rev.7 として一括再実行**する方針（`docs/PROGRESS_LOG.md`）。
 >
-> **Venue フィルタの取りこぼし（Threats に記載必須）:** Known-Item Test の in-scope 13件のうち
+> **Venue フィルタの取りこぼし（Threats に記載必須）:** Known-Item Test の in-scope 12件のうち
 > **6件がこの Phase 2 で脱落**している（unmatched 3 / below_rank 2 / criterion 1）。
 > 内訳は `outputs/venue_dropped_known_items.csv`、回収手段はスノーボーリング（§8）。
 > なお Venue 未照合 5,166件のうち上位50件を監査した結果、**高ランク誌の表記ゆれ脱落は0件**
@@ -412,15 +413,15 @@ PubMed∩Scopus 606 / Scopus∩IEEE 352 / Scopus∩ACM 142 / PubMed∩IEEE 39 / 
 
 ### 検索の網羅性検証（Known-Item Test）
 
-`scripts/known_item_test.py` が gold set（`self_scale_references.csv`、`SearchScope` 列で in-scope 13件）を
+`scripts/known_item_test.py` が gold set（`self_scale_references.csv`、`SearchScope` 列で in-scope 12件）を
 各 step ファイルに突き合わせ、recall を測定して `known_item_analysis.md` を生成する。
 
 | 段階 | 生存 | recall |
 |---|---|---|
-| step0 統合生データ（検索式で拾えたか） | 9/13 | **69.2%** |
-| step1 重複削除後 | 9/13 | 69.2% |
-| step2 Venueランク通過後 | 3/13 | **23.1%** |
-| step3 最終候補 | 3/13 | 23.1% |
+| step0 統合生データ（検索式で拾えたか） | 8/12 | **66.7%** |
+| step1 重複削除後 | 8/12 | 66.7% |
+| step2 Venueランク通過後 | 3/12 | **25.0%** |
+| step3 最終候補 | 3/12 | 25.0% |
 
 - **step0 で4件脱落（検索式・カバレッジの問題）:** Frontiers in Virtual Reality 3件 =
   DBカバレッジ欠落（同誌はSJR Q1）、Being Barbie 1件 = クエリG1ギャップ
@@ -577,7 +578,7 @@ URL列のドメイン、DOIプレフィックス、Publisher列を優先順位�
 
 ### 8.1 なぜ必要か
 
-Known-Item Test で、in-scope 13件中 **6件が Phase 2 の Venue ホワイトリストで脱落**していることが判明した
+Known-Item Test で、in-scope 12件中 **5件が Phase 2 の Venue ホワイトリストで脱落**していることが判明した
 （`outputs/venue_dropped_known_items.csv`: unmatched 3 / below_rank 2 / criterion 1）。
 これは検索式では捕捉できているのに Venue 基準で落ちる取りこぼしであり、
 検索式の改良（Rev.6 第2波）では解決しない。引用ネットワーク経由の回収がこの残余リスクを緩和する。

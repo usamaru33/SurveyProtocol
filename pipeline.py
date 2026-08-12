@@ -133,6 +133,100 @@ def normalize_venue(name: str) -> str:
     return re.sub(r"\s+", " ", n).strip()
 
 
+# ---------------------------------------------------------------------------
+# Venue 正規化の構造ガード(Rev.12、docs/normalization_design.md の案1/3/4/6)
+#
+# 現行の積極的な正規化はストップワードで種別語(journal of / transactions on /
+# conference on / symposium on / workshop)まで落とすため、**ジャーナルと会議が
+# 同一キーに融合する**。実測された衝突は 899キー・採否反転 426キー。
+# 例: ACM Transactions on Applied Perception(SJR)と ACM Symposium on Applied
+#     Perception(CORE B)が共に "acm applied perception" になる。
+# ---------------------------------------------------------------------------
+
+_JOURNAL_WORDS = re.compile(
+    r"\b(journal|transactions|magazine|letters|review|reviews|quarterly|bulletin)\b", re.I)
+_CONF_WORDS = re.compile(
+    r"\b(conference|symposium|workshop|proceedings|proc|congress|meeting|"
+    r"convention|colloquium)\b", re.I)
+
+
+def venue_type_marker(name: str) -> str:
+    """案1: Venue 名から種別マーカーを推定する。'J' / 'C' / ''(不明)。
+
+    ジャーナル語と会議語が両方出るとき(例: "Proceedings of the ACM on
+    Human-Computer Interaction" = PACM HCI はジャーナル扱いだが proceedings を含む)は
+    **判定不能として '' を返す**。誤ったマーカーを付けると正しい照合まで殺すため、
+    曖昧なら両方試す側に倒す。
+    """
+    has_j = bool(_JOURNAL_WORDS.search(name or ""))
+    has_c = bool(_CONF_WORDS.search(name or ""))
+    if has_j and not has_c:
+        return "J"
+    if has_c and not has_j:
+        return "C"
+    return ""
+
+
+def typed_key(marker: str, norm: str) -> str:
+    return f"{marker}:{norm}"
+
+
+def candidate_typed_keys(name: str, norm: str) -> list[str]:
+    """データ側 Venue に対する照合キー候補。種別不明なら J/C の両方を試す。"""
+    if not norm:
+        return []
+    m = venue_type_marker(name)
+    return [typed_key(m, norm)] if m else [typed_key("J", norm), typed_key("C", norm)]
+
+
+def is_short_key(norm: str, max_tokens: int = 2) -> bool:
+    """案3: トークン数が閾値以下の短いキーか。
+
+    短いキー("presence" / "sensors" 等)は正規化一致・fuzzy で誤照合しやすい
+    (実例: データの Presence 誌29件が "Annual International Workshop on Presence" に
+    吸われて CORE C 判定になった)。短キーでは exact(小文字原題)と ISSN のみ許可する。
+    """
+    return len(norm.split()) <= max_tokens
+
+
+def raw_similarity(a: str, b: str) -> float:
+    """正規化前の元文字列同士の類似度。"""
+    return difflib.SequenceMatcher(None, (a or "").lower(), (b or "").lower()).ratio()
+
+
+SANITY_THRESHOLD = 0.60        # 案4: 元文字列類似度の下限
+CONTAINMENT_THRESHOLD = 0.80   # 案4: 語の包含率の下限(定型句で希釈される場合の救済)
+
+# 包含率の計算から外す純粋な機能語。**種別語や修飾語は落とさない**
+# ("international conference" を落とすと、ICSE と PACM SE のような別物まで
+#  包含率1.0になってしまう)。
+_FILLER = {"of", "the", "on", "and", "in", "for", "a", "an", "to", "at"}
+
+
+def _content_tokens(s: str) -> set[str]:
+    toks = re.findall(r"[a-z0-9]+", (s or "").lower())
+    return {t for t in toks
+            if t not in _FILLER and not re.fullmatch(r"\d+(?:st|nd|rd|th)?", t)}
+
+
+def containment(matched_title: str, data_venue: str) -> float:
+    """照合先タイトルの語が、データ側 Venue にどれだけ含まれているか。
+
+    元文字列の類似度だけで判定すると、"Proceedings of the 18th ACM International
+    Conference on Multimodal Interaction" のような**定型句で薄まった長い Venue 名**が
+    正しい照合先 "International Conference on Multimodal Interaction" に対しても
+    0.5 程度しか出ず、正当な照合まで棄却してしまう(実測で確認)。
+    照合先の語がデータ側に出揃っているかを見れば、この希釈に影響されない。
+    """
+    # CORE のタイトルは "(was International Conference on Multimodal Interfaces)" や
+    # "(ACM)" のような注記を含むことがある。これはデータ側 Venue には現れないので、
+    # 残したまま包含率を測ると正しい照合まで閾値割れする。
+    m = _content_tokens(re.sub(r"\([^)]*\)", " ", matched_title or ""))
+    if not m:
+        return 0.0
+    return len(m & _content_tokens(data_venue)) / len(m)
+
+
 def extract_parenthesized_acronym(name: str) -> str:
     """Return text inside the last parentheses if it looks like an acronym,
     e.g. '2010 IEEE VR Conference (VR)' -> 'VR'"""
@@ -167,6 +261,9 @@ def load_core(core_path: Path) -> dict:
             core[norm] = entry
             if acronym:
                 core[acronym.lower()] = entry
+            # 案1: 種別マーカー付きキー。CORE は会議ランキングなので既定は 'C'。
+            typed = core.setdefault("__typed__", {})
+            typed.setdefault(typed_key(venue_type_marker(title) or "C", norm), entry)
     return core
 
 
@@ -249,6 +346,12 @@ def load_sjr(sjr_path: Path) -> dict:
             entry = {"original_title": title, "quartile": quartile}
             sjr[norm]          = entry
             sjr[title.lower()] = entry
+            # 案1: 種別マーカー付きキー。SJR は誌ランキングなので既定は 'J'。
+            # setdefault にしているのは、同一キーの「後勝ち上書き」を避けるため
+            # (実測の問題: キー 'sensors' が Q1 の Sensors ではなく後行の
+            #  Journal of Sensors(Q2)に上書きされ、Q1誌が Q2 として除外され得た)。
+            sjr.setdefault("__typed__", {}).setdefault(
+                typed_key(venue_type_marker(title) or "J", norm), entry)
             # ISSN index
             if issn_idx >= 0 and issn_idx < len(row):
                 issns_raw = row[issn_idx].strip().strip('"')
@@ -363,6 +466,213 @@ def best_sjr_match(venue: str, sjr: dict, issn: str = "", threshold: float = 0.8
     return None, None
 
 
+_resolve_cache: dict[str, dict] = {}
+
+
+def resolve_venue(raw_venue: str, core: dict, sjr: dict, issn: str = "",
+                  fuzzy_threshold: float = 0.82) -> dict:
+    """Venue → ランキング照合(Rev.12)。
+
+    **案6: exact をリスト横断で fuzzy より常に優先する**照合順序:
+
+        1. CORE exact  (種別キー → 正規化キー → 小文字原題)
+        2. SJR  exact  (ISSN → 種別キー → 正規化キー → 小文字原題)
+        3. CORE acronym(括弧内略称)
+        4. CORE fuzzy  (最後の手段)
+
+    旧実装は「CORE を全段(fuzzy 含む)やってから SJR」だったため、SJR に正確な収載が
+    あってもCORE側の低類似 fuzzy が先に成立して奪っていた。最大の実例は
+    `Proceedings of the ACM on Human-Computer Interaction`(SJR に正確収載)が
+    CORE `Indian Conference on Human-Computer Interaction` に fuzzy 照合された **82件**。
+
+    ガード:
+      - 案3 短キーガード: 正規化キーのトークン数 ≤2 では正規化一致・fuzzy を禁止し、
+        小文字原題 exact と ISSN のみ許可する。
+      - 案4 サニティチェック: 照合成立後に元文字列類似度 ≥ SANITY_THRESHOLD を要求。
+        満たさなければ unmatched に落とす(silent failure を顕在化させる)。
+        ISSN 一致と小文字原題 exact は同一性が確定しているため対象外。
+
+    戻り値: {"source", "matched_title", "rank", "stage", "rejected"}
+            source は "CORE" / "SJR" / None。rejected はガードで棄却した根拠(あれば)。
+    """
+    ck = f"{raw_venue}||{issn}"
+    if ck in _resolve_cache:
+        return _resolve_cache[ck]
+
+    def out(source, title, rank, stage, rejected=""):
+        r = {"source": source, "matched_title": title, "rank": rank,
+             "stage": stage, "rejected": rejected}
+        _resolve_cache[ck] = r
+        return r
+
+    norm = normalize_venue(raw_venue)
+    low = (raw_venue or "").strip().lower()
+    short = is_short_key(norm)
+    core_typed = core.get("__typed__", {})
+    sjr_typed = sjr.get("__typed__", {})
+    rejected: list[str] = []
+
+    def sane(entry_title: str, stage: str) -> bool:
+        """案4: 照合成立後の安全網。次のどちらかを満たせば通す。
+
+          (a) 元文字列類似度 ≥ SANITY_THRESHOLD
+          (b) 照合先の語の包含率 ≥ CONTAINMENT_THRESHOLD かつ照合先が3語以上
+              (定型句で希釈された長い Venue 名を正当に救済する。短い照合先で
+               包含だけを見ると偶発一致を通すため、語数の下限を課す)
+        """
+        s = raw_similarity(raw_venue, entry_title)
+        if s >= SANITY_THRESHOLD:
+            return True
+        c = containment(entry_title, raw_venue)
+        if c >= CONTAINMENT_THRESHOLD and len(_content_tokens(entry_title)) >= 3:
+            return True
+        rejected.append(f"{stage}:'{entry_title}'(sim={s:.2f}/cont={c:.2f})")
+        return False
+
+    marker = venue_type_marker(raw_venue)
+
+    def is_true_raw_hit(entry: dict) -> bool:
+        """`low in db` が本当に「原題(または略称)そのもの」の一致かを検証する。
+
+        core/sjr の辞書は**正規化キーと原題キーを同じ名前空間に混ぜている**ため、
+        `low in db` だけでは正規化キーへの偶然の一致を拾ってしまう。
+        実例: データ 'Presence' は core['presence'](= "Annual International Workshop
+        on Presence" の正規化キー)に当たり、原題一致を装って短キーガードを迂回していた。
+        同様に 'Sensors' は sjr['sensors'](= "Journal of Sensors" の正規化キー)に当たる。
+        """
+        t = (entry.get("original_title") or "").strip().lower()
+        a = (entry.get("acronym") or "").strip().lower()
+        return low == t or (bool(a) and low == a)
+
+    # --- 1. CORE exact -----------------------------------------------------
+    if low in core and is_true_raw_hit(core[low]):
+        e = core[low]
+        return out("CORE", e["original_title"], e["rank"], "core_exact_raw")
+    if norm and not short:
+        for k in candidate_typed_keys(raw_venue, norm):
+            e = core_typed.get(k)
+            if e and sane(e["original_title"], "core_typed"):
+                return out("CORE", e["original_title"], e["rank"], "core_exact_typed")
+        # 種別が確定しているときは素の正規化キーへフォールバックしない。
+        # フォールバックすると種別マーカーの意味が消える(実例: ACM Transactions on
+        # Applied Perception(J)が ACM Symposium on Applied Perception(C)に当たる)。
+        if not marker:
+            e = core.get(norm)
+            if e and sane(e["original_title"], "core_norm"):
+                return out("CORE", e["original_title"], e["rank"], "core_exact_norm")
+
+    # --- 2. SJR exact ------------------------------------------------------
+    issn_index = sjr.get("__issn_index__", {})
+    for raw_issn in re.split(r"[,\s]+", issn or ""):
+        raw_issn = raw_issn.strip().replace("-", "")
+        if raw_issn and raw_issn in issn_index:
+            e = issn_index[raw_issn]
+            return out("SJR", e["original_title"], e["quartile"], "sjr_issn")
+    if low in sjr and low != "__issn_index__" and is_true_raw_hit(sjr[low]):
+        e = sjr[low]
+        return out("SJR", e["original_title"], e["quartile"], "sjr_exact_raw")
+    if norm and not short:
+        for k in candidate_typed_keys(raw_venue, norm):
+            e = sjr_typed.get(k)
+            if e and sane(e["original_title"], "sjr_typed"):
+                return out("SJR", e["original_title"], e["quartile"], "sjr_exact_typed")
+        if not marker:
+            e = sjr.get(norm)
+            if e and norm != "__issn_index__" and sane(e["original_title"], "sjr_norm"):
+                return out("SJR", e["original_title"], e["quartile"], "sjr_exact_norm")
+
+    # --- 3. CORE acronym ---------------------------------------------------
+    acronym = extract_parenthesized_acronym(raw_venue)
+    if acronym:
+        for k in (acronym.lower(), normalize_venue(acronym)):
+            e = core.get(k) if k else None
+            if e and sane(e["original_title"], "core_acronym"):
+                return out("CORE", e["original_title"], e["rank"], "core_acronym")
+
+    # --- 4. CORE fuzzy(最後の手段) ----------------------------------------
+    if norm and not short:
+        searchable = {k: v for k, v in core.items() if not k.startswith("__")}
+        bk, bs = _fuzzy_best(norm, searchable, fuzzy_threshold)
+        if bk and bs >= fuzzy_threshold:
+            e = core[bk]
+            if sane(e["original_title"], "core_fuzzy"):
+                return out("CORE", e["original_title"], e["rank"], "core_fuzzy")
+
+    note = ""
+    if short and norm:
+        note = f"短キーガード(tokens<=2: '{norm}')"
+    if rejected:
+        note = (note + " / " if note else "") + "サニティ棄却 " + "; ".join(rejected[:3])
+    return out(None, None, None, "unmatched", note)
+
+
+# ---------------------------------------------------------------------------
+# Rev.13: フィルタ層(Phase 1.5) — 取得後に正規化クエリを一律再適用する
+#
+# 【なぜ必要か】DB ごとに検索の当たり方が違う。実測で判明しているだけでも
+#   - 第1波 Scopus は TITLE-ABS-KEY、第2波は TITLE-ABS(scope が違う)
+#   - 第1波 IEEE はより広いフィールド指定(1,077件が第2波に現れず、
+#     そのうち TA で3群成立するのは 4.7% だけ)
+#   - ACM 第2波は Title 検索と Abstract 検索の和集合(フィールド横断の一致を落とす)
+# このまま統合すると「どの DB で拾われたか」によって適格性が変わってしまう。
+# 取得後に**同じクエリを全レコードへ1回だけ**適用して、この差を吸収する。
+# (methodology_decision_Rev7.md 方針3。Zhou et al. 2025 と同じ発想)
+#
+# 【選定基準より前に置く理由】これは「取得の差を均す処理」であって
+# 「適格性で落とす処理」ではない。Venue ランク(Phase 2)やキーワード除外(Phase 3a)
+# より前に置き、PRISMA でも別の段として報告する。
+#
+# 【重複削除より後に置く理由】同じ論文の ACM コピーと Scopus コピーで判定が割れる。
+# マージ後の1レコードに対して1回だけ適用する。
+#
+# 【フェイルセーフ(必須)】要旨が無いレコードは**判定不能であって不適格ではない**。
+# タイトルのみで判定すると要旨欠落567件のうち566件が落ちるが、これは中身ではなく
+# メタデータ品質による除外であり正当化できない。判定不能は保留し人手へ送る。
+# gold set 12件での検証: 本設計での脱落は 0件(タイトルのみ判定だと4件が落ちる)。
+# ---------------------------------------------------------------------------
+
+QUERY_CONCEPT_GROUPS_TA = [
+    ("G1 没入環境", re.compile(
+        r"\b(virtual realit\w*|vr|hmds?|head[- ]mounted displays?"
+        r"|virtual environment\w*|immersive virtual)\b", re.I)),
+    ("G2 身体表象", re.compile(
+        r"\b(avatars?|bod(?:y|ies|ily)|embodiment|embodied)\b", re.I)),
+    ("G3 スケール知覚", re.compile(
+        r"\b(sizes?|scal\w*|heights?|distances?)\b", re.I)),
+]
+
+# 重複グループ間で補完するフィールド(Rev.13)。
+#
+# **Venue 名(Publication Title)は絶対にマージしない。** DB ごとに表記が違い、
+# 「長い方が良い」わけではないため。実際に一度マージしたところ、gold #11 の venue が
+# IEEE 表記から Scopus 表記
+# ('25th IEEE Conference on Virtual Reality and 3D User Interfaces, VR 2018 - Proceedings')
+# に置き換わり、CORE A* に照合できなくなって step2 recall が 3/12 → 2/12 に落ちた。
+# Venue 表記の統一はエイリアス表と正規化(Rev.12)の担当であって、マージの仕事ではない。
+#
+#   MERGE_LONGEST : 値が長い方を採る(切り詰められた要旨があるため)
+#   MERGE_IF_EMPTY: 空のときだけ埋める(識別子は上書きしてはならない)
+MERGE_LONGEST = ["Abstract Note"]
+MERGE_IF_EMPTY = ["DOI", "ISSN"]
+MERGE_FIELDS = MERGE_LONGEST + MERGE_IF_EMPTY
+
+
+def filter_layer_verdict(title: str, abstract: str) -> tuple[str, str]:
+    """(verdict, reason) を返す。verdict は 'pass' / 'fail' / 'hold'。
+
+    - 要旨あり: Title+Abstract に3概念群すべてが成立すれば pass、欠ければ fail
+    - 要旨なし: **hold**(判定不能。除外せず人手スクリーニングへ)
+    """
+    abstract = (abstract or "").strip()
+    if not abstract:
+        return "hold", "要旨なしのため判定不能(フェイルセーフで保留)"
+    text = f"{title or ''} {abstract}"
+    missing = [name for name, rx in QUERY_CONCEPT_GROUPS_TA if not rx.search(text)]
+    if missing:
+        return "fail", "概念群が不成立: " + " / ".join(missing)
+    return "pass", ""
+
+
 def compile_exclusions(cats):
     return [(lbl, [(p, re.compile(p, re.IGNORECASE)) for p in pats])
             for lbl, pats in cats]
@@ -408,6 +718,9 @@ def phase1_dedup(rows: list[dict], fieldnames: list[str],
     seen_title: dict[str, int] = {}
     seen_key: dict[str, int]   = {}
 
+    index_of_kept: dict[int, dict] = {}   # Rev.13: 採用行への参照(フィールド補完用)
+    merged_counts: dict[str, int] = {}
+
     dedup: list[dict] = []
     dup_doi_count   = 0
     dup_title_count = 0
@@ -430,17 +743,44 @@ def phase1_dedup(rows: list[dict], fieldnames: list[str],
             dup_reason = f"Duplicate Title (first seen at row {seen_title[title]})"
 
         if dup_reason:
+            # Rev.13: 重複を捨てる前に、**残す側に欠けているフィールドを補う**。
+            # 旧実装は先出コピーをそのまま採用して残りを捨てていたため、
+            # 「ACM(要旨なし)が Scopus(要旨あり)より先に並んでいる」というだけの理由で
+            # 要旨を捨てていた。実測では欠落7,375件のうち3,439件が、
+            # 同じ論文の別コピーに要旨を持っていた(外部API不要で回収できる)。
+            # 判定は決定論的(値が空でないもの/より長いものを採る)。
+            keep_idx = (seen_doi.get(doi) if doi and doi in seen_doi else
+                        seen_key.get(key) if key and key in seen_key else
+                        seen_title.get(title))
+            if keep_idx is not None:
+                kept = index_of_kept.get(keep_idx)
+                if kept is not None:
+                    for col in MERGE_FIELDS:
+                        cur = (kept.get(col) or "").strip()
+                        new = (row.get(col) or "").strip()
+                        if not new:
+                            continue
+                        take = (len(new) > len(cur)) if col in MERGE_LONGEST else (not cur)
+                        if take:
+                            kept[col] = new
+                            merged_counts[col] = merged_counts.get(col, 0) + 1
             continue
 
         if doi:   seen_doi[doi]     = i
         if key:   seen_key[key]     = i
         if title: seen_title[title] = i
+        index_of_kept[i] = row
         dedup.append(row)
 
     removed = len(rows) - len(dedup)
     log_lines.append(f"  Removed by DOI match   : {dup_doi_count:>8,}")
     log_lines.append(f"  Removed by Key match   : {dup_key_count:>8,}")
     log_lines.append(f"  Removed by Title match : {dup_title_count:>8,}")
+    if merged_counts:
+        log_lines.append("")
+        log_lines.append("  --- Field merge from duplicates (Rev.13) ---")
+        for col, cnt in sorted(merged_counts.items(), key=lambda x: -x[1]):
+            log_lines.append(f"    {col:<22}: {cnt:>8,} 件を重複コピーから補完")
     log_lines.append(f"  Total removed          : {removed:>8,}")
     log_lines.append(f"  Records after dedup    : {len(dedup):>8,}")
     log_lines.append("")
@@ -465,6 +805,68 @@ def phase1_dedup(rows: list[dict], fieldnames: list[str],
 # ---------------------------------------------------------------------------
 # Phase 2: CORE Rank Filtering (A / A* only)
 # ---------------------------------------------------------------------------
+
+def phase1_5_filter(rows: list[dict], fieldnames: list[str],
+                    outdir: Path, log_lines: list[str]) -> list[dict]:
+    """Phase 1.5: フィルタ層。取得後に正規化クエリを一律再適用する(Rev.13)。
+
+    設計理由は `filter_layer_verdict` の直上のコメントを参照。
+    保留(hold)は**除外しない**。pass と hold を次段へ通す。
+    """
+    SEP = "=" * 72
+    log_lines += [SEP, "  PHASE 1.5: FILTER LAYER (normalized query re-application)",
+                  SEP, ""]
+    title_col = resolve_col(fieldnames, TITLE_ALIASES)
+    abs_col = resolve_col(fieldnames, ABSTRACT_ALIASES)
+
+    kept, dropped = [], []
+    n_pass = n_hold = 0
+    miss_counter: dict[str, int] = {}
+    for row in rows:
+        verdict, reason = filter_layer_verdict(
+            row.get(title_col, "") if title_col else "",
+            row.get(abs_col, "") if abs_col else "")
+        row["Filter_Layer"] = verdict
+        row["Filter_Layer_Reason"] = reason
+        if verdict == "fail":
+            dropped.append(row)
+            for g in reason.replace("概念群が不成立: ", "").split(" / "):
+                miss_counter[g] = miss_counter.get(g, 0) + 1
+        else:
+            kept.append(row)
+            if verdict == "pass":
+                n_pass += 1
+            else:
+                n_hold += 1
+
+    log_lines.append(f"  Input records   : {len(rows):>8,}")
+    log_lines.append(f"  Pass (3 groups) : {n_pass:>8,}")
+    log_lines.append(f"  Hold (要旨なし) : {n_hold:>8,}   ← 判定不能。除外せず人手へ")
+    log_lines.append(f"  Fail (excluded) : {len(dropped):>8,}")
+    log_lines.append(f"  Records kept    : {len(kept):>8,}")
+    if miss_counter:
+        log_lines.append("")
+        log_lines.append("  --- 不成立だった概念群(重複計上) ---")
+        for g, c in sorted(miss_counter.items(), key=lambda x: -x[1]):
+            log_lines.append(f"    {g:<20}: {c:>8,}")
+    log_lines.append("")
+
+    out_fields = fieldnames + ["Filter_Layer", "Filter_Layer_Reason"]
+    write_csv(outdir / "step1_5_filter_included.csv", kept, out_fields)
+    write_csv(outdir / "step1_5_filter_excluded.csv", dropped, out_fields)
+    log_lines.append("  Included output -> step1_5_filter_included.csv")
+    log_lines.append("  Excluded output -> step1_5_filter_excluded.csv")
+    log_lines.append("")
+
+    print(f"\n{'='*60}")
+    print(f"  PHASE 1.5: Filter Layer (Rev.13)")
+    print(f"{'='*60}")
+    print(f"  Input     : {len(rows):,}")
+    print(f"  Pass      : {n_pass:,}   Hold(要旨なし): {n_hold:,}")
+    print(f"  Excluded  : {len(dropped):,}")
+    print(f"  Remaining : {len(kept):,}")
+    return kept
+
 
 def phase2_core(rows: list[dict], fieldnames: list[str],
                 core: dict, sjr: dict, outdir: Path, log_lines: list[str],
@@ -491,8 +893,14 @@ def phase2_core(rows: list[dict], fieldnames: list[str],
     sjr_q_dist: dict[str, int] = defaultdict(int)  # SJR quartiles
     unmatched_venues: list[str] = []
 
-    out_fields_incl = fieldnames + ["Matched_Venue", "Ranking_Source", "CORE_Rank", "SJR_Quartile"]
-    out_fields_excl = fieldnames + ["Matched_Venue", "Ranking_Source", "CORE_Rank", "SJR_Quartile", "Excl_Reason_Phase2"]
+    # Rev.12: Match_Stage(どの段で照合したか)と Match_Guard_Note(ガードの棄却理由)を
+    # 出力に含める。誤照合が「起きたら見える」状態にするのが構造ガードの本質なので、
+    # 監査可能性のために必ず残す。
+    _rev12 = ["Match_Stage", "Match_Guard_Note"]
+    out_fields_incl = fieldnames + ["Matched_Venue", "Ranking_Source", "CORE_Rank",
+                                    "SJR_Quartile"] + _rev12
+    out_fields_excl = fieldnames + ["Matched_Venue", "Ranking_Source", "CORE_Rank",
+                                    "SJR_Quartile", "Excl_Reason_Phase2"] + _rev12
 
     for row in rows:
         raw_venue = (row.get(venue_col, "") or "") if venue_col else ""
@@ -500,6 +908,7 @@ def phase2_core(rows: list[dict], fieldnames: list[str],
         # --- Step 0: 著者確認済みエイリアス表(照合より先に参照。誤照合防止) ---
         alias = alias_lookup(raw_venue, aliases)
         if alias is not None:
+            row["Match_Stage"]    = "alias"   # Rev.12: 監査のため段を明示する
             row["Matched_Venue"]  = alias["canonical"]
             row["Ranking_Source"] = f"{alias['source']}(alias)"
             row["CORE_Rank"]      = alias["rank"] if alias["source"] == "CORE" else ""
@@ -522,8 +931,15 @@ def phase2_core(rows: list[dict], fieldnames: list[str],
                 excluded.append(row)
             continue
 
-        # --- Step A: CORE lookup ---
-        matched_title, rank = best_core_match(raw_venue, core)
+        # --- Step A/B: 照合(Rev.12: exact をリスト横断で fuzzy より優先) ---
+        raw_issn = (row.get(issn_col, "") or "") if issn_col else ""
+        res = resolve_venue(raw_venue, core, sjr, issn=raw_issn)
+        matched_title, rank = (res["matched_title"], res["rank"]) \
+            if res["source"] == "CORE" else (None, None)
+        row["Match_Stage"] = res["stage"]
+        if res["rejected"]:
+            row["Match_Guard_Note"] = res["rejected"]
+            stats["guard_rejected"] = stats.get("guard_rejected", 0) + 1
 
         if matched_title is not None:
             row["Matched_Venue"]   = matched_title
@@ -541,9 +957,9 @@ def phase2_core(rows: list[dict], fieldnames: list[str],
                 excluded.append(row)
             continue
 
-        # --- Step B: SJR lookup (for journals not in CORE) ---
-        raw_issn  = (row.get(issn_col, "") or "") if issn_col else ""
-        sjr_title, quartile = best_sjr_match(raw_venue, sjr, issn=raw_issn)
+        # --- Step B: SJR 側の結果(同じ resolve_venue の戻り値を使う) ---
+        sjr_title, quartile = (res["matched_title"], res["rank"]) \
+            if res["source"] == "SJR" else (None, None)
 
         if sjr_title is not None:
             row["Matched_Venue"]   = sjr_title
@@ -795,12 +1211,16 @@ def main(argv=None):
     # ── Phase 1 ──────────────────────────────────────────────
     after_p1 = phase1_dedup(rows, fieldnames, args.outdir, log_lines)
 
+    # ── Phase 1.5(Rev.13): 取得の差を均す。選定基準(P2/P3)より前に置く ──
+    after_p15 = phase1_5_filter(after_p1, fieldnames, args.outdir, log_lines)
+    fieldnames_f = fieldnames + ["Filter_Layer", "Filter_Layer_Reason"]
+
     # ── Phase 2 ──────────────────────────────────────────────
-    after_p2 = phase2_core(after_p1, fieldnames, core, sjr, args.outdir, log_lines,
+    after_p2 = phase2_core(after_p15, fieldnames_f, core, sjr, args.outdir, log_lines,
                            aliases=aliases)
 
     # ── Phase 3 ──────────────────────────────────────────────
-    after_p3 = phase3_keywords(after_p2, fieldnames, args.outdir, log_lines)
+    after_p3 = phase3_keywords(after_p2, fieldnames_f, args.outdir, log_lines)
 
     # Summary
     SEP = "=" * 72
@@ -808,7 +1228,8 @@ def main(argv=None):
         SEP, "  PIPELINE SUMMARY", SEP, "",
         f"  Original records   : {len(rows):>8,}",
         f"  After dedup (P1)   : {len(after_p1):>8,}  (-{len(rows)-len(after_p1):,})",
-        f"  After CORE  (P2)   : {len(after_p2):>8,}  (-{len(after_p1)-len(after_p2):,})",
+        f"  After filter (P1.5): {len(after_p15):>8,}  (-{len(after_p1)-len(after_p15):,})",
+        f"  After CORE  (P2)   : {len(after_p2):>8,}  (-{len(after_p15)-len(after_p2):,})",
         f"  After keywords (P3): {len(after_p3):>8,}  (-{len(after_p2)-len(after_p3):,})",
         "",
         "  Output files:",

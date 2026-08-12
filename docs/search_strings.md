@@ -46,6 +46,18 @@ AND ("Size" OR "Scale" OR "Height" OR "Distance")
 > 記録先は本表の「Fields searched」列。現在「要著者確認」のままの初回分も、著者の検索履歴から
 > 判明したら遡って埋める(判明しなければ「記録なし」と明記し Threats で言及)。
 
+> **【Rev.10 確定(2026-08-10)/ Rev.11 で根拠を更新】実効 scope は Title-Abstract (TA) で最終確定。TAK への格上げは行わない。**
+> 第2波統合後の実測(`ResearchVR4.csv` 26,434件)で判断した: **第2波12,533件は gold set を1件も
+> 新規回収しなかった**。一方 TAK は Scopus 実測で +87%(2,533→4,727)であり、人手2名/件の
+> Phase 3b の工数をほぼ倍にする。
+> **【Rev.11 追記】** Rev.10 では「TA 準拠だと recall が 61.5% に落ちる」としていたが、
+> これは gold set #3(用語定義論文)を分母に含めた場合の値だった。#3 を background に
+> 移した後の再計算では **全体・第1波のみ・第2波のみのいずれも 8/12 = 66.7% で同値**であり、
+> **TA 確定に recall 上のコストは無かった**(第1波にしか無い gold は存在しない)。
+> 脱落文献は Phase 2 後のスノーボーリングで名指しで回収する
+> (`protocol_changelog.md` Rev.10/Rev.11、`snowballing_protocol.md` §0/§1.1)。
+> 以下の「TA+K に格上げする場合のみ」という留保は **Rev.10 で失効**。
+
 > **【Rev.8 確定(2026-07-22)】DB構成を3DB(ACM/IEEE/Scopus)に確定。PubMed は不使用。**
 > 理由・詳細は `protocol_changelog.md` Rev.8、正当化ドラフトは `methodology_decision_Rev7.md` §Rev.8追記を参照。
 > 下表の PubMed / PsycInfo 行は**経緯として保存**し削除しない(初回検索は実施済みの事実であり、
@@ -67,7 +79,7 @@ AND ("Size" OR "Scale" OR "Height" OR "Distance")
 | IEEE Xplore(初回) | 統合クエリ(上記)✅ ※Command Search 構文は未記録 | Title, Abstract(指定構文は**要著者確認**) | **要著者確認** | ≤ 2025-12-25(Zotero取込日) | **1,276** ✅ |
 | IEEE Xplore(更新検索) | 統合クエリ(上記)✅ | 同上 | 出版年 2025〜2026 に限定 | 2026-07-17 | **297**(うち初回・他DBと重複しない新規 **101**)✅ |
 | ~~PubMed~~ **(Rev.8: 不使用に確定)** | 統合クエリ(上記)✅ ※[tiab] タグの付与形は未記録 | Title/Abstract [tiab](推定、**要著者確認**) | **要著者確認** | ≤ 2026-05-15(Zotero取込日) | 781(初回検索は実施済み。**PRISMA報告からは除外**。主題適合性がスコープ外のため不採用) |
-| Scopus | 統合クエリ(上記)✅ ※TITLE-ABS() / TITLE-ABS-KEY() の別は**要著者確認 → 下記2026-07-27実測で高確度判明** | Title, Abstract(**実際は TITLE-ABS-KEY だった可能性が高い、下記参照**) | **要著者確認** | ≤ 2026-05-15(Zotero取込日) | **4,331** ✅ |
+| Scopus | 統合クエリ(上記)✅ | **`TITLE-ABS-KEY`(Rev.11 で確定)** — 件数の整合による判定。第2波の `TITLE-ABS` とは **scope が異なる** | **記録なし** | ≤ 2026-05-15(Zotero取込日) | **4,331** ✅ |
 | ~~PsycInfo~~ **(Rev.8: 不使用を再確認)** | **未実行が確定**(2026-07-17: Zotero にコレクション無し、アクセス制約のため実行不可)。Rev.8で「Scopus が PsycINFO 収録誌の相当部分を索引しており心理系文献の捕捉は Scopus に依拠する」ことを Known-Item Test で実証(`methodology_decision_Rev7.md` §Rev.8)。不実行の正当化は同ドラフトを本文に転用 | — | — | — | 0(未実行) |
 
 ## 第2波(Rev.6 改訂クエリ)の実行記録
@@ -77,7 +89,7 @@ AND ("Size" OR "Scale" OR "Height" OR "Distance")
 | Scopus(第2波) | `TITLE-ABS(("Virtual Reality" OR "VR" OR "HMD" OR "head-mounted display" OR "head mounted display" OR "Virtual Environment*" OR "immersive virtual") AND ("Avatar" OR "Body" OR "Embodiment") AND ("Size" OR "Scale" OR "Height" OR "Distance"))` | TITLE-ABS | なし(view=COMPLETE) | 2026-07-30 | **2,542** ✅ |
 | ACM DL(第2波・title検索) | Rev.6 改訂クエリを `Title:` 指定で実行 | Title のみ | 出版年でスライス(下表) | 2026-08-02〜03 | **6,012**(UI表示) / 取得 6,013 |
 | ACM DL(第2波・abstract検索) | Rev.6 改訂クエリを `Abstract:` 指定で実行 | Abstract のみ | 出版年でスライス(下表) | 2026-08-02〜03 | **8,328**(UI表示) / 取得 8,331 |
-| IEEE Xplore(第2波) | — | `"Document Title":` / `"Abstract":` | — | 未実施 | 379(UI表示のみ、エクスポート待ち) |
+| IEEE Xplore(第2波) | **要著者確認**(Command Search の構文を verbatim で記録すること) | `"Document Title":` / `"Abstract":`(**要著者確認**) | **要著者確認** | 2026-08-10 | **361**(取得・ユニーク) ✅ |
 
 > **ACM は Title 検索と Abstract 検索の和集合**(Rev.9 時点の決定、`search_replication.md` §1)。
 > **代償: フィールド横断の一致(例: G1 はタイトル・G2 は要旨にのみ出現)を取りこぼす。**
@@ -85,6 +97,22 @@ AND ("Size" OR "Scale" OR "Height" OR "Distance")
 >
 > 取得件数が UI 表示をわずかに上回るのは、エクスポートが数日にまたがったことによる索引の自然増。
 > 不足ではないため許容する。**和集合のユニークは 9,630件**(`raw/acm_wave2_20260803.csv`)。
+
+> **IEEE 第2波の取得メモ(2026-08-10):** 100件単位の分割エクスポート5本(`raw/IEEE2/*.bib`)を
+> `scripts/merge_bib.py` で統合 → 全370件 / **ユニーク361件**(スライス間重複9件を除去)。
+> Zotero 経由の CSV は**二重取り込みで670行**あったため、DOI優先・正規化タイトル代替の
+> キーで重複309行を除去して `raw/ieee_wave2_20260810.csv`(361行)とした。
+> Abstract 充足率 100% / DOI 99.4%。bib とのキー集合は一致(DOI欠損2件はタイトル表記差のみ)。
+>
+> **【Rev.11 で確定】ヒット数は 361件が正。** 2026-08-01 時点の UI 表示値 **379件** は
+> **誤りとして扱う**(著者確認済み)。当該値は ACM の「81件」が構文エラーと判明したのと
+> 同じセッションで記録されたものであり、信頼性が低い(`PROGRESS_LOG.md` 2026-08-01)。
+> 379 は経緯としてのみ保存し、PRISMA の "records identified" には **361** を用いる。
+>
+> **重要(Threats 行き):** 第1波IEEE(1,276+297)のうち **1,077件が第2波に現れない**。
+> これらは TA で3群が成立するのが **4.7%** にすぎず(第2波に残った322件は 91.0% が成立)、
+> **第1波IEEE がより広いフィールドscope(All Metadata 等)で実行されていた**ことの実測証拠である。
+> 第2波の TA 準拠が正しい挙動。「Fields searched = 要著者確認」だった項目への回答でもある。
 
 ### ACM 第2波のスライス内訳(エクスポート上限1,000件への対応)
 

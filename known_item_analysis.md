@@ -1,17 +1,17 @@
 # Known-Item 脱落分析レポート
 
-> `scripts/known_item_test.py` による自動生成(2026-08-10)。
-> Known-Item 13 件。判定は全て決定論的(DOI/正規化タイトル一致)。
+> `scripts/known_item_test.py` による自動生成(2026-08-12)。
+> Known-Item 12 件。判定は全て決定論的(DOI/正規化タイトル一致)。
 > FUZZY 候補は手動確認が必要であり、recall には算入していない。
 
 ## 段階別 recall
 
 | 段階 | 内容 | 生存 | recall |
 |---|---|---|---|
-| step0 | 統合生データ(検索式で拾えたか) | 9/13 | 69.2% |
-| step1 | 重複削除後 | 9/13 | 69.2% |
-| step2 | Venueランク通過後 | 3/13 | 23.1% |
-| step3 | キーワード除外通過後(最終候補) | 3/13 | 23.1% |
+| step0 | 統合生データ(検索式で拾えたか) | 8/12 | 66.7% |
+| step1 | 重複削除後 | 8/12 | 66.7% |
+| step2 | Venueランク通過後 | 3/12 | 25.0% |
+| step3 | キーワード除外通過後(最終候補) | 3/12 | 25.0% |
 
 ## step0 脱落 — 検索式の欠陥
 
@@ -61,22 +61,16 @@
 
 ## step2 脱落 — Venue ホワイトリストの欠陥
 
-### The Sense of Embodiment in Virtual Reality
-
-- 脱落理由: CORE Rank 'C' (< A) のため除外 (venue: 'Presence' → 照合先: 'Annual International Workshop on Presence')
-- ランキングリスト内に類似Venueなし(CORE lev≥0.75 / SJR lev≥0.85 の範囲で候補ゼロ)。`outputs/unmatched_venues_top50.csv` も参照。
-
 ### Distortion in Perceived Size and Body-Based Scaling in Virtual Environments
 
-- 脱落理由: Venue名 'ACM International Conference Proceeding Series' が CORE/SJR いずれにも未照合
+- 脱落理由: Venue名 'Proceedings of the 8th Augmented Human International Conference' が CORE/SJR いずれにも未照合
 - ランキングリスト内に類似Venueなし(CORE lev≥0.75 / SJR lev≥0.85 の範囲で候補ゼロ)。`outputs/unmatched_venues_top50.csv` も参照。
 - 注記: ランク不足ではなく**照合漏れ**。類似Venueが提示されている場合は表記ゆれであり、正規化ルールまたはエイリアス表への追加で救済可能。類似Venueなしの場合は当該Venueがランキングリスト自体に未収載(ワークショップ等)であり、除外維持が妥当かを個別判断する。
 
 ### The influence of eye height and avatars on egocentric distance estimates in immersive virtual environments
 
-- 脱落理由: Venue名 'Proceedings - APGV 2011: ACM SIGGRAPH Symposium on Applied Perception in Graphics and Visualization' が CORE/SJR いずれにも未照合
+- 脱落理由: CORE Rank 'B' (< A) のため除外 (venue: 'Proceedings of the ACM SIGGRAPH Symposium on Applied Perception in Graphics and Visualization' → 照合先: 'ACM Symposium on Applied Perception')
 - ランキングリスト内に類似Venueなし(CORE lev≥0.75 / SJR lev≥0.85 の範囲で候補ゼロ)。`outputs/unmatched_venues_top50.csv` も参照。
-- 注記: ランク不足ではなく**照合漏れ**。類似Venueが提示されている場合は表記ゆれであり、正規化ルールまたはエイリアス表への追加で救済可能。類似Venueなしの場合は当該Venueがランキングリスト自体に未収載(ワークショップ等)であり、除外維持が妥当かを個別判断する。
 
 ### Dwarf or Giant: The Influence of Interpupillary Distance and Eye Height on Size Perception in Virtual Environments
 
@@ -85,10 +79,9 @@
 
 ### Does Scaling Player Size Skew One's Ability to Correctly Evaluate Object Sizes in a Virtual Environment?
 
-- 脱落理由: Venue名 'Proceedings - MIG 2020: 13th ACM SIGGRAPH Conference on Motion, Interaction, and Games' が CORE/SJR いずれにも未照合
+- 脱落理由: CORE Rank 'C' (< A) のため除外 (venue: 'Motion, Interaction and Games' → 照合先: 'ACM SIGGRAPH Conference on Motion Interaction and Games')
 - ランキングリスト内の最近傍(表記ゆれ調査):
   - `ACM SIGGRAPH conference on Motion Interaction and Games` [CORE C] (lev=1.000)
-- 注記: ランク不足ではなく**照合漏れ**。類似Venueが提示されている場合は表記ゆれであり、正規化ルールまたはエイリアス表への追加で救済可能。類似Venueなしの場合は当該Venueがランキングリスト自体に未収載(ワークショップ等)であり、除外維持が妥当かを個別判断する。
 
 ### Gulliver's virtual travels: active embodiment in extreme body sizes for modulating our body representations
 

@@ -1,6 +1,6 @@
 ========================================================================
   PRISMA 3-Phase Screening Pipeline
-  Input : ResearchVR3.csv
+  Input : ResearchVR4.csv
   CORE  : C:\Users\is0690vr\SurveyPlot\SurveyProtocol\CORE.csv
 ========================================================================
 
@@ -8,101 +8,120 @@
   PHASE 1: DEDUPLICATION
 ========================================================================
 
-  Input records          :   14,682
+  Input records          :   26,434
   Title column           : 'Title'
   DOI column             : 'DOI'
   Key column             : 'Key'
 
-  Removed by DOI match   :    1,824
+  Removed by DOI match   :    7,384
   Removed by Key match   :        0
-  Removed by Title match :      315
-  Total removed          :    2,139
-  Records after dedup    :   12,543
+  Removed by Title match :      708
+
+  --- Field merge from duplicates (Rev.13) ---
+    Abstract Note         :    4,172 件を重複コピーから補完
+    ISSN                  :    1,474 件を重複コピーから補完
+    DOI                   :        3 件を重複コピーから補完
+  Total removed          :    8,092
+  Records after dedup    :   18,342
 
   Output -> step1_dedup.csv
+
+========================================================================
+  PHASE 1.5: FILTER LAYER (normalized query re-application)
+========================================================================
+
+  Input records   :   18,342
+  Pass (3 groups) :    2,610
+  Hold (要旨なし) :    3,707   ← 判定不能。除外せず人手へ
+  Fail (excluded) :   12,025
+  Records kept    :    6,317
+
+  --- 不成立だった概念群(重複計上) ---
+    G3 スケール知覚           :    8,898
+    G2 身体表象             :    8,734
+    G1 没入環境             :    2,421
+
+  Included output -> step1_5_filter_included.csv
+  Excluded output -> step1_5_filter_excluded.csv
 
 ========================================================================
   PHASE 2: CORE A/A* + SJR Q1 SCREENING
 ========================================================================
 
-  Input records   :   12,543
+  Input records   :    6,317
   Venue column    : 'Publication Title'
-  CORE entries    :    1,955
-  SJR entries     :   50,326
+  CORE entries    :    1,956
+  SJR entries     :   50,327
+  Venue aliases   :       33 keys
 
   --- CORE Rank Distribution ---
-    CORE A*              :    850
-    CORE A               :    123
-    CORE B               :  2,187
-    CORE C               :    262
-    CORE Unranked        :     20
-    CORE Journal Published:     47
-    CORE Australasian C  :      2
-    CORE National:India  :      4
-    CORE National: USA   :     14
-    CORE Multiconference :     12
-    CORE National: Poland:      1
-    CORE National: S. Korea:      2
-    CORE National: India :    118
-    CORE National/Regional:      2
-    CORE National: Pakistan:      1
-    CORE National: China :     15
-    CORE National: UK    :      4
-    CORE Australasian B  :     11
-    CORE unranked: merged:      5
-    CORE National: Romania:      3
+    CORE A*              :    258
+    CORE A               :     48
+    CORE B               :  1,048
+    CORE C               :     63
+    CORE Journal Published:      9
+    CORE Australasian B  :      4
+    CORE unranked: merged:      4
+    CORE National: India :      7
+    CORE National: USA   :      4
+    CORE Multiconference :      9
+    CORE Regional:Scandinavia:      6
+    CORE National: Romania:      1
+    CORE journal published:      3
+    CORE National/Regional:      1
+    CORE Unranked        :      3
+    CORE National: China :      2
     CORE National        :      1
-    CORE Regional:Scandinavia:     14
-    CORE National: japan :      1
-    CORE journal published:      9
 
   --- SJR Quartile Distribution ---
-    SJR  Q1              :  1,936
-    SJR  Q2              :    826
-    SJR  Q3              :    347
-    SJR  Q4              :    265
-    SJR  -               :    295
+    SJR  Q1              :    861
+    SJR  Q2              :    421
+    SJR  Q3              :    168
+    SJR  Q4              :    151
+    SJR  -               :    148
 
-  INCLUDED total         :    2,909
-    CORE A/A*            :      973
-    SJR Q1               :    1,936
-  EXCLUDED total         :    9,634
-    CORE low rank (B/C)  :    2,735
-    SJR Q2/Q3/Q4         :    1,733
-    Unmatched            :    5,166
+  INCLUDED total         :    1,167
+    CORE A/A*            :      181
+    SJR Q1               :      838
+    Alias (high rank)    :      148
+  EXCLUDED total         :    5,150
+    CORE low rank (B/C)  :      310
+    SJR Q2/Q3/Q4         :      860
+    Alias (low rank)     :      883
+    Unmatched            :    3,097
 
   --- Sample Unmatched Venues (first 30) ---
-    2017 IEEE 3rd workshop on everyday virtual reality (WEVR)
-    2021 international conference on culture-oriented science & technology (ICCST)
-    2017 international conference on virtual reality and visualization (ICVRV)
-    2023 21st international conference on emerging eLearning technologies and applications (ICETA)
-    2022 6th scientific school dynamics of complex networks and their applications (DCNA)
-    2023 international conference on computational intelligence and knowledge economy (ICCIKE)
-    2025 IEEE international conference on artificial intelligence and eXtended and virtual reality (AIxVR)
-    2023 IEEE 11th international conference on serious games and applications for health (SeGAH)
-    2015 SAI intelligent systems conference (IntelliSys)
-    2017 39th annual international conference of the IEEE engineering in medicine and biology society (EMBC)
-    2011 IEEE virtual reality conference
-    2019 11th international conference on virtual worlds and games for serious applications (VS-games)
-    2020 IEEE international conference on artificial intelligence and virtual reality (AIVR)
-    2025 international conference on artificial intelligence, computer, data sciences and applications (ACDSA)
-    2019 IEEE international conference on artificial intelligence and virtual reality (AIVR)
-    2023 58th international scientific conference on information, communication and energy systems and technologies (ICEST)
-    2013 23rd international conference on artificial reality and telexistence (ICAT)
-    2023 14th international conference on computing communication and networking technologies (ICCCNT)
-    2025 IEEE 14th global conference on consumer electronics (GCCE)
-    2019 IEEE international conference on artificial intelligence and virtual reality (AIVR)
-    2008 9th international conference on computer-aided industrial design and conceptual design
-    2025 IEEE world haptics conference (WHC)
-    Proceedings of CG international '96
-    2025 IEEE international conference on artificial intelligence and eXtended and virtual reality (AIxVR)
-    2023 IEEE 6th international conference on information systems and computer aided education (ICISCAE)
-    2019 14th IEEE conference on industrial electronics and applications (ICIEA)
-    2024 international russian smart industry conference (SmartIndustryCon)
-    2019 5th experiment international conference (exp.at'19)
-    2016 IEEE symposium on 3D user interfaces (3DUI)
-    2025 international conference on intelligent computing and virtual & augmented reality simulations (ICVARS)
-    ... and 5136 more
+    Proceedings of the 2015 Virtual Reality International Conference
+    Proceedings of the Fifth Biennial African Human-Computer Interaction Conference
+    Adjunct Proceedings of the 2022 Nordic Human-Computer Interaction Conference
+    Companion Proceedings of the 22nd International Conference on Intelligent User Interfaces
+    Proceedings of the 27th International Conference on Multimodal Interaction
+    Proceedings of the 2020 The 2nd World Symposium on Software Engineering
+    2021 4th International Conference on Information Systems and Computer Aided Education
+    Proceedings of the first symposium on Virtual reality modeling language - VRML '95
+    (empty)
+    (empty)
+    Proceedings of the 8th ACM International Conference on PErvasive Technologies Related to Assistive Environments
+    The 24th International Conference on 3D Web Technology
+    Proceedings of the 7th International Conference on PErvasive Technologies Related to Assistive Environments
+    Designing Interactive Systems Conference
+    Proceedings of the 15th ACM SIGGRAPH Conference on Virtual-Reality Continuum and Its Applications in Industry - Volume 1
+    Proceedings of the Virtual Reality International Conference - Laval Virtual
+    SIGGRAPH ASIA 2016 Symposium on Education: Talks
+    Proceedings of the 22nd annual conference on Computer graphics and interactive techniques - SIGGRAPH '95
+    Proceedings of the 4th international conference on Computer graphics, virtual reality, visualisation and interaction in Africa
+    Proceedings of the ACM conference on Hypertext
+    ACM SIGGRAPH 2018 Computer Animation Festival
+    (empty)
+    ACM SIGCSE Bulletin
+    ACM SIGGRAPH 98 Conference abstracts and applications
+    Proceedings of the 2018 ACM Symposium on Eye Tracking Research &amp; Applications
+    Proceedings of the twelfth ACM SIGACT-SIGMOD-SIGART symposium on Principles of database systems - PODS '93
+    2021 4th International Conference on Control and Computer Vision
+    Proceedings of the 24th annual conference on Computer graphics and interactive techniques - SIGGRAPH '97
+    Proceedings of the 2025 2nd International Conference on Virtual Reality, Image and Signal Processing
+    Proceedings of the 13th ACM SIGPLAN International Workshop on Virtual Machines and Intermediate Languages
+    ... and 3067 more
 
   Included output -> step2_rank_included.csv
   Excluded output -> step2_rank_excluded.csv
@@ -111,78 +130,72 @@
   PHASE 3: KEYWORD EXCLUSION
 ========================================================================
 
-  Input records   :    2,909
+  Input records   :    1,167
   Title column    : 'Title'
   Abstract column : 'Abstract Note'
 
-  Included        :    1,827  (62.8 %)
-  Excluded        :    1,082  (37.2 %)
+  Included        :      784  (67.2 %)
+  Excluded        :      383  (32.8 %)
 
   --- By Category ---
-       313  Cat1 [Not VR / Out of Scope]
-        71  Cat2 [Tech / Non-Empirical]
-       765  Cat3 [Clinical / Medical]
+       119  Cat1 [Not VR / Out of Scope]
+        24  Cat2 [Tech / Non-Empirical]
+       263  Cat3 [Clinical / Medical]
 
   --- By Keyword (top hits) ---
   +-- Cat1 [Not VR / Out of Scope]
-  |     162  \baugmented reality\b
-  |     138  \bar\b
-  |      61  \bmixed reality\b
-  |      35  \bmr\b
-  |      22  \bsmartphone\b
-  |      13  \btablet(?:\s+computer)?\b
-  |       6  \b360[- ]?(?:degree[s]?\s+)?video\b
-  |       5  \bflat[- ]screen\b
-  |       4  \bcomputer monitor\b
-  |       3  \bdesktop monitor\b
-  |       3  \bmobile phone\b
-  |       3  \bcave automatic virtual\b
+  |      51  \baugmented reality\b
+  |      50  \bar\b
+  |      25  \bmixed reality\b
+  |      14  \bmr\b
+  |       9  \bsmartphone\b
+  |       6  \btablet(?:\s+computer)?\b
+  |       4  \bflat[- ]screen\b
+  |       2  \bcomputer monitor\b
+  |       2  \b360[- ]?(?:degree[s]?\s+)?video\b
+  |       2  \bmobile phone\b
   |       2  \bcave system\b
-  |       1  \bpanoramic video\b
+  |       1  \bdesktop monitor\b
   |
   +-- Cat2 [Tech / Non-Empirical]
-  |      12  \bpoint\s+cloud\b
-  |      11  \bgpu\b
-  |       9  \breal[- ]?time\s+rendering\b
-  |       6  \brendering\s+(?:algorithm|engine|pipeline|technique|performance)\b
-  |       6  \bsegmentation\s+algorithm\b
-  |       6  \boptimiz(?:ation|ing)\s+algorithm\b
-  |       5  \bframe\s+rate\b
-  |       5  \bsystem\s+architecture\b
-  |       4  \btracking\s+algorithm\b
-  |       4  \bsoftware\s+(?:framework|architecture|library)\b
-  |       2  \bshader\b
-  |       2  \brefresh\s+rate\b
-  |       1  \bdepth\s+camera\b
-  |       1  \btechnical\s+report\b
+  |       4  \breal[- ]?time\s+rendering\b
+  |       4  \bpoint\s+cloud\b
+  |       3  \bframe\s+rate\b
+  |       3  \bsegmentation\s+algorithm\b
+  |       2  \bgpu\b
+  |       2  \bdepth\s+camera\b
+  |       2  \bsystem\s+architecture\b
+  |       1  \brendering\s+(?:algorithm|engine|pipeline|technique|performance)\b
+  |       1  \brefresh\s+rate\b
+  |       1  \boptimiz(?:ation|ing)\s+algorithm\b
+  |       1  \bsoftware\s+(?:framework|architecture|library)\b
   |
   +-- Cat3 [Clinical / Medical]
-  |     539  \bpatient[s]?\b
-  |     287  \brehabilitation\b
-  |      89  \bsurgery\b
-  |      78  \bclinical\s+(?:trial|study|outcome|setting|population)\b
-  |      42  \bphysical\s+therapy\b
-  |      26  \bschizophrenia\b
-  |      22  \bstroke\s+(?:patient|rehabilitation|survivor|recovery)\b
-  |      19  \bexposure\s+therapy\b
-  |      18  \bchronic\s+pain\b
-  |      17  \bcognitive\s+(?:behavioural|behavioral)\s+therapy\b
-  |      17  \bautism\s+spectrum\b
-  |      17  \bpain\s+management\b
-  |      16  \bdementia\b
-  |      15  \bsurgical\s+(?:training|simulation|procedure|planning)\b
-  |      11  \bminimally\s+invasive\b
-  |       9  \bphobia\b
-  |       9  \bneurological\s+(?:disorder|condition|rehabilitation|disease)\b
-  |       8  \balzheimer\b
-  |       7  \bpsychosis\b
-  |       6  \blaparoscop\w+\b
-  |       6  \bptsd\b
-  |       5  \bpain\s+relief\b
-  |       4  \btherapeutic\s+intervention\b
-  |       4  \bpost[- ]traumatic\s+stress\b
+  |     173  \bpatient[s]?\b
+  |      92  \brehabilitation\b
+  |      35  \bsurgery\b
+  |      26  \bclinical\s+(?:trial|study|outcome|setting|population)\b
+  |      13  \bchronic\s+pain\b
+  |      12  \bschizophrenia\b
+  |      11  \bexposure\s+therapy\b
+  |      10  \bpain\s+management\b
+  |       9  \bphysical\s+therapy\b
+  |       9  \bcognitive\s+(?:behavioural|behavioral)\s+therapy\b
+  |       9  \bautism\s+spectrum\b
+  |       8  \bphobia\b
+  |       7  \bdementia\b
+  |       6  \bpsychosis\b
+  |       5  \bstroke\s+(?:patient|rehabilitation|survivor|recovery)\b
+  |       3  \btherapeutic\s+intervention\b
+  |       3  \bminimally\s+invasive\b
+  |       3  \bptsd\b
+  |       3  \bpain\s+relief\b
   |       2  \boccupational\s+therapy\b
-  |       1  \bpsychiatric\s+(?:disorder|treatment|patient)\b
+  |       2  \bsurgical\s+(?:training|simulation|procedure|planning)\b
+  |       2  \blaparoscop\w+\b
+  |       2  \bpost[- ]traumatic\s+stress\b
+  |       2  \balzheimer\b
+  |       2  \bneurological\s+(?:disorder|condition|rehabilitation|disease)\b
   |
 
   --- Silent Patterns (zero hits) ---
@@ -191,13 +204,20 @@
     \bflat panel\b
     \b2d display\b
     \bspherical video\b
+    \bpanoramic video\b
     \bomnidirectional video\b
     \bprojection mapping\b
     \bprojected display\b
+    \bcave automatic virtual\b
     \bcave display\b
   Cat2 [Tech / Non-Empirical]
+    \bshader\b
     \bstereo\s+reconstruction\b
     \bmotion[- ]to[- ]photon\b
+    \btracking\s+algorithm\b
+    \btechnical\s+report\b
+  Cat3 [Clinical / Medical]
+    \bpsychiatric\s+(?:disorder|treatment|patient)\b
 
   Included output -> step3_kw_included.csv
   Excluded output -> step3_kw_excluded.csv
@@ -206,10 +226,11 @@
   PIPELINE SUMMARY
 ========================================================================
 
-  Original records   :   14,682
-  After dedup (P1)   :   12,543  (-2,139)
-  After CORE  (P2)   :    2,909  (-9,634)
-  After keywords (P3):    1,827  (-1,082)
+  Original records   :   26,434
+  After dedup (P1)   :   18,342  (-8,092)
+  After filter (P1.5):    6,317  (-12,025)
+  After CORE  (P2)   :    1,167  (-5,150)
+  After keywords (P3):      784  (-383)
 
   Output files:
     step1_dedup.csv
