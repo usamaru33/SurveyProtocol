@@ -55,7 +55,7 @@
   Venue aliases   :       33 keys
 
   --- CORE Rank Distribution ---
-    CORE A*              :    258
+    CORE A*              :    270
     CORE A               :     48
     CORE B               :  1,048
     CORE C               :     63
@@ -80,15 +80,15 @@
     SJR  Q4              :    151
     SJR  -               :    148
 
-  INCLUDED total         :    1,167
-    CORE A/A*            :      181
+  INCLUDED total         :    1,179
+    CORE A/A*            :      193
     SJR Q1               :      838
     Alias (high rank)    :      148
-  EXCLUDED total         :    5,150
+  EXCLUDED total         :    5,138
     CORE low rank (B/C)  :      310
     SJR Q2/Q3/Q4         :      860
     Alias (low rank)     :      883
-    Unmatched            :    3,097
+    Unmatched            :    3,085
 
   --- Sample Unmatched Venues (first 30) ---
     Proceedings of the 2015 Virtual Reality International Conference
@@ -121,7 +121,7 @@
     Proceedings of the 24th annual conference on Computer graphics and interactive techniques - SIGGRAPH '97
     Proceedings of the 2025 2nd International Conference on Virtual Reality, Image and Signal Processing
     Proceedings of the 13th ACM SIGPLAN International Workshop on Virtual Machines and Intermediate Languages
-    ... and 3067 more
+    ... and 3055 more
 
   Included output -> step2_rank_included.csv
   Excluded output -> step2_rank_excluded.csv
@@ -130,16 +130,16 @@
   PHASE 3: KEYWORD EXCLUSION
 ========================================================================
 
-  Input records   :    1,167
+  Input records   :    1,179
   Title column    : 'Title'
   Abstract column : 'Abstract Note'
 
-  Included        :      784  (67.2 %)
-  Excluded        :      383  (32.8 %)
+  Included        :      795  (67.4 %)
+  Excluded        :      384  (32.6 %)
 
   --- By Category ---
        119  Cat1 [Not VR / Out of Scope]
-        24  Cat2 [Tech / Non-Empirical]
+        25  Cat2 [Tech / Non-Empirical]
        263  Cat3 [Clinical / Medical]
 
   --- By Keyword (top hits) ---
@@ -165,10 +165,10 @@
   |       2  \bgpu\b
   |       2  \bdepth\s+camera\b
   |       2  \bsystem\s+architecture\b
+  |       2  \bsoftware\s+(?:framework|architecture|library)\b
   |       1  \brendering\s+(?:algorithm|engine|pipeline|technique|performance)\b
   |       1  \brefresh\s+rate\b
   |       1  \boptimiz(?:ation|ing)\s+algorithm\b
-  |       1  \bsoftware\s+(?:framework|architecture|library)\b
   |
   +-- Cat3 [Clinical / Medical]
   |     173  \bpatient[s]?\b
@@ -229,8 +229,8 @@
   Original records   :   26,434
   After dedup (P1)   :   18,342  (-8,092)
   After filter (P1.5):    6,317  (-12,025)
-  After CORE  (P2)   :    1,167  (-5,150)
-  After keywords (P3):      784  (-383)
+  After CORE  (P2)   :    1,179  (-5,138)
+  After keywords (P3):      795  (-384)
 
   Output files:
     step1_dedup.csv

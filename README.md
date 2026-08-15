@@ -6,7 +6,7 @@
 > **現行の確定値 (2026-08-12 実行, Rev.13):** 入力 `ResearchVR4.csv`（26,434件 = 3DB × 第1波+第2波）
 >
 > ```
-> 26,434 → 18,342（P1 重複削除）→ 6,317（P1.5 フィルタ層）→ 1,167（P2 Venue）→ 784（P3a キーワード）
+> 26,434 → 18,342（P1 重複削除）→ 6,317（P1.5 フィルタ層）→ 1,179（P2 Venue）→ 795（P3a キーワード）
 > ```
 >
 > **⚠️ 本ドキュメントを読むときの前提（2026-08-12 時点）:**
@@ -174,9 +174,9 @@ SurveyProtocol/
 ├── step1_dedup.csv              # Phase 1 出力: 重複削除済み（18,342件、フィールドマージ済み）
 ├── step1_5_filter_included.csv  # Phase 1.5 出力: フィルタ層 通過（6,317件）
 ├── step1_5_filter_excluded.csv  # Phase 1.5 出力: フィルタ層 除外（12,025件）
-├── step2_rank_included.csv      # Phase 2 出力: 高ランクVenue通過（1,167件）
+├── step2_rank_included.csv      # Phase 2 出力: 高ランクVenue通過（1,179件）
 ├── step2_rank_excluded.csv      # Phase 2 出力: 低ランクVenue除外（9,634件）
-├── step3_kw_included.csv        # Phase 3a 出力: ★最終候補（784件）
+├── step3_kw_included.csv        # Phase 3a 出力: ★最終候補（795件）
 ├── step3_kw_excluded.csv        # Phase 3 出力: キーワード除外（1,082件）
 │
 ├── pipeline_log.txt             # パイプライン実行ログ（詳細・最新値はここ）
@@ -184,7 +184,7 @@ SurveyProtocol/
 ├── .env                         # APIキー（**git管理外**。IEEE / Scopus / Semantic Scholar）
 ├── .env.example                 # 変数名テンプレート（コミット可・値は空）
 ├── venue_aliases.csv            # 著者確認済みVenueエイリアス表（Phase 2 の最優先照合）
-├── self_scale_references.csv    # ★正式 gold set（SearchScope列: in-scope 12件 / background 8件）
+├── self_scale_references.csv    # ★正式 gold set（SearchScope列: in-scope 17件 / background 8件）
 ├── known_items.md               # 拡充用の下書き（現在は有効行0のテンプレート、下記注参照）
 ├── known_item_analysis.md       # ★自動生成: 脱落分析（known_item_test.py が書く）
 ├── README.md                    # このファイル
@@ -357,10 +357,10 @@ recall を過大評価させる要因なので、`SUSPECT` は `HIT` として�
 
 | 分類 | 件数 |
 |---|---|
-| CORE A/A* | 306件 |
+| CORE A/A* | 318件 |
 | SJR Q1 | 838件 |
 | エイリアス経由の通過 | 23件 |
-| **通過合計** | **1,167件** |
+| **通過合計** | **1,179件** |
 | CORE 低ランク（B/C等） | 1,114件 |
 | SJR Q2/Q3/Q4 | 860件 |
 | ランク未判定（Unmatched） | 3,097件 |
@@ -369,7 +369,7 @@ recall を過大評価させる要因なので、`SUSPECT` は `HIT` として�
 > 入力は Phase 1.5 通過分の 6,317件。Rev.12 の正規化改修（種別マーカー・短キーガード・
 > サニティチェック・照合順序の修正）が適用されており、`Match_Stage` 列でどの段で照合したかを追える。
 
-> **Venue フィルタの取りこぼし（Threats に記載必須）:** Known-Item Test の in-scope 12件のうち
+> **Venue フィルタの取りこぼし（Threats に記載必須）:** Known-Item Test の in-scope 17件のうち
 > **5件がこの Phase 2 で脱落**している。Rev.12 の改修で内訳が
 > 「照合漏れ3 / ランク不足1 / 基準どおり1」→ **「照合漏れ1 / ランク不足3 / 基準どおり1」**に変わった。
 > #8 SAP と #13 MIG は「リストに無い」のではなく「正しく照合したうえで CORE B・C だった」ことが
@@ -422,7 +422,7 @@ Title + Abstract Note を結合したテキストに対して正規表現マッ�
 
 | 分類 | 件数 | 割合 |
 |---|---|---|
-| **通過（最終候補）** | **784件** | **67.2%** |
+| **通過（最終候補）** | **795件** | **67.2%** |
 | Cat1 除外（非没入・スコープ外） | 112件 | — |
 | Cat2 除外（技術・非実証） | 24件 | — |
 | Cat3 除外（臨床・医療） | 262件 | — |
@@ -449,11 +449,11 @@ Title + Abstract Note を結合したテキストに対して正規表現マッ�
 ├─ Phase 1.5 フィルタ層 ─────────────── -12,025件
 │   └─ 通過        : 6,317 件    （pass 2,610 / hold 3,707 ＝要旨なしで判定不能）
 │
-├─ Phase 2 学会ランクスクリーニング ──── -5,150件
-│   └─ 高ランク通過: 1,167 件
+├─ Phase 2 学会ランクスクリーニング ──── -5,138件
+│   └─ 高ランク通過: 1,179 件
 │
-└─ Phase 3a キーワード除外 ──────────── -383件
-    └─ 最終候補    : 784 件  ← step3_kw_included.csv（Phase 3b の対象）
+└─ Phase 3a キーワード除外 ──────────── -384件
+    └─ 最終候補    : 795 件  ← step3_kw_included.csv（Phase 3b の対象）
 ```
 
 **DB間重複の内訳（初回分、重複除去の報告用）:**
@@ -462,15 +462,16 @@ PubMed∩Scopus 606 / Scopus∩IEEE 352 / Scopus∩ACM 142 / PubMed∩IEEE 39 / 
 
 ### 検索の網羅性検証（Known-Item Test）
 
-`scripts/known_item_test.py` が gold set（`self_scale_references.csv`、`SearchScope` 列で in-scope 12件）を
+`scripts/known_item_test.py` が gold set（`self_scale_references.csv`、`SearchScope` 列で in-scope 17件）を
 各 step ファイルに突き合わせ、recall を測定して `known_item_analysis.md` を生成する。
 
 | 段階 | 生存 | recall |
 |---|---|---|
-| step0 統合生データ（検索式で拾えたか） | 8/12 | **66.7%** |
-| step1 重複削除後 | 8/12 | 66.7% |
-| step2 Venueランク通過後 | 3/12 | **25.0%** |
-| step3 最終候補 | 3/12 | 25.0% |
+| step0 統合生データ（検索式で拾えたか） | 13/17 | **76.5%** |
+| step1 重複削除後 | 13/17 | 76.5% |
+| step1.5 フィルタ層通過後 | 11/17 | 64.7% |
+| step2 Venueランク通過後 | 5/17 | **29.4%** |
+| step3 最終候補 | 5/17 | 29.4% |
 
 - **step0 で4件脱落（検索式・カバレッジの問題）:** Frontiers in Virtual Reality 3件 =
   DBカバレッジ欠落（同誌はSJR Q1）、Being Barbie 1件 = クエリG1ギャップ
@@ -627,7 +628,7 @@ URL列のドメイン、DOIプレフィックス、Publisher列を優先順位�
 
 ### 8.1 なぜ必要か
 
-Known-Item Test で、in-scope 12件中 **5件が Phase 2 の Venue ホワイトリストで脱落**していることが判明した
+Known-Item Test で、in-scope 17件中 **6件が Phase 2 の Venue ホワイトリストで脱落**していることが判明した
 （`outputs/venue_dropped_known_items.csv`: unmatched 3 / below_rank 2 / criterion 1）。
 これは検索式では捕捉できているのに Venue 基準で落ちる取りこぼしであり、
 検索式の改良（Rev.6 第2波）では解決しない。引用ネットワーク経由の回収がこの残余リスクを緩和する。

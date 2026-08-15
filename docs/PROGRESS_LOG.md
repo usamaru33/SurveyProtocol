@@ -37,7 +37,7 @@
 
 ## 完了していること
 
-### 1. プロトコル（Rev.13 まで確定）
+### 1. プロトコル（Rev.14 まで確定）
 - **DB構成: 3DB（ACM DL / IEEE Xplore / Scopus）**。PubMed は Rev.8 で不使用に確定、PsycINFO はアクセス制約で不使用。
 - **判定に AI/LLM は不使用**（Rev.2）。Phase 3a は決定論的キーワード除外、Phase 3b/4 は人手。
 - **Venue 基準: CORE A*/A のみ + SJR Q1 のみ**（Rev.4）。Q2脱落826件は Threats で報告。
@@ -67,8 +67,8 @@
 26,434 件（ResearchVR4.csv = 3DB × 第1波+第2波）
   → Phase 1   重複削除        : -8,092  → 18,342 件（+ 重複コピーからのフィールドマージ）
   → Phase 1.5 フィルタ層      : -12,025 →  6,317 件（pass 2,610 / hold 3,707）
-  → Phase 2   Venueランク      : -5,150  →  1,167 件
-  → Phase 3a  キーワード除外    : -383    →    784 件（step3_kw_included.csv ★最終候補）
+  → Phase 2   Venueランク      : -5,138  →  1,179 件
+  → Phase 3a  キーワード除外    : -384    →    795 件（step3_kw_included.csv ★最終候補）
 ```
 
 - **2026-08-12 に正規化改修（Rev.12）を適用して公式再実行**。2026-07-17 15:06 以来の凍結を解除した。
@@ -79,11 +79,11 @@
 - Phase 1 で重複コピーから **Abstract 4,172件 / ISSN 1,474件** を補完（外部API不要）。
 - Phase 2 出力に `Match_Stage` / `Match_Guard_Note` を追加（誤照合を可視化する監査列）。
   unmatched 9,066件のうちガード起因は 865件（9.5%）。
-- **Phase 3b の工数は 3名ペア分担で約 523件/人**（784×2÷3）。
+- **Phase 3b の工数は 3名ペア分担で約 530件/人**（795×2÷3）。
 
 ### 4. 検証基盤
-- **Known-Item Test**（`scripts/known_item_test.py`）: gold set = `self_scale_references.csv`（in-scope 12件）。
-  現在 step0 **66.67%**（8/12、目標 ≥80%）→ step2 **25.00%**（Rev.12 再実行後も同値）。
+- **Known-Item Test**（`scripts/known_item_test.py`）: gold set = `self_scale_references.csv`（in-scope 17件、卒論の参考文献から5件を拡充）。
+  現在 step0 **76.47%**（13/17、目標 ≥80%）→ step1.5 64.71% → step2 **29.41%**（Rev.14）。
   **Rev.12 で脱落の性質が変わった**: venue 脱落5件の内訳が「照合漏れ3件」→「照合漏れ1件（#7のみ）/
   ランク不足3件」へ。#8・#13 は正しく照合したうえで CORE B・C だった。脱落分析は `known_item_analysis.md` に自動生成。
 - **エクスポート完全性の監査**（`scripts/export_completeness_audit.py`）: 打ち切り検出・重複・
@@ -121,12 +121,12 @@
 
 ### C. スクリーニング本体
 7. **Phase 3b: Title/Abstract 二重スクリーニング** — 評価者3名のペア分担、各文献を2名が独立評価、
-   ペアごとの Cohen's κ の平均を報告（Rev.9）。工数は **約523件/人**（784件×2÷3）。
+   ペアごとの Cohen's κ の平均を報告（Rev.9）。工数は **約530件/人**（795件×2÷3）。
    - ~~判定シート様式が**未作成**~~ → **作成済み（2026-08-12）**。
      `scripts/make_screening_sheets.py`（生成）/ `scripts/score_screening.py`（κ算出・協議リスト）/
      `docs/screening_protocol.md`（運用手順）。**評価者ごとに別ファイル**にして独立性を担保。
      ブロック割当は決定論的（キーの MD5 mod 3）。**Excel版（.xlsx）も生成済みで記入待ち**
-     （ブロック1 240件 / 2 261件 / 3 283件）
+     （ブロック1 241件 / 2 265件 / 3 289件）
    - キーワードスコアは読む順序のトリアージにのみ使用可。自動除外はしない
    - ~~要旨欠落の扱い~~ → **解決（Rev.13）**。重複コピーからのマージで大幅に回収し、
      残る要旨なしは Phase 1.5 で `hold` として保留（除外しない）。最終784件中の要旨なしは **170件**
@@ -140,7 +140,10 @@
 12. **スノーボーリング実行** — `snowball_search.py` → `outputs/snowballing_log.csv` →
     `picos_decision` 記入。Venue脱落6件の回収が目的。**未実行**
 13. **Venue suspect の目視確認** — 優先度P1 = 91ユニーク/240件（`outputs/venue_suspect_matches.csv`）
-14. **gold set の in-scope 拡充** — 13件 → 15〜25件。1件が recall を7.7%動かす粒度の粗さを解消する
+14. ~~**gold set の in-scope 拡充**~~ → **17件に到達（Rev.14、卒論の参考文献から5件追加）**。
+    目標15〜25件の範囲内。ただし**コーパスに不在の境界事例**（例: Ogawa et al. 2014 IEEE VR
+    「Changing the perceived size of a virtual object by modifying its motion velocity」）の
+    追加は継続課題。拾えた文献だけを gold にすると recall が構造的に高く出る（循環）ため
 15. **ACM Abstract 補完の要否判断** — 検索の網羅性とは別問題と判明したため優先度は低いが、
     Phase 3b で人が要旨を読む以上は必要（第2波ACMは97.6%充足なので対象は第1波分）
 16. **引用数の補完** — S2 API で citationCount 取得。**専用スクリプトは未整備**。

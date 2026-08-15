@@ -76,6 +76,12 @@ FUZZY_THRESHOLD = 0.90  # Levenshtein 類似度の下限(候補提示用)
 # 実測値にもとづく(同一論文の表記差 0.736 / 誤DOIによる別論文 0.330)。
 DOI_TITLE_SUSPECT_THRESHOLD = 0.60
 
+# DOI が一致していて、タイトル差がこの類似度以上なら「単なる誤植」とみなし警告しない。
+# 実測で明確に分離できる(1文字の誤植 0.991 / 副題が違う実際の誤り 0.736 / 別論文 0.330)。
+# 出版社レコード側の誤植(例: IEEE の 'lmmersive'(小文字L)、'characterstics')で
+# 毎回警告が出ると、本物の gold set の誤りが埋もれてしまう。
+TITLE_TYPO_TOLERANCE = 0.95
+
 # 実際に実行された統合検索クエリ(search_strings.md / rule.md Rev.5)の3コンセプト群。
 # step0 脱落分析に使用。※旧版はrule.md計画段階のクエリを使っていたが、実行版に訂正済み。
 QUERY_CONCEPT_GROUPS: list[tuple[str, list[str]]] = [
@@ -103,6 +109,10 @@ def _latest_merged_name() -> str:
 STEPS = [
     ("step0", _latest_merged_name(), "統合生データ(検索式で拾えたか)"),
     ("step1", "step1_dedup.csv", "重複削除後"),
+    # Rev.13 で追加された Phase 1.5(フィルタ層)。この段を STEPS に入れないと、
+    # ここで落ちた文献が「step2 で脱落」と誤って報告される(実際に #24/#25 で発生した)。
+    # 脱落段の帰属は Threats to Validity の記述に直結するので、段を省略してはいけない。
+    ("step1_5", "step1_5_filter_included.csv", "フィルタ層通過後(正規化クエリ再適用)"),
     ("step2", "step2_rank_included.csv", "Venueランク通過後"),
     ("step3", "step3_kw_included.csv", "キーワード除外通過後(最終候補)"),
 ]
@@ -455,7 +465,9 @@ def main() -> None:
             if row is not None:
                 if key == "step0":
                     matched_row_step0 = row
-                    if method == "DOI(表記差)":
+                    if method == "DOI(表記差)" and (
+                            lev_similarity(title_n, norm_title(row.get("Title", "")),
+                                           floor=0.0) or 0) < TITLE_TYPO_TOLERANCE:
                         # 同一論文だが gold set のタイトル表記が実物と違う。
                         # recall には算入するが、gold set の品質問題として必ず表に出す。
                         meta_warnings.append(

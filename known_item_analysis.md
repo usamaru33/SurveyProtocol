@@ -1,17 +1,18 @@
 # Known-Item 脱落分析レポート
 
-> `scripts/known_item_test.py` による自動生成(2026-08-12)。
-> Known-Item 12 件。判定は全て決定論的(DOI/正規化タイトル一致)。
+> `scripts/known_item_test.py` による自動生成(2026-08-15)。
+> Known-Item 17 件。判定は全て決定論的(DOI/正規化タイトル一致)。
 > FUZZY 候補は手動確認が必要であり、recall には算入していない。
 
 ## 段階別 recall
 
 | 段階 | 内容 | 生存 | recall |
 |---|---|---|---|
-| step0 | 統合生データ(検索式で拾えたか) | 8/12 | 66.7% |
-| step1 | 重複削除後 | 8/12 | 66.7% |
-| step2 | Venueランク通過後 | 3/12 | 25.0% |
-| step3 | キーワード除外通過後(最終候補) | 3/12 | 25.0% |
+| step0 | 統合生データ(検索式で拾えたか) | 13/17 | 76.5% |
+| step1 | 重複削除後 | 13/17 | 76.5% |
+| step1_5 | フィルタ層通過後(正規化クエリ再適用) | 11/17 | 64.7% |
+| step2 | Venueランク通過後 | 5/17 | 29.4% |
+| step3 | キーワード除外通過後(最終候補) | 5/17 | 29.4% |
 
 ## step0 脱落 — 検索式の欠陥
 
@@ -59,6 +60,11 @@
 - 提案: 上記 ❌ のコンセプト群に、この論文で使われている同義語を OR 追加して再検索し、ヒット件数の増分を確認する。
 - 注: 実際の検索は Title+Abstract 対象のため、Abstract に命中語がある可能性もある。原文 Abstract を確認のうえ判断すること。
 
+## step1 等での想定外の脱落
+
+- **Impact of virtual self-touch on the embodiment of avatars with different body sizes** — 
+- **The plausibility paradox for scaled-down users in virtual environments** — 
+
 ## step2 脱落 — Venue ホワイトリストの欠陥
 
 ### Distortion in Perceived Size and Body-Based Scaling in Virtual Environments
@@ -88,6 +94,12 @@
 - 脱落理由: SJR 'Q2' のため除外 (venue: 'Cognitive Processing' → 照合先: 'Cognitive Processing')
 - ランキングリスト内に類似Venueなし(CORE lev≥0.75 / SJR lev≥0.85 の範囲で候補ゼロ)。`outputs/unmatched_venues_top50.csv` も参照。
 - 注記: SJR Q2 による除外。採用基準は「Q1のみ」で確定済み(protocol_changelog.md Rev.4)であり、この脱落は**基準どおりの動作**。 Threats to Validity 節で報告する事例として記録する。
+
+### The effect of self-embodiment on distance perception in immersive virtual environments
+
+- 脱落理由: CORE Rank 'B' (< A) のため除外 (venue: 'Proceedings of the 2008 ACM symposium on Virtual reality software and technology' → 照合先: 'ACM Virtual Reality Software and Technology')
+- ランキングリスト内の最近傍(表記ゆれ調査):
+  - `ACM Virtual Reality Software and Technology` [CORE B] (lev=0.830)
 
 ## step3 脱落 — 除外キーワードの誤爆
 
