@@ -27,11 +27,11 @@
 |---|---|---|
 | 対象 | step2 で脱落した Known-Item **5件** | まだ誰も気づいていない主題適合文献 |
 | 手段 | **DOI による直接回収**(下記 §1.1) | citation searching(前方・後方探索) |
-| 探索コスト | **ゼロ**(DOI は既知) | 新規候補 1,433件の人手判定 |
+| 探索コスト | **ゼロ**(DOI は既知) | 新規候補の人手判定(Rev.15 実測 257件) |
 | 判断 | `drop_category` 別の決定論的ルーティング | PICOS による個別判定 |
 
 **要点: 5件は「既知」なのだから、引用探索で釣り上げる対象ではない。**
-DOI が分かっている文献を1,433件の候補を読んで回収するのは手段と目的が逆立ちしている。
+DOI が分かっている文献を、多数の候補を読んで回収するのは手段と目的が逆立ちしている。
 citation searching が本来担うのは (B) — venue フィルタが落とした**未知の**文献の発見であり、
 5件はその探索の**シード**であって回収**対象**ではない。
 
@@ -75,7 +75,8 @@ citation searching は使わない。判断と理由は PROGRESS_LOG.md に記�
 
 ### 1.2 シードの性質による扱いの差(2026-08-10 実測にもとづく)
 
-1ホップ実行(2026-08-10、`outputs/snowballing_log.csv` 1,854行 / 新規1,433件)を
+**改修前**の1ホップ実行(2026-08-10、1,854行 / 新規1,433件。旧ログは
+`outputs/snowballing_log_pre20260810.csv`)を
 シード別に集計すると、**主題シードと定義シードで効率が2桁違う**ことが分かった。
 「G3語(size/scale/height/distance)を含む率」は主題適合性の決定論的な代理指標である。
 
@@ -122,7 +123,7 @@ citation searching は使わない。判断と理由は PROGRESS_LOG.md に記�
 **方針まとめ:**
 - **主題シード5件(#7/#8/#10/#13/#14)は前方・後方とも全件を読む。** 計185件、密度18〜59%。
 - **#3 は後方のみ**(65件)。
-- 人手判定の対象は **1,433件 → 約245件**に圧縮される。
+- 人手判定の対象は **1,433件 → 257件**に圧縮された(Rev.15 実測)。
 - **PRISMA-S に逸脱として明記する**: 「シード1件(定義典拠論文)については前方探索を実施していない。
   理由は被引用が主題非依存であり、実測で1,188件中の主題適合が2件であったため」。
 
@@ -201,10 +202,10 @@ flowchart TB
 
     subgraph R["Identification of studies via other methods"]
         R1["Seed set<br/>Venueフィルタで脱落した known-item 5<br/>+ 定義シード #3(後方のみ)<br/>n = 5 + 1"]
-        R2["Records identified via citation searching<br/>backward 173 + forward 1,681<br/>ユニーク n = 1,854"]
-        R3["Records already identified in database search<br/>右カラムに二重計上しない<br/>n = 421"]
-        R4["New records via citation searching<br/>n = 1,433<br/>うち DOI 欠落 139 は手作業で同定"]
-        R5["Records screened on title/abstract<br/>Phase 3b と同一基準<br/>n = 1,433"]
+        R2["Records identified via citation searching<br/>backward 182 + forward 293<br/>n = 475"]
+        R3["Records already identified in database search<br/>右カラムに二重計上しない<br/>n = 158 (+ シード間重複 30)"]
+        R4["New records via citation searching<br/>n = 285<br/>うちタイトル取得不能 3 は手作業で同定"]
+        R5["Records excluded by keyword rules (Phase 3a)<br/>n = 28<br/>→ Records screened on title/abstract<br/>Phase 3b と同一基準<br/>n = 257"]
         R6["Reports assessed for eligibility<br/>Phase 4・全文<br/>n = TBD"]
         R1 --> R2 --> R3 --> R4 --> R5 --> R6
     end
@@ -218,10 +219,10 @@ flowchart TB
 | 段階 | 定義 | 現在値 |
 |---|---|---|
 | Seed set | Known-Item Test で **Phase 2 の Venue フィルタにより脱落**した in-scope 文献(5)+ 定義シード #3(後方専用、§1.3) | 5 + 1 |
-| Records identified | シードの前方(被引用)・後方(参考文献)を1ホップ探索して得た文献。DOI優先・正規化タイトル代替で一意化 | 1,854 |
-| うち重複 | 既存コーパス(`raw/*.csv` + `step3_kw_included.csv`)に既出。**左カラムで同定済みなので右では数えない** | 421 |
-| New records | 右カラムの "Records identified via citation searching" として報告する数 | **1,433** |
-| Screened | Phase 3b と**同一の**適格性基準で Title/Abstract 判定 | 1,433 |
+| Records identified | シードの前方(被引用)・後方(参考文献)を1ホップ探索して得た文献。DOI優先・正規化タイトル代替で一意化 | 475 |
+| うち重複 | 既存コーパスに既出 158 + シード間の重複 30 | 188 |
+| New records | 右カラムの "Records identified via citation searching" として報告する数 | **285** |
+| Screened | Phase 3a 除外 28 を引いて Phase 3b と**同一の**基準で Title/Abstract 判定 | **257** |
 | Assessed | 全文評価(Phase 4)。左カラムと同じ体制・同じ PICOS | TBD |
 
 ### 4.3 ★重要な設計判断: 右カラムに Venue フィルタを適用しない
@@ -233,7 +234,7 @@ flowchart TB
 実際、シード #10(ICAT-EGVE)・#13(MIG)はいずれも低ランク会場で脱落した文献であり、
 Venue フィルタを適用すると自分自身すら通らない。
 
-参考値として、新規1,433件のうち Phase 2 基準を満たすのは **579件**、満たさないのが **824件**。
+参考値(Rev.15 実測)として、判定対象257件のうち Phase 2 基準を満たすのは **92件**、満たさないのが **165件**。
 **この824件こそが本来の回収対象**であり、ここを切ると右カラムを設ける意味が無くなる。
 
 `snowball_search.py` が付与する `venue_rank_note` は**参考情報であり採否には使わない**
@@ -243,6 +244,49 @@ Venue フィルタを適用すると自分自身すら通らない。
 > 学際・ワークショップ会場の主題関連文献が系統的に脱落することが Known-Item Test で判明したため
 > (in-scope 12件中5件)、脱落文献を起点とする citation searching を補完的に実施した。
 > **citation searching で同定した文献には venue フィルタを適用していない**」ことを明記する。
+
+### 4.3b 右カラムに適用する段・しない段(2026-08-16 実行後に確定)
+
+Phase 1.5(フィルタ層)は Rev.13 で新設されたため §4.3 執筆時には存在しなかった。
+実行後の実測をふまえ、右カラムに何を適用するかを次のとおり確定する。
+
+| 段 | 右カラムへの適用 | 理由 |
+|---|---|---|
+| Phase 1.5 フィルタ層 | **適用しない** | 目的が「DB間の検索scope差の吸収」であり、DB検索で取得していない文献には吸収すべき差が存在しない。かつ「クエリが取りこぼしたものを拾う」目的に対しクエリを再適用するのは §4.3 と同じ自己矛盾 |
+| Phase 2 Venueランク | **適用しない**(§4.3) | 下記の実測を根拠として確定 |
+| Phase 3a キーワード除外 | **適用する** | PICOS 由来の適格性基準。「検索経路が違うだけで包含基準は緩めない」(§3) |
+| Phase 3b 人手判定 | **適用する** | 下記の注参照 |
+
+**Venue フィルタを適用しないことの実測根拠(2026-08-16):**
+判定対象257件に Phase 2 を適用すると **165件(64%)が消える**が、その内訳は
+
+| 判定 | 件数 |
+|---|---|
+| 通過 | 92 |
+| **未照合** | **88** |
+| **venue名なし** | **49** |
+| ランク不足 | 28 |
+
+であり、**除外の83%(137/165)は品質判断ではなく照合失敗**である。右カラムの venue 文字列は
+Crossref/S2 由来で非正規(`Conscious Cogn` / `J Exp Psychol Hum Percept Perform` のような
+短縮形)であり、Zotero で正規化された左カラムとは**照合の前提が違う**。実際に
+`Science`・`Cognition`・`Experimental Brain Research` といった主要誌が未照合で落ちる。
+さらに落ちる会場には **`Presence` と `ICAT-EGVE`** が含まれるが、これは gold set #3・#10 が
+step2 で脱落した当の会場であり、回収目的を自ら打ち消すことになる。
+
+> **【前例についての正直な注記】** この非対称な運用(DB検索には venue フィルタを適用し、
+> 引用探索には適用しない)について、**明確な前例は文献調査では確認できなかった**。
+> したがってこれは「標準手法だから」ではなく、**上記の実測を根拠に本レビューが立てた判断**である。
+> 成立の前提は「**venue 制限は検索スコープの定義であって適格性基準ではない**」という位置づけであり、
+> これを `rule.md` に明記し、PRISMA-S に逸脱として記載し、本文では
+> **最終的に採択された文献が2つの異なる品質レジームから来ること**を明示する(§4.6)。
+
+> **【Phase 3b を設ける理由】** PRISMA 2020 の公式フロー図では、右カラムに
+> Title/Abstract スクリーニングの箱が無く、**identification から全文評価へ直行する**想定である
+> (引用探索は通常「参考文献リストを人が読んで拾う」作業で、その時点で人手フィルタが効いているため)。
+> 本レビューの右カラムは `snowball_search.py` による機械生成で人手フィルタを経ていないため、
+> この想定が当てはまらない。**規定より慎重に** Title/Abstract 段を設ける
+> (257件をいきなり全文評価するより工数も少ない)。
 
 ### 4.4 計上ルール
 

@@ -37,7 +37,7 @@
 
 ## 完了していること
 
-### 1. プロトコル（Rev.14 まで確定）
+### 1. プロトコル（Rev.15 まで確定）
 - **DB構成: 3DB（ACM DL / IEEE Xplore / Scopus）**。PubMed は Rev.8 で不使用に確定、PsycINFO はアクセス制約で不使用。
 - **判定に AI/LLM は不使用**（Rev.2）。Phase 3a は決定論的キーワード除外、Phase 3b/4 は人手。
 - **Venue 基準: CORE A*/A のみ + SJR Q1 のみ**（Rev.4）。Q2脱落826件は Threats で報告。
@@ -79,7 +79,8 @@
 - Phase 1 で重複コピーから **Abstract 4,172件 / ISSN 1,474件** を補完（外部API不要）。
 - Phase 2 出力に `Match_Stage` / `Match_Guard_Note` を追加（誤照合を可視化する監査列）。
   unmatched 9,066件のうちガード起因は 865件（9.5%）。
-- **Phase 3b の工数は 3名ペア分担で約 530件/人**（795×2÷3）。
+- **Phase 3b の判定対象は 1,052件**（DB検索795 + 引用探索257）。3名ペア分担で **約701件/人**。
+  引用探索分には venue フィルタとフィルタ層を適用していない（`snowballing_protocol.md` §4.3b）。
 
 ### 4. 検証基盤
 - **Known-Item Test**（`scripts/known_item_test.py`）: gold set = `self_scale_references.csv`（in-scope 17件、卒論の参考文献から5件を拡充）。
@@ -96,7 +97,7 @@
 ### 5. API 検索の自動化
 - `scripts/db_search_scopus.py`（**稼働中**）/ `scripts/db_search_ieee.py`（403 で停止中）/
   `scripts/api_search_common.py`（クエリ生成・polite_get・RIS出力・.env読み込み）。
-- `scripts/snowball_search.py`（S2 引用探索、**1ホップ実行済み** 1,854行/新規1,433件。列追加のため要再実行）、`scripts/enrich_abstracts.py`（Abstract補完、少数件試験のみ）。
+- `scripts/snowball_search.py`（S2 引用探索、**Rev.15 で再実行済み** 475行/新規317件→判定対象257件）、`scripts/enrich_abstracts.py`（Abstract補完、少数件試験のみ）。
 
 ### 6. 関連ツール `../docs-system`（Next.js、別リポジトリ相当）
 - Semantic Scholar 検索 → 引用ネットワーク可視化（D3）→ Supabase + R2。**サーベイ本体とは未接続。**
@@ -121,12 +122,12 @@
 
 ### C. スクリーニング本体
 7. **Phase 3b: Title/Abstract 二重スクリーニング** — 評価者3名のペア分担、各文献を2名が独立評価、
-   ペアごとの Cohen's κ の平均を報告（Rev.9）。工数は **約530件/人**（795件×2÷3）。
+   ペアごとの Cohen's κ の平均を報告（Rev.9）。工数は **約701件/人**（1,052件×2÷3）。
    - ~~判定シート様式が**未作成**~~ → **作成済み（2026-08-12）**。
      `scripts/make_screening_sheets.py`（生成）/ `scripts/score_screening.py`（κ算出・協議リスト）/
      `docs/screening_protocol.md`（運用手順）。**評価者ごとに別ファイル**にして独立性を担保。
      ブロック割当は決定論的（キーの MD5 mod 3）。**Excel版（.xlsx）も生成済みで記入待ち**
-     （ブロック1 241件 / 2 265件 / 3 289件）
+     （ブロック1 325件 / 2 356件 / 3 371件）
    - キーワードスコアは読む順序のトリアージにのみ使用可。自動除外はしない
    - ~~要旨欠落の扱い~~ → **解決（Rev.13）**。重複コピーからのマージで大幅に回収し、
      残る要旨なしは Phase 1.5 で `hold` として保留（除外しない）。最終784件中の要旨なしは **170件**
@@ -137,8 +138,9 @@
 11. **PRISMA フロー図の作成**、`rule.md` 冒頭の「○○件」の確定値への置換
 
 ### D. 補助タスク（並行可能）
-12. **スノーボーリング実行** — `snowball_search.py` → `outputs/snowballing_log.csv` →
-    `picos_decision` 記入。Venue脱落6件の回収が目的。**未実行**
+12. ~~**スノーボーリング実行**~~ → **実行済み（Rev.15、2026-08-16）**。475行→新規317件→
+    判定対象257件。判定は Phase 3b の判定シートに統合したため `picos_decision` 列は未使用。
+    残: タイトル取得不能3件の手作業同定（`snowballing_protocol.md` §4.4）
 13. **Venue suspect の目視確認** — 優先度P1 = 91ユニーク/240件（`outputs/venue_suspect_matches.csv`）
 14. ~~**gold set の in-scope 拡充**~~ → **17件に到達（Rev.14、卒論の参考文献から5件追加）**。
     目標15〜25件の範囲内。ただし**コーパスに不在の境界事例**（例: Ogawa et al. 2014 IEEE VR
