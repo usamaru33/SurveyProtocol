@@ -87,7 +87,7 @@ KW_GROUPS = {
 }
 
 SHEET_COLS = [
-    "record_id", "block", "source", "kw_groups", "has_abstract",
+    "record_id", "block", "source", "kw_groups", "has_abstract", "abstract_source",
     "title", "abstract", "venue", "year", "doi", "rank",
     "decision", "reason", "note",
 ]
@@ -181,6 +181,25 @@ def load_snowball(path: Path, exclusions) -> list[dict]:
     return out
 
 
+def load_abstract_cache(path: Path) -> dict[str, str]:
+    """`enrich_screening_abstracts.py` が作った要旨キャッシュ(DOI → 要旨)。
+
+    **この要旨は人手判定の材料としてのみ使う。** Phase 1.5(フィルタ層)や Phase 3a
+    (キーワード除外)を再適用してはならない。理由は enrich_screening_abstracts.py の
+    ヘッダを参照(要約: 既に「判定不能なので人手に委ねる」と決めたレコードについて、
+    検索が見ていない外部データで自動除外を発動させることになるため)。
+    """
+    if not path.exists():
+        return {}
+    out = {}
+    with path.open(encoding="utf-8-sig", newline="", errors="replace") as f:
+        for r in csv.DictReader(f):
+            a = (r.get("abstract") or "").strip()
+            if a and r.get("doi"):
+                out[r["doi"]] = a
+    return out
+
+
 def rank_label(row: dict) -> str:
     src = row.get("Ranking_Source", "") or ""
     if src.startswith("CORE"):
@@ -201,6 +220,9 @@ def main() -> None:
                     help="引用探索の結果(PRISMA 右カラム)。--no-snowball で無効化")
     ap.add_argument("--no-snowball", action="store_true",
                     help="引用探索分を含めない(左カラムのみで生成する)")
+    ap.add_argument("--abstract-cache", type=Path,
+                    default=ROOT / "outputs" / "enriched_abstracts.csv",
+                    help="DOI から補完した要旨のキャッシュ(人手判定の材料としてのみ使う)")
     ap.add_argument("--outdir", type=Path, default=ROOT / "screening")
     ap.add_argument("--dry-run", action="store_true", help="件数だけ表示して書き込まない")
     args = ap.parse_args()
@@ -214,6 +236,10 @@ def main() -> None:
         sys.exit(f"[ERROR] {args.input.name} が空です")
 
     print(f"[INFO] 入力: {args.input.name}  {len(rows):,} 件(左カラム=DB検索)")
+    abs_cache = load_abstract_cache(args.abstract_cache)
+    if abs_cache:
+        print(f"[INFO] 要旨キャッシュ: {len(abs_cache):,} 件を読み込み"
+              f"({args.abstract_cache.name})")
     if not args.no_snowball:
         rows = rows + load_snowball(args.snowball,
                                     compile_exclusions(EXCLUSION_CATEGORIES))
@@ -236,6 +262,11 @@ def main() -> None:
         a, b = BLOCK_PAIRS[blk]
         title = (row.get("Title") or "").strip()
         abstract = (row.get("Abstract Note") or "").strip()
+        abs_src = "database" if abstract else "none"
+        if not abstract:
+            enriched = abs_cache.get(norm_doi(row.get("DOI", "")))
+            if enriched:
+                abstract, abs_src = enriched, "enriched"
 
         assignment.append({
             "record_id": rid,
@@ -251,6 +282,7 @@ def main() -> None:
             "record_id": rid,
             "block": blk + 1,
             "source": "snowballing" if row.get("__source__") == "snowballing" else "database",
+            "abstract_source": abs_src,
             "kw_groups": kw_group_count(title, abstract),
             "has_abstract": "Y" if abstract else "N",
             "title": title,
@@ -297,6 +329,13 @@ def main() -> None:
     no_abs_ids = {r["record_id"] for lst in per_reviewer.values()
                   for r in lst if r["has_abstract"] == "N"}
     total_no_abs = len(no_abs_ids)
+    enriched_ids = {r["record_id"] for lst in per_reviewer.values()
+                    for r in lst if r["abstract_source"] == "enriched"}
+    if enriched_ids:
+        print(f"\n[INFO] 要旨を DOI から補完したもの: {len(enriched_ids):,} 件"
+              f"(`abstract_source=enriched` 列で識別できる)")
+        print("       ★ この要旨は**人手判定の材料としてのみ**使う。"
+              "Phase 1.5 / Phase 3a を再適用してはならない")
     print(f"\n[WARN] Abstract が無い文献 {total_no_abs:,} 件 "
           f"({total_no_abs / n * 100:.1f}%) — この文献は**タイトルのみ**での判定になる。")
     print("       `has_abstract=N` 列で識別できる。判定の信頼性が下がるため、")

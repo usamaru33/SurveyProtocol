@@ -162,6 +162,7 @@ SurveyProtocol/
 │   ├── db_search_ieee.py        # IEEE Xplore API 検索（第2波。※要 IEEE_API_KEY）
 │   ├── db_search_scopus.py      # Scopus API 検索（第2波）
 │   ├── snowball_search.py       # ★ スノーボーリング（引用探索）→ §8
+│   ├── enrich_screening_abstracts.py  # ★ 判定対象の要旨を DOI から補完（Rev.16）
 │   ├── enrich_abstracts.py      # Crossref→S2 で Abstract 補完（DOIベース）
 │   ├── export_completeness_audit.py  # ★エクスポートの打ち切り・欠落検出（§4.1）
 │   ├── merge_raw.py             # ★raw/*.csv → 統合生データ生成（Source_DB 付与・PubMed除外）
@@ -169,6 +170,7 @@ SurveyProtocol/
 │   ├── known_item_test.py       # Known-Item Test（recall測定 → known_item_analysis.md）
 │   └── *_audit.py               # Venue照合・正規化衝突・PubMed固有件数などの監査
 ├── outputs/                     # 上記スクリプトの出力（監査CSV・実行ログ）
+│   ├── enriched_abstracts.csv   # ★ DOI から補完した要旨のキャッシュ（人手判定の材料専用）
 │   ├── snowballing_log.csv      # スノーボーリング結果（17列。判定は判定シートに統合）
 │   └── snowballing_log_pre20260810.csv  # 旧12列版（Rev.10 改修前。経緯として保存）
 │
@@ -480,7 +482,13 @@ Title + Abstract Note を結合したテキストに対して正規表現マッ�
 | **合計** | **1,052** |
 
 3名ペア分担で **約701件/人**（総判定 2,104）。判定シートは `screening/`（§10）。
-要旨欠落は **325件（30.9%）**＝左170 + 右155。
+要旨欠落は **191件（18.2%）**＝左63 + 右128（Rev.16 で DOI から134件を外部補完した結果）。
+
+> **補完した要旨で自動除外を掛け直していない。** 補完は人手判定を助けるためのもので、
+> 既に「判定不能なので人手に委ねる」と決めたレコードの扱いを機械側に巻き戻さない。
+> 理由は `docs/protocol_changelog.md` Rev.16（要約: PRISMA 2020 は自動ツールによる除外を
+> スクリーニングの手前に置き人手除外と分けて報告することを求めており、補完後の再適用は
+> 検索が一度も見ていないテキストで自動除外を発動させることになる）。
 
 **DB間重複の内訳（初回分、重複除去の報告用）:**
 PubMed∩Scopus 606 / Scopus∩IEEE 352 / Scopus∩ACM 142 / PubMed∩IEEE 39 / ACM∩IEEE 0 / ACM∩PubMed 0
