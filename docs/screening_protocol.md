@@ -200,3 +200,56 @@ PRISMA / 本文に載せるため、以下を `score_screening.py` の出力か�
 - `kw_groups` によるトリアージは読む順序を変えるだけで、判定対象は全件のまま。
   **順序が判定に与える影響（先に読んだものほど厳しく/甘くなる等）は統制していない。**
   これも Threats の候補
+
+---
+
+## 7. 記入見本（配布時に一緒に渡す）
+
+評価者に判定シートを配るとき、**記入の仕方を示す見本**を一緒に渡す。
+
+```bash
+python -X utf8 scripts/make_screening_example.py
+```
+
+出力: `screening/EXAMPLE_記入見本.xlsx`（全員に同じものを配る）
+
+5件の例で次を示している。
+
+| ID | 判定 | 示している論点 |
+|---|---|---|
+| EXAMPLE-1 | Include | 典型例。理由欄は Include なら空でよい |
+| EXAMPLE-2 | Exclude | `P: 患者・外科医で健常成人でない` — **基準名で書く** |
+| EXAMPLE-3 | Exclude | `I: デスクトップモニタで HMD でない` — 実験は良質でも I 基準で落ちる |
+| EXAMPLE-4 | Exclude | `S: ユーザー実験による評価が無い` — 技術提案・デモ |
+| EXAMPLE-5 | Unsure | 迷ったら無理に二択にしない |
+
+各行の `note` 列に「なぜそう書いたか」の解説を入れてある。
+「はじめに」シートには PICOS の要約と、いちばん大事な原則
+（**除外できると確信できないものは残す** — この段階の誤除外は回復不能）を書いた。
+
+### ★ 見本が判定対象を汚染しない設計
+
+見本の素材は**すべて判定対象1,052件の外**から採る。
+
+- **Phase 3a で機械的に除外済み**の文献（`step3_kw_excluded.csv`）
+  … 除外理由が決定論的に記録済みなので、それを転記するだけで済む
+- **gold set のうち判定対象に含まれないもの**
+  … 著者が既に分類済みなので、新たな判定を伴わない
+
+つまり見本の判定は**新しい判断ではなく既存の記録の転記**である。`record_id` は
+`EXAMPLE-n` とし、`assignment.csv` に載らないため `score_screening.py` の集計からも
+構造的に除外される。スクリプトには**汚染チェック**を組み込んであり、見本の DOI が
+判定対象に含まれていればエラーで停止する。
+
+> **配布前に著者が内容を確認すること。** 見本の判定・理由は形式を示すためのものだが、
+> 配布時には「著者の判断」として提示される。表現が意図と違えば
+> `scripts/make_screening_example.py` の `EXAMPLES` を編集して作り直す。
+
+### 配布物
+
+```
+screening/EXAMPLE_記入見本.xlsx   ← 全員に配る
+screening/sheet_kataoka.xlsx      ← Kataoka（164件）
+screening/sheet_watanabe.xlsx     ← WATANABE（164件）
+screening/sheet_author.xlsx       ← 著者（1,052件）
+```
