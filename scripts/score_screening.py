@@ -334,7 +334,12 @@ def main() -> None:
     # --- 4. 最終判定(協議が埋まっていれば) --------------------------------
     unresolved = [r for r in worklist
                   if (r.get("final_decision") or "").strip().lower() not in VALID]
-    if worklist and unresolved:
+    if not agreed and not worklist:
+        # 誰も記入していない状態。ここで空の final_decisions.csv を書くと
+        # 「スクリーニングが完了して0件だった」と誤解されるので生成しない。
+        print("\n  [INFO] 判定が1件も記入されていないため "
+              "final_decisions.csv は生成しない。")
+    elif worklist and unresolved:
         print(f"\n  [INFO] 未解決の協議 {len(unresolved):,} 件があるため "
               f"final_decisions.csv は生成しない。")
     else:
