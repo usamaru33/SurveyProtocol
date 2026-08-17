@@ -84,6 +84,7 @@ COLUMNS = [
     ("rank",         "ランク",           11, False, False),
     ("has_abstract", "要旨有無",          9, False, False),
     ("source",       "取得経路",         12, False, False),
+    ("calibration",  "校正セット",       11, False, False),
     ("abstract_source", "要旨の出所",    12, False, False),
     ("kw_groups",    "概念群",            8, False, False),
     ("doi",          "DOI",              26, False, False),
@@ -100,6 +101,9 @@ HEADER_HELP = {
     "取得経路": "database = データベース検索で見つけたもの\n"
                 "snowballing = 引用探索(参考文献・被引用)で見つけたもの\n"
                 "判定基準はどちらも同じです。PRISMA の報告で区別するための記録です。",
+    "校正セット": "Y = 3名全員が判定する校正セット(評価者間一致度 κ の算出に使う)\n"
+                  "N = 著者がまず判定し、Exclude になったものだけ第2評価者が確認する\n"
+                  "※ 判定基準はどちらも同じです。",
     "要旨の出所": "database = 検索結果に元から含まれていた要旨\n"
                   "enriched = 要旨が無かったため DOI から外部で補完したもの\n"
                   "none = 要旨を取得できず、タイトルのみで判断することになる\n"
@@ -268,6 +272,8 @@ def build_sheet(ws, rows: list[dict]) -> None:
 def main() -> None:
     ap = argparse.ArgumentParser(description="Phase 3b 判定シートの Excel 版を生成")
     ap.add_argument("--dir", type=Path, default=ROOT / "screening")
+    ap.add_argument("--prefix", type=str, default="",
+                    help="シート名の接頭辞(stage2_ など)")
     ap.add_argument("--only", type=str, default="",
                     help="特定の評価者だけ生成(author / kataoka / watanabe)")
     ap.add_argument("--force", action="store_true",
@@ -278,8 +284,8 @@ def main() -> None:
     for rev in targets:
         if rev not in REVIEWERS:
             sys.exit(f"[ERROR] 未知の評価者: {rev}(有効: {', '.join(REVIEWERS)})")
-        src = args.dir / f"sheet_{rev}.csv"
-        dst = args.dir / f"sheet_{rev}.xlsx"
+        src = args.dir / f"{args.prefix}sheet_{rev}.csv"
+        dst = args.dir / f"{args.prefix}sheet_{rev}.xlsx"
         if not src.exists():
             print(f"[SKIP] {src.name} が無い。先に make_screening_sheets.py を実行すること")
             continue

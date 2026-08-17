@@ -17,19 +17,25 @@ make_screening_sheets.py — Phase 3b(Title/Abstract 二重スクリーニング
   - 他の評価者の判定列は存在しない
 統合と κ 算出は `score_screening.py` が、全員の記入完了後に行う。
 
-【体制(protocol_changelog.md Rev.9)】
-評価者3名のペア分担。文献集合を3ブロックに分け、各ブロックを異なるペアに割り当てる。
-各文献は必ず2名が独立に評価する。全員が全件を見る設計ではないため Fleiss' κ は用いず、
-**ペアごとの Cohen's κ とその平均**を報告する。
+【体制(protocol_changelog.md Rev.17): liberal accelerated】
+「**1人が Include にすれば通す。Exclude するには2人必要**」。
 
-  ブロック1 → 著者 × Kataoka
-  ブロック2 → 著者 × WATANABE
-  ブロック3 → Kataoka × WATANABE
+  stage 1  著者が全件を判定 + 校正セット(15%)は3名全員が判定
+  stage 2  著者が Exclude / Unsure にしたものだけ第2評価者が確認
+           (`make_screening_stage2.py` で生成)
 
-【ブロック割当の決定論性】
-割当は「文献キー(DOI 優先・正規化タイトル代替)の MD5 を 3 で割った余り」で決める。
-乱数を使わないので**誰がいつ実行しても同じ割当**になり、コーパスが多少変わっても
-既存文献の割当は動かない(再実行時に判定済みの作業が無駄にならない)。
+Phase 3b のエラーは非対称で、誤 Exclude は回復不能(全文を読む機会が永久に失われる)だが、
+誤 Include は Phase 4 の手間が増えるだけである。**除外の方向にだけ2人を要求する**ことで、
+工数を抑えつつ感度を2人体制と同等に保つ。単独スクリーニングは関連文献の 13% を見落とす
+(2人体制は 3%)という RCT の実測が根拠。
+
+**校正セットが必須**である理由は下の `is_calibration` のコメントを参照
+(除外プールだけでは κ が常に 0 になるため)。
+
+【割当の決定論性】
+校正セットの抽出も第2評価者の振り分けも、文献キー(DOI 優先・正規化タイトル代替)の
+MD5 から決める。乱数を使わないので**誰がいつ実行しても同じ割当**になり、コーパスが
+多少変わっても既存文献の割当は動かない(再実行時に判定済みの作業が無駄にならない)。
 
 【トリアージ列について(重要)】
 `kw_groups` は Rev.6 統合クエリの3概念群が Title+Abstract にいくつ成立するかで、
@@ -38,10 +44,10 @@ make_screening_sheets.py — Phase 3b(Title/Abstract 二重スクリーニング
 **全件を判定する義務は変わらない**。
 
 【出力】
-  screening/assignment.csv         割当の正(record_id・block・ペア・両評価者)
-  screening/sheet_author.csv       著者の判定シート
-  screening/sheet_kataoka.csv      Kataoka の判定シート
-  screening/sheet_watanabe.csv     WATANABE の判定シート
+  screening/assignment.csv         割当の正(record_id・calibration・第2評価者)
+  screening/sheet_author.csv       著者の判定シート(全1,052件)
+  screening/sheet_kataoka.csv      Kataoka の stage 1 シート(校正セットのみ)
+  screening/sheet_watanabe.csv     WATANABE の stage 1 シート(校正セットのみ)
 
 実行:
   python -X utf8 scripts/make_screening_sheets.py
@@ -65,18 +71,49 @@ csv.field_size_limit(10 ** 9)
 
 from pipeline import EXCLUSION_CATEGORIES, compile_exclusions, screen_keywords  # noqa: E402
 
-# --- 評価者体制(Rev.9) -----------------------------------------------------
+# --- 評価者体制 ------------------------------------------------------------
 REVIEWERS = {
     "author":   "著者",
     "kataoka":  "Yuta Kataoka",
     "watanabe": "Ryoichi WATANABE",
 }
-# ブロック番号 → 担当ペア
+SECOND_REVIEWERS = ["kataoka", "watanabe"]   # 除外プールを分担する2名
+
+# 旧 Rev.9 のペア分担(--design pair で使える。既定は liberal)
 BLOCK_PAIRS = {
     0: ("author", "kataoka"),
     1: ("author", "watanabe"),
     2: ("kataoka", "watanabe"),
 }
+
+# --- liberal accelerated(Rev.17) -------------------------------------------
+# 「1人が Include にすれば通す。Exclude するには2人必要」。
+#
+# 【なぜ】Phase 3b のエラーは非対称である。誤って Exclude すると全文を読む機会が
+# 永久に失われる(回復不能)が、誤って Include しても Phase 4 の手間が増えるだけ。
+# 単独スクリーニングは関連文献の 13% を見落とす(2人体制は 3%)という RCT の実測が
+# あるため、**除外の方向にだけ2人を要求する**ことで、工数を抑えつつ感度を保つ。
+# 本プロトコルが既に採っている「除外できると確信できないものは残す」「協議で解決
+# しなければ Include に倒す」という再現率優先の思想とも一致する。
+#
+# 【★ 校正セットが必須である理由(実装上の要点)】
+# 除外プールだけで Cohen's κ を計算すると、著者側の判定が定義上すべて Exclude で
+# 分散がないため **Pe = Po となり κ が実際の一致率によらず常に 0** になる。
+# したがって κ を報告するには、**3名全員が全判定を行う校正セット**が別に必要。
+# ここでは判定対象の 15% を決定論的に抽出して校正セットとする。
+# (副次的な効果として、本作業前の判断基準のすり合わせにもなる)
+CALIBRATION_PCT = 15
+
+
+def is_calibration(key: str, pct: int = CALIBRATION_PCT) -> bool:
+    """校正セットに入るか。決定論的(乱数は使わない)でブロック割当とは独立にする。"""
+    return int(hashlib.md5(("cal:" + key).encode("utf-8")).hexdigest(), 16) % 100 < pct
+
+
+def second_reviewer_of(key: str) -> str:
+    """除外プールの第2評価者。決定論的に2名へ振り分ける。"""
+    h = int(hashlib.md5(("2nd:" + key).encode("utf-8")).hexdigest(), 16)
+    return SECOND_REVIEWERS[h % len(SECOND_REVIEWERS)]
 
 # --- トリアージ用の概念群(Rev.6 統合クエリ。除外には使わない) ---------------
 KW_GROUPS = {
@@ -87,7 +124,8 @@ KW_GROUPS = {
 }
 
 SHEET_COLS = [
-    "record_id", "block", "source", "kw_groups", "has_abstract", "abstract_source",
+    "record_id", "block", "calibration", "source", "kw_groups", "has_abstract",
+    "abstract_source",
     "title", "abstract", "venue", "year", "doi", "rank",
     "decision", "reason", "note",
 ]
@@ -259,7 +297,7 @@ def main() -> None:
 
         rid = record_id(key)
         blk = block_of(key)
-        a, b = BLOCK_PAIRS[blk]
+        cal = is_calibration(key)
         title = (row.get("Title") or "").strip()
         abstract = (row.get("Abstract Note") or "").strip()
         abs_src = "database" if abstract else "none"
@@ -271,8 +309,11 @@ def main() -> None:
         assignment.append({
             "record_id": rid,
             "block": blk + 1,
-            "reviewer_a": a,
-            "reviewer_b": b,
+            "calibration": "Y" if cal else "N",
+            # 校正セットは3名全員が判定する。それ以外は著者が判定し、
+            # 著者が Exclude にしたものだけ第2評価者が確認する(stage 2 で配る)。
+            "reviewer_a": "author",
+            "reviewer_b": ("all" if cal else second_reviewer_of(key)),
             "key": key,
             "title": title,
             "doi": norm_doi(row.get("DOI", "")),
@@ -281,6 +322,7 @@ def main() -> None:
         sheet_row = {
             "record_id": rid,
             "block": blk + 1,
+            "calibration": "Y" if cal else "N",
             "source": "snowballing" if row.get("__source__") == "snowballing" else "database",
             "abstract_source": abs_src,
             "kw_groups": kw_group_count(title, abstract),
@@ -295,8 +337,11 @@ def main() -> None:
             "reason": "",     # ← Exclude 時は抵触した PICOS 基準を書く
             "note": "",
         }
-        per_reviewer[a].append(sheet_row)
-        per_reviewer[b].append(dict(sheet_row))
+        # stage 1: 著者は全件。他2名は校正セットのみ。
+        per_reviewer["author"].append(sheet_row)
+        if cal:
+            for r in SECOND_REVIEWERS:
+                per_reviewer[r].append(dict(sheet_row))
 
     if dup:
         print(f"[WARN] 入力に重複キー {dup} 件。先出を採用した")
@@ -307,13 +352,13 @@ def main() -> None:
 
     # --- サマリ -------------------------------------------------------------
     n = len(assignment)
-    blocks = {i + 1: sum(1 for a in assignment if a["block"] == i + 1) for i in range(3)}
+    n_cal = sum(1 for a in assignment if a["calibration"] == "Y")
 
-    print(f"\n[INFO] 判定対象 {n:,} 件(ユニーク)")
-    print("  ブロック別:")
-    for b, cnt in blocks.items():
-        a1, a2 = BLOCK_PAIRS[b - 1]
-        print(f"    ブロック{b}: {cnt:5,d} 件  ({REVIEWERS[a1]} × {REVIEWERS[a2]})")
+    print(f"\n[INFO] 判定対象 {n:,} 件(ユニーク) — liberal accelerated 方式")
+    print(f"  校正セット(3名全員が判定・κ の算出基盤): {n_cal:,} 件 ({n_cal / n * 100:.0f}%)")
+    print(f"  著者のみが判定                        : {n - n_cal:,} 件")
+    print("  ※ 著者が Exclude にしたものは stage 2 で第2評価者へ配る")
+    print("     (Include は1人の判断で通す = liberal accelerated)")
     src_dist = {}
     for lst in per_reviewer.values():
         for r in lst:
@@ -323,7 +368,10 @@ def main() -> None:
     print("  評価者別の担当件数:")
     for r, lst in per_reviewer.items():
         print(f"    {REVIEWERS[r]:18s}: {len(lst):5,d} 件")
-    print(f"  総判定数: {n * 2:,}(= {n:,} × 2名)")
+    total = sum(len(v) for v in per_reviewer.values())
+    print(f"  stage 1 の判定数: {total:,}")
+    print(f"  ※ stage 2(著者の Exclude 分)は著者の記入完了後に "
+          f"`make_screening_stage2.py` で生成する")
 
     # Abstract 欠落は Phase 3b の判定品質に直結するので必ず警告する
     no_abs_ids = {r["record_id"] for lst in per_reviewer.values()
@@ -350,8 +398,8 @@ def main() -> None:
     # 割当表(正。評価者は編集しない)
     apath = args.outdir / "assignment.csv"
     with apath.open("w", encoding="utf-8-sig", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=["record_id", "block", "reviewer_a",
-                                          "reviewer_b", "key", "title", "doi"])
+        w = csv.DictWriter(f, fieldnames=["record_id", "block", "calibration",
+                                          "reviewer_a", "reviewer_b", "key", "title", "doi"])
         w.writeheader()
         w.writerows(assignment)
     print(f"\n[INFO] 出力: {apath}  ({len(assignment):,} 行)")

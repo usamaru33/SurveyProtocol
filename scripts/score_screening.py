@@ -8,7 +8,7 @@ score_screening.py — Phase 3b の集計(Cohen's κ・不一致抽出・最終�
 評価者ごとの判定シート(`screening/sheet_<id>.csv`)を突き合わせて、
 
   1. 記入の妥当性を検査する(未記入・不正値・担当外レコード・取り違え)
-  2. **ペアごとの Cohen's κ とその平均**を算出する(Rev.9)
+  2. **ペアごとの Cohen's κ とその平均**を算出する(校正セットのみ。Rev.17)
   3. 不一致と Unsure を「協議リスト」に書き出す
   4. 協議結果が記入されていれば、最終判定シートを確定する
 
@@ -56,7 +56,7 @@ sys.path.insert(0, str(_HERE))
 
 csv.field_size_limit(10 ** 9)
 
-from make_screening_sheets import REVIEWERS  # noqa: E402
+from make_screening_sheets import REVIEWERS, second_reviewer_of  # noqa: E402
 
 VALID = {"include", "exclude", "unsure"}
 CANON = {"include": "Include", "exclude": "Exclude", "unsure": "Unsure"}
@@ -165,8 +165,10 @@ def main() -> None:
     problems: list[str] = []
     blank = Counter()
     for rev, sheet in sheets.items():
-        expected = {rid for rid, a in assignment.items()
-                    if rev in (a["reviewer_a"], a["reviewer_b"])}
+        # stage 1 の担当: 著者は全件、他2名は校正セットのみ
+        expected = (set(assignment) if rev == "author"
+                    else {rid for rid, a in assignment.items()
+                          if a.get("calibration") == "Y"})
         got = set(sheet)
         if got - expected:
             problems.append(f"{rev}: 担当外の record_id が {len(got - expected)} 件")
@@ -186,8 +188,9 @@ def main() -> None:
     print("=" * 66)
     print(f"  対象レコード: {len(assignment):,} 件")
     for rev in REVIEWERS:
-        n_exp = sum(1 for a in assignment.values()
-                    if rev in (a["reviewer_a"], a["reviewer_b"]))
+        n_exp = (len(assignment) if rev == "author"
+                 else sum(1 for a in assignment.values()
+                          if a.get("calibration") == "Y"))
         # 「シートに行があって decision が妥当」なものだけを記入済みと数える。
         # 行そのものが欠けているケースを未記入に含めないと進捗が過大に出る。
         done = sum(1 for rid, row in sheets.get(rev, {}).items()
@@ -203,16 +206,25 @@ def main() -> None:
         if len(problems) > 15:
             print(f"    ... 他 {len(problems) - 15} 件")
 
-    # --- 2. ペアごとの Cohen's κ -------------------------------------------
+    # --- 2. ペアごとの Cohen's κ(校正セットのみ) --------------------------
+    #
+    # ★ κ は **校正セット(calibration=Y、3名全員が全判定を行う)でのみ**算出する。
+    #   liberal accelerated の除外プールで κ を計算してはならない。著者側の判定が
+    #   定義上すべて Exclude で分散が無いため Pe = Po となり、
+    #   **実際の一致率によらず κ が常に 0** になるためである(実測で確認済み)。
     pair_rows: dict[tuple[str, str], list[tuple[str, str]]] = defaultdict(list)
-    for rid, a in assignment.items():
-        ra, rb = a["reviewer_a"], a["reviewer_b"]
-        da = (sheets.get(ra, {}).get(rid, {}).get("decision") or "").strip().lower()
-        db = (sheets.get(rb, {}).get(rid, {}).get("decision") or "").strip().lower()
-        if da in VALID and db in VALID:
-            pair_rows[(ra, rb)].append((CANON[da], CANON[db]))
+    cal_ids = [rid for rid, a in assignment.items() if a.get("calibration") == "Y"]
+    for rid in cal_ids:
+        decs = {}
+        for rv in REVIEWERS:
+            d = (sheets.get(rv, {}).get(rid, {}).get("decision") or "").strip().lower()
+            if d in VALID:
+                decs[rv] = CANON[d]
+        for ra, rb in combinations(sorted(decs), 2):
+            pair_rows[(ra, rb)].append((decs[ra], decs[rb]))
 
-    print("\n  --- ペアごとの Cohen's κ(3カテゴリ: Include/Exclude/Unsure) ---")
+    print(f"\n  --- ペアごとの Cohen's κ(校正セット {len(cal_ids):,} 件・"
+          f"3カテゴリ: Include/Exclude/Unsure) ---")
     kappas = []
     for pair in sorted(pair_rows):
         k, po, pe, n = cohen_kappa(pair_rows[pair])
@@ -241,11 +253,37 @@ def main() -> None:
 
     # --- 3. 協議リスト -----------------------------------------------------
     worklist, agreed = [], []
+    # stage 2(著者が Exclude/Unsure にした分の第2評価)。無ければ空。
+    stage2 = {rv: load_sheet(args.dir / f"stage2_sheet_{rv}.csv")
+              for rv in REVIEWERS if rv != "author"}
+    n_liberal = 0
     for rid, a in assignment.items():
-        ra, rb = a["reviewer_a"], a["reviewer_b"]
+        ra = "author"
         row_a = sheets.get(ra, {}).get(rid, {})
-        row_b = sheets.get(rb, {}).get(rid, {})
         da = (row_a.get("decision") or "").strip().lower()
+
+        if a.get("calibration") == "Y":
+            # 校正セットは3名全員が判定済み。著者 × 割当上の第2評価者で突き合わせる。
+            rb = "kataoka" if second_reviewer_of(a["key"]) == "kataoka" else "watanabe"
+            row_b = sheets.get(rb, {}).get(rid, {})
+        else:
+            rb = a["reviewer_b"]
+            # ★ liberal accelerated: Include は1名の判断で通す(第2評価者に回さない)。
+            #   誤 Include は Phase 4 の手間が増えるだけだが、誤 Exclude は
+            #   全文を読む機会が永久に失われるため、除外側にだけ2名を要求する。
+            if da == "include":
+                n_liberal += 1
+                agreed.append({
+                    "record_id": rid, "block": a["block"], "title": a["title"],
+                    "doi": a["doi"], "reviewer_a": ra, "decision_a": "Include",
+                    "reason_a": row_a.get("reason", ""),
+                    "reviewer_b": "—", "decision_b": "—", "reason_b": "",
+                    "final_decision": "Include",
+                    "consensus_note": "liberal accelerated: 1名の Include で通過",
+                })
+                continue
+            row_b = stage2.get(rb, {}).get(rid, {})
+
         db = (row_b.get("decision") or "").strip().lower()
         if da not in VALID or db not in VALID:
             continue

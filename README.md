@@ -40,7 +40,8 @@
    - [PRISMA 上の扱い](#87-prisma-上の扱い)
 9. [分類体系 (Taxonomy)](#9-分類体系-taxonomy)
 10. [実行方法](#10-実行方法)
-11. [期待される知見と貢献](#11-期待される知見と貢献)
+11. [Phase 3b: 人手スクリーニングの実施](#11-phase-3b-人手スクリーニングの実施)
+12. [期待される知見と貢献](#12-期待される知見と貢献)
 
 ---
 
@@ -168,7 +169,15 @@ SurveyProtocol/
 │   ├── merge_raw.py             # ★raw/*.csv → 統合生データ生成（Source_DB 付与・PubMed除外）
 │   ├── merge_bib.py             # 年スライスの .bib を引用キー単位で一意化して統合
 │   ├── known_item_test.py       # Known-Item Test（recall測定 → known_item_analysis.md）
+│   ├── make_screening_sheets.py # ★Phase 3b 判定シート生成（stage 1・CSV）→ §11
+│   ├── make_screening_xlsx.py   # ★判定シートの Excel 版（評価者の作業ファイル）
+│   ├── make_screening_stage2.py # ★stage 2（著者の Exclude 分を第2評価者へ）
+│   ├── score_screening.py       # ★Phase 3b 集計（κ・協議リスト・最終判定）
 │   └── *_audit.py               # Venue照合・正規化衝突・PubMed固有件数などの監査
+├── screening/                   # ★Phase 3b の判定シート一式 → §11
+│   ├── assignment.csv           # 割当の正（record_id・calibration・第2評価者）
+│   ├── sheet_<id>.csv / .xlsx   # stage 1 の判定シート（評価者ごとに独立）
+│   └── stage2_sheet_<id>.csv    # stage 2（著者の記入完了後に生成）
 ├── outputs/                     # 上記スクリプトの出力（監査CSV・実行ログ）
 │   ├── enriched_abstracts.csv   # ★ DOI から補完した要旨のキャッシュ（人手判定の材料専用）
 │   ├── snowballing_log.csv      # スノーボーリング結果（17列。判定は判定シートに統合）
@@ -481,8 +490,18 @@ Title + Abstract Note を結合したテキストに対して正規表現マッ�
 | 引用探索（右カラム） | 257 |
 | **合計** | **1,052** |
 
-3名ペア分担で **約701件/人**（総判定 2,104）。判定シートは `screening/`（§10）。
-要旨欠落は **191件（18.2%）**＝左63 + 右128（Rev.16 で DOI から134件を外部補完した結果）。
+**liberal accelerated 方式**（Rev.17）: 1名の Include で通す / Exclude には2名。
+
+| 段 | 内容 | 担当 |
+|---|---|---|
+| stage 1 | 全1,052件を著者が判定。うち**校正セット164件（15%）は3名全員** | 著者 1,052 / 他2名 各164 |
+| stage 2 | 著者が Exclude / Unsure にしたものだけ第2評価者が確認 | 2名で分担 |
+
+**κ は校正セット164件でのみ算出する。** 除外プールだけで計算すると著者の判定に分散が無く
+**κ が常に 0** になるため（`docs/protocol_changelog.md` Rev.17）。
+判定シートは `screening/`（§10）。
+要旨欠落は **191件（18.2%）**＝左63 + 右128。Rev.16 で DOI から **134件**を外部補完した結果
+（補完前は325件・30.9%）。`abstract_source` 列で `database` / `enriched` / `none` を識別できる。
 
 > **補完した要旨で自動除外を掛け直していない。** 補完は人手判定を助けるためのもので、
 > 既に「判定不能なので人手に委ねる」と決めたレコードの扱いを機械側に巻き戻さない。
@@ -961,7 +980,68 @@ python -X utf8 scripts/snowball_search.py --seeds-csv outputs/snowballing_hop2_s
 
 ---
 
-## 11. 期待される知見と貢献
+## 11. Phase 3b: 人手スクリーニングの実施
+
+手続きの定義は `docs/screening_protocol.md`、方針の決定経緯は
+`docs/protocol_changelog.md` Rev.9 / Rev.17。本節は**実行手順**のみ。
+
+### 11.1 判定対象と体制
+
+判定対象 **1,052件**（DB検索795 + 引用探索257）。**liberal accelerated 方式**で、
+**1名の Include で通す / Exclude には2名**を要する。
+
+| 段 | 内容 | 担当 |
+|---|---|---|
+| stage 1 | 全1,052件を著者が判定。うち**校正セット164件（15%）は3名全員** | 著者 1,052 / 他2名 各164 |
+| stage 2 | 著者が Exclude / Unsure にしたものだけ第2評価者が確認 | 2名で分担 |
+
+Phase 3b のエラーは非対称（誤 Exclude は回復不能／誤 Include は Phase 4 の手間が増えるだけ）で、
+単独スクリーニングは関連文献の **13%** を見落とす（2名体制は 3%）という RCT の実測がある。
+**除外の方向にだけ2名を要求**することで、工数を抑えつつ感度を保つ。
+
+### 11.2 手順
+
+```bash
+# stage 1: 判定シートを生成（CSV → Excel）
+python -X utf8 scripts/make_screening_sheets.py
+python -X utf8 scripts/make_screening_xlsx.py
+
+#   → screening/sheet_<id>.xlsx を各評価者に配布
+#   → 記入後に screening/ へ戻してもらう
+
+# stage 2: 著者の記入完了後、Exclude/Unsure だけを第2評価者へ
+python -X utf8 scripts/make_screening_stage2.py
+python -X utf8 scripts/make_screening_xlsx.py --prefix stage2_
+
+# 集計: κ・協議リスト・最終判定
+python -X utf8 scripts/score_screening.py
+```
+
+### 11.3 設計上の要点
+
+- **評価者ごとに独立したファイル**にしている。1枚のシートに両者の判定列を並べると、
+  先に書いた側が後の側から見えて独立性が壊れ、κ が意味を失う。
+  **stage 2 のシートにも著者の判定は入れていない**
+- **割当は決定論的**（校正セットの抽出・第2評価者の振り分けとも文献キーの MD5）。
+  乱数を使わないので再生成しても記入済みの作業は動かない
+- **κ は校正セット164件でのみ算出する。** 除外プールだけで計算すると著者の判定が
+  定義上すべて Exclude で分散が無く、**実際の一致率によらず κ が常に 0** になる
+- `kw_groups`（概念群スコア）は**読む順序のトリアージ専用**。この値による自動除外はしない
+- 判定シートは記入中は git 追跡しない（互いの判定が見えるため）。
+  **完了後に `git add -f` で監査証跡として追跡に加える**
+
+### 11.4 報告に必要な数値
+
+- ペア別 Cohen's κ（3本）とその平均、Landis & Koch の解釈
+  — **校正セット164件で算出したものであることを明記する**
+- liberal accelerated で1名の Include により通過した件数（第2評価者を経ていない分）
+- 一致件数 / 要協議件数、協議で解決した件数 / 解決せず Include に倒した件数
+- Phase 3b の Include 件数（= Phase 4 の対象）と Exclude 件数
+- 取得経路別（database / snowballing）の内訳 — PRISMA の左右カラム別報告用
+
+---
+
+## 12. 期待される知見と貢献
 
 本分類データを用いた分析によって明らかにしたい知見:
 
