@@ -83,6 +83,9 @@ COLUMNS = [
     ("year",         "年",                7, False, False),
     ("rank",         "ランク",           11, False, False),
     ("has_abstract", "要旨有無",          9, False, False),
+    ("source",       "取得経路",         12, False, False),
+    ("calibration",  "校正セット",       11, False, False),
+    ("abstract_source", "要旨の出所",    12, False, False),
     ("kw_groups",    "概念群",            8, False, False),
     ("doi",          "DOI",              26, False, False),
     ("block",        "ブロック",          9, False, False),
@@ -95,6 +98,16 @@ HEADER_HELP = {
                   "例) P: 患者対象 / I: HMDでない / S: ユーザー実験なし",
     "メモ": "任意。協議で持ち出したい論点があれば。",
     "要旨有無": "N = 要旨が無く、タイトルだけで判断することになる文献です。",
+    "取得経路": "database = データベース検索で見つけたもの\n"
+                "snowballing = 引用探索(参考文献・被引用)で見つけたもの\n"
+                "判定基準はどちらも同じです。PRISMA の報告で区別するための記録です。",
+    "校正セット": "Y = 3名全員が判定する校正セット(評価者間一致度 κ の算出に使う)\n"
+                  "N = 著者がまず判定し、Exclude になったものだけ第2評価者が確認する\n"
+                  "※ 判定基準はどちらも同じです。",
+    "要旨の出所": "database = 検索結果に元から含まれていた要旨\n"
+                  "enriched = 要旨が無かったため DOI から外部で補完したもの\n"
+                  "none = 要旨を取得できず、タイトルのみで判断することになる\n"
+                  "※ enriched も判定材料としては同じように使ってください。",
     "概念群": "検索クエリの3概念群がいくつ当たったか(0〜3)。\n"
               "**読む順序の目安にすぎません。この値で判定しないでください。**",
     "ランク": "Phase 2 で既に基準を満たしています。判定材料にはしないでください。",
@@ -128,6 +141,10 @@ INTRO = [
     ("・オートフィルタで「判定」を (空白) で絞ると未記入だけ表示できます。", ""),
     ("・薄い赤の行は要旨が無い文献です(「要旨有無」列が N)。", ""),
     ("  タイトルだけで判断することになるので、無理なら Unsure にしてください。", ""),
+    ("・「要旨の出所」列が enriched のものは、検索結果に要旨が無かったため", ""),
+    ("  DOI から外部で補完したものです。判定材料としては同じように使ってください。", ""),
+    ("・「取得経路」列は database / snowballing の2種類があります。", ""),
+    ("  判定基準はどちらも同じです。区別は PRISMA の報告に使うだけです。", ""),
     ("・「概念群」は読む順序の目安です。並べ替えの基準に使ってあるだけで、", ""),
     ("  この数値で判定しないでください。", ""),
     ("・入力する3列以外はロックしてあります(誤編集の防止)。", ""),
@@ -255,6 +272,8 @@ def build_sheet(ws, rows: list[dict]) -> None:
 def main() -> None:
     ap = argparse.ArgumentParser(description="Phase 3b 判定シートの Excel 版を生成")
     ap.add_argument("--dir", type=Path, default=ROOT / "screening")
+    ap.add_argument("--prefix", type=str, default="",
+                    help="シート名の接頭辞(stage2_ など)")
     ap.add_argument("--only", type=str, default="",
                     help="特定の評価者だけ生成(author / kataoka / watanabe)")
     ap.add_argument("--force", action="store_true",
@@ -265,8 +284,8 @@ def main() -> None:
     for rev in targets:
         if rev not in REVIEWERS:
             sys.exit(f"[ERROR] 未知の評価者: {rev}(有効: {', '.join(REVIEWERS)})")
-        src = args.dir / f"sheet_{rev}.csv"
-        dst = args.dir / f"sheet_{rev}.xlsx"
+        src = args.dir / f"{args.prefix}sheet_{rev}.csv"
+        dst = args.dir / f"{args.prefix}sheet_{rev}.xlsx"
         if not src.exists():
             print(f"[SKIP] {src.name} が無い。先に make_screening_sheets.py を実行すること")
             continue

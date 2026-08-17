@@ -582,12 +582,28 @@ def resolve_venue(raw_venue: str, core: dict, sjr: dict, issn: str = "",
                 return out("SJR", e["original_title"], e["quartile"], "sjr_exact_norm")
 
     # --- 3. CORE acronym ---------------------------------------------------
+    #
+    # 略称照合では**サニティチェックの向きを逆にする**(2026-08-13 修正)。
+    # 通常の照合は「照合先の語がデータ側に出揃っているか」(containment)を見るが、
+    # 略称の場合はデータ側の venue 名が公式名より短いのが普通で、この向きだと落ちる。
+    # 実例: データ '2015 IEEE virtual reality (VR)' は括弧内略称 (VR) で CORE A* の
+    #       'IEEE Conference on Virtual Reality and 3D User Interfaces' に正しく当たるが、
+    #       照合先の "3D User Interfaces" がデータ側に無いため cont=0.43 で棄却されていた。
+    #       IEEE VR は本サーベイの中核会場であり、この表記で27件が未照合除外されていた。
+    # 正しくは「**データ側の語が照合先に含まれるか**」を見る
+    # (ieee virtual reality ⊆ IEEE Conference on Virtual Reality and 3D User Interfaces)。
     acronym = extract_parenthesized_acronym(raw_venue)
     if acronym:
         for k in (acronym.lower(), normalize_venue(acronym)):
             e = core.get(k) if k else None
-            if e and sane(e["original_title"], "core_acronym"):
-                return out("CORE", e["original_title"], e["rank"], "core_acronym")
+            if not e:
+                continue
+            title = e["original_title"]
+            # 逆向きの包含: データ側 venue 名の語が照合先にどれだけ含まれるか
+            back = containment(raw_venue, title)
+            if back >= CONTAINMENT_THRESHOLD or sane(title, "core_acronym"):
+                return out("CORE", title, e["rank"], "core_acronym")
+            rejected.append(f"core_acronym:'{title}'(back_cont={back:.2f})")
 
     # --- 4. CORE fuzzy(最後の手段) ----------------------------------------
     if norm and not short:

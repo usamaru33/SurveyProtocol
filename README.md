@@ -6,7 +6,7 @@
 > **現行の確定値 (2026-08-12 実行, Rev.13):** 入力 `ResearchVR4.csv`（26,434件 = 3DB × 第1波+第2波）
 >
 > ```
-> 26,434 → 18,342（P1 重複削除）→ 6,317（P1.5 フィルタ層）→ 1,167（P2 Venue）→ 784（P3a キーワード）
+> 26,434 → 18,342（P1 重複削除）→ 6,317（P1.5 フィルタ層）→ 1,179（P2 Venue）→ 795（P3a キーワード）
 > ```
 >
 > **⚠️ 本ドキュメントを読むときの前提（2026-08-12 時点）:**
@@ -40,7 +40,8 @@
    - [PRISMA 上の扱い](#87-prisma-上の扱い)
 9. [分類体系 (Taxonomy)](#9-分類体系-taxonomy)
 10. [実行方法](#10-実行方法)
-11. [期待される知見と貢献](#11-期待される知見と貢献)
+11. [Phase 3b: 人手スクリーニングの実施](#11-phase-3b-人手スクリーニングの実施)
+12. [期待される知見と貢献](#12-期待される知見と貢献)
 
 ---
 
@@ -162,21 +163,32 @@ SurveyProtocol/
 │   ├── db_search_ieee.py        # IEEE Xplore API 検索（第2波。※要 IEEE_API_KEY）
 │   ├── db_search_scopus.py      # Scopus API 検索（第2波）
 │   ├── snowball_search.py       # ★ スノーボーリング（引用探索）→ §8
+│   ├── enrich_screening_abstracts.py  # ★ 判定対象の要旨を DOI から補完（Rev.16）
 │   ├── enrich_abstracts.py      # Crossref→S2 で Abstract 補完（DOIベース）
 │   ├── export_completeness_audit.py  # ★エクスポートの打ち切り・欠落検出（§4.1）
 │   ├── merge_raw.py             # ★raw/*.csv → 統合生データ生成（Source_DB 付与・PubMed除外）
 │   ├── merge_bib.py             # 年スライスの .bib を引用キー単位で一意化して統合
 │   ├── known_item_test.py       # Known-Item Test（recall測定 → known_item_analysis.md）
+│   ├── make_screening_sheets.py # ★Phase 3b 判定シート生成（stage 1・CSV）→ §11
+│   ├── make_screening_xlsx.py   # ★判定シートの Excel 版（評価者の作業ファイル）
+│   ├── make_screening_stage2.py # ★stage 2（著者の Exclude 分を第2評価者へ）
+│   ├── score_screening.py       # ★Phase 3b 集計（κ・協議リスト・最終判定）
 │   └── *_audit.py               # Venue照合・正規化衝突・PubMed固有件数などの監査
+├── screening/                   # ★Phase 3b の判定シート一式 → §11
+│   ├── assignment.csv           # 割当の正（record_id・calibration・第2評価者）
+│   ├── sheet_<id>.csv / .xlsx   # stage 1 の判定シート（評価者ごとに独立）
+│   └── stage2_sheet_<id>.csv    # stage 2（著者の記入完了後に生成）
 ├── outputs/                     # 上記スクリプトの出力（監査CSV・実行ログ）
-│   └── snowballing_log.csv      # スノーボーリング結果（採否列は著者記入）
+│   ├── enriched_abstracts.csv   # ★ DOI から補完した要旨のキャッシュ（人手判定の材料専用）
+│   ├── snowballing_log.csv      # スノーボーリング結果（17列。判定は判定シートに統合）
+│   └── snowballing_log_pre20260810.csv  # 旧12列版（Rev.10 改修前。経緯として保存）
 │
 ├── step1_dedup.csv              # Phase 1 出力: 重複削除済み（18,342件、フィールドマージ済み）
 ├── step1_5_filter_included.csv  # Phase 1.5 出力: フィルタ層 通過（6,317件）
 ├── step1_5_filter_excluded.csv  # Phase 1.5 出力: フィルタ層 除外（12,025件）
-├── step2_rank_included.csv      # Phase 2 出力: 高ランクVenue通過（1,167件）
+├── step2_rank_included.csv      # Phase 2 出力: 高ランクVenue通過（1,179件）
 ├── step2_rank_excluded.csv      # Phase 2 出力: 低ランクVenue除外（9,634件）
-├── step3_kw_included.csv        # Phase 3a 出力: ★最終候補（784件）
+├── step3_kw_included.csv        # Phase 3a 出力: ★最終候補（795件）
 ├── step3_kw_excluded.csv        # Phase 3 出力: キーワード除外（1,082件）
 │
 ├── pipeline_log.txt             # パイプライン実行ログ（詳細・最新値はここ）
@@ -184,7 +196,7 @@ SurveyProtocol/
 ├── .env                         # APIキー（**git管理外**。IEEE / Scopus / Semantic Scholar）
 ├── .env.example                 # 変数名テンプレート（コミット可・値は空）
 ├── venue_aliases.csv            # 著者確認済みVenueエイリアス表（Phase 2 の最優先照合）
-├── self_scale_references.csv    # ★正式 gold set（SearchScope列: in-scope 12件 / background 8件）
+├── self_scale_references.csv    # ★正式 gold set（SearchScope列: in-scope 17件 / background 8件）
 ├── known_items.md               # 拡充用の下書き（現在は有効行0のテンプレート、下記注参照）
 ├── known_item_analysis.md       # ★自動生成: 脱落分析（known_item_test.py が書く）
 ├── README.md                    # このファイル
@@ -357,10 +369,10 @@ recall を過大評価させる要因なので、`SUSPECT` は `HIT` として�
 
 | 分類 | 件数 |
 |---|---|
-| CORE A/A* | 306件 |
+| CORE A/A* | 318件 |
 | SJR Q1 | 838件 |
 | エイリアス経由の通過 | 23件 |
-| **通過合計** | **1,167件** |
+| **通過合計** | **1,179件** |
 | CORE 低ランク（B/C等） | 1,114件 |
 | SJR Q2/Q3/Q4 | 860件 |
 | ランク未判定（Unmatched） | 3,097件 |
@@ -369,7 +381,7 @@ recall を過大評価させる要因なので、`SUSPECT` は `HIT` として�
 > 入力は Phase 1.5 通過分の 6,317件。Rev.12 の正規化改修（種別マーカー・短キーガード・
 > サニティチェック・照合順序の修正）が適用されており、`Match_Stage` 列でどの段で照合したかを追える。
 
-> **Venue フィルタの取りこぼし（Threats に記載必須）:** Known-Item Test の in-scope 12件のうち
+> **Venue フィルタの取りこぼし（Threats に記載必須）:** Known-Item Test の in-scope 17件のうち
 > **5件がこの Phase 2 で脱落**している。Rev.12 の改修で内訳が
 > 「照合漏れ3 / ランク不足1 / 基準どおり1」→ **「照合漏れ1 / ランク不足3 / 基準どおり1」**に変わった。
 > #8 SAP と #13 MIG は「リストに無い」のではなく「正しく照合したうえで CORE B・C だった」ことが
@@ -422,7 +434,7 @@ Title + Abstract Note を結合したテキストに対して正規表現マッ�
 
 | 分類 | 件数 | 割合 |
 |---|---|---|
-| **通過（最終候補）** | **784件** | **67.2%** |
+| **通過（最終候補）** | **795件** | **67.2%** |
 | Cat1 除外（非没入・スコープ外） | 112件 | — |
 | Cat2 除外（技術・非実証） | 24件 | — |
 | Cat3 除外（臨床・医療） | 262件 | — |
@@ -449,12 +461,53 @@ Title + Abstract Note を結合したテキストに対して正規表現マッ�
 ├─ Phase 1.5 フィルタ層 ─────────────── -12,025件
 │   └─ 通過        : 6,317 件    （pass 2,610 / hold 3,707 ＝要旨なしで判定不能）
 │
-├─ Phase 2 学会ランクスクリーニング ──── -5,150件
-│   └─ 高ランク通過: 1,167 件
+├─ Phase 2 学会ランクスクリーニング ──── -5,138件
+│   └─ 高ランク通過: 1,179 件
 │
-└─ Phase 3a キーワード除外 ──────────── -383件
-    └─ 最終候補    : 784 件  ← step3_kw_included.csv（Phase 3b の対象）
+└─ Phase 3a キーワード除外 ──────────── -384件
+    └─ 左カラム確定 : 795 件  ← step3_kw_included.csv
 ```
+
+**引用探索（PRISMA 右カラム、§8）:**
+
+```
+475 行 発見
+├─ 既存コーパスに既出 ─────────────── -158件（左カラムで同定済み。二重計上しない）
+├─ シード間の重複 ────────────────── -30件
+├─ タイトル取得不能 ──────────────── -3件（手作業で同定・要対応）
+└─ Phase 3a キーワード除外 ────────── -28件
+    └─ 右カラム確定 : 257 件
+```
+
+> 右カラムには **Phase 1.5 と Phase 2 を適用していない**（理由は §8）。
+> Phase 3a と Phase 3b は左右で同一基準。
+
+**Phase 3b（人手二重スクリーニング）の判定対象:**
+
+| 取得経路 | 件数 |
+|---|---|
+| データベース検索（左カラム） | 795 |
+| 引用探索（右カラム） | 257 |
+| **合計** | **1,052** |
+
+**liberal accelerated 方式**（Rev.17）: 1名の Include で通す / Exclude には2名。
+
+| 段 | 内容 | 担当 |
+|---|---|---|
+| stage 1 | 全1,052件を著者が判定。うち**校正セット164件（15%）は3名全員** | 著者 1,052 / 他2名 各164 |
+| stage 2 | 著者が Exclude / Unsure にしたものだけ第2評価者が確認 | 2名で分担 |
+
+**κ は校正セット164件でのみ算出する。** 除外プールだけで計算すると著者の判定に分散が無く
+**κ が常に 0** になるため（`docs/protocol_changelog.md` Rev.17）。
+判定シートは `screening/`（§10）。
+要旨欠落は **191件（18.2%）**＝左63 + 右128。Rev.16 で DOI から **134件**を外部補完した結果
+（補完前は325件・30.9%）。`abstract_source` 列で `database` / `enriched` / `none` を識別できる。
+
+> **補完した要旨で自動除外を掛け直していない。** 補完は人手判定を助けるためのもので、
+> 既に「判定不能なので人手に委ねる」と決めたレコードの扱いを機械側に巻き戻さない。
+> 理由は `docs/protocol_changelog.md` Rev.16（要約: PRISMA 2020 は自動ツールによる除外を
+> スクリーニングの手前に置き人手除外と分けて報告することを求めており、補完後の再適用は
+> 検索が一度も見ていないテキストで自動除外を発動させることになる）。
 
 **DB間重複の内訳（初回分、重複除去の報告用）:**
 PubMed∩Scopus 606 / Scopus∩IEEE 352 / Scopus∩ACM 142 / PubMed∩IEEE 39 / ACM∩IEEE 0 / ACM∩PubMed 0
@@ -462,15 +515,16 @@ PubMed∩Scopus 606 / Scopus∩IEEE 352 / Scopus∩ACM 142 / PubMed∩IEEE 39 / 
 
 ### 検索の網羅性検証（Known-Item Test）
 
-`scripts/known_item_test.py` が gold set（`self_scale_references.csv`、`SearchScope` 列で in-scope 12件）を
+`scripts/known_item_test.py` が gold set（`self_scale_references.csv`、`SearchScope` 列で in-scope 17件）を
 各 step ファイルに突き合わせ、recall を測定して `known_item_analysis.md` を生成する。
 
 | 段階 | 生存 | recall |
 |---|---|---|
-| step0 統合生データ（検索式で拾えたか） | 8/12 | **66.7%** |
-| step1 重複削除後 | 8/12 | 66.7% |
-| step2 Venueランク通過後 | 3/12 | **25.0%** |
-| step3 最終候補 | 3/12 | 25.0% |
+| step0 統合生データ（検索式で拾えたか） | 13/17 | **76.5%** |
+| step1 重複削除後 | 13/17 | 76.5% |
+| step1.5 フィルタ層通過後 | 11/17 | 64.7% |
+| step2 Venueランク通過後 | 5/17 | **29.4%** |
+| step3 最終候補 | 5/17 | 29.4% |
 
 - **step0 で4件脱落（検索式・カバレッジの問題）:** Frontiers in Virtual Reality 3件 =
   DBカバレッジ欠落（同誌はSJR Q1）、Being Barbie 1件 = クエリG1ギャップ
@@ -622,12 +676,30 @@ URL列のドメイン、DOIプレフィックス、Publisher列を優先順位�
 手続きの定義は `docs/snowballing_protocol.md`、本節はその**実装**の説明。
 
 > ⚠️ **外部APIに通信する**（Semantic Scholar / Crossref）。既定では著者が実行する。
-> 2026-08-06 に著者の明示的な指示により初回実行済み。
-> スクリプトが行うのは「取得」と「機械的に分かる情報の付与」までで、**PICOS採否は著者が判断する**。
+> スクリプトが行うのは「取得」と「機械的に分かる情報の付与」までで、**PICOS採否は人が判断する**。
+
+> **実行状況（Rev.15、2026-08-16）:** シード7件（主題6件 + 定義シード #3 は後方探索のみ）で実行。
+>
+> ```
+> 475行 → 既存コーパスに既出 -158 → シード間重複 -30 → タイトル取得不能 -3
+>       → Phase 3a キーワード除外 -28 → 257件（判定対象）
+> ```
+>
+> **右カラムに適用する段・しない段**（`docs/snowballing_protocol.md` §4.3b）:
+>
+> | 段 | 適用 | 理由 |
+> |---|---|---|
+> | Phase 1.5 フィルタ層 | **しない** | DB検索で取得していない文献に「DB間のscope差」は存在しない |
+> | Phase 2 Venueランク | **しない** | 適用すると165件(64%)が消えるが、その83%は品質判断ではなく**照合失敗**（未照合88 / venue名なし49）。`Science`・`Cognition` や、回収対象そのものである `Presence`・`ICAT-EGVE` が落ちる |
+> | Phase 3a キーワード除外 | **する** | PICOS 由来の適格性基準 |
+> | Phase 3b 人手判定 | **する** | PRISMA 公式フロー図は右カラムで Title/Abstract 段を省略し全文評価へ直行する想定だが、本レビューの右カラムは機械生成で人手フィルタを経ていないため、**規定より慎重に**この段を設ける |
+>
+> ⚠️ **この非対称な運用に明確な前例は確認できていない。** 詳細と報告義務は
+> `docs/protocol_changelog.md` Rev.15 を参照。
 
 ### 8.1 なぜ必要か
 
-Known-Item Test で、in-scope 12件中 **5件が Phase 2 の Venue ホワイトリストで脱落**していることが判明した
+Known-Item Test で、in-scope 17件中 **6件が Phase 2 の Venue ホワイトリストで脱落**していることが判明した
 （`outputs/venue_dropped_known_items.csv`: unmatched 3 / below_rank 2 / criterion 1）。
 これは検索式では捕捉できているのに Venue 基準で落ちる取りこぼしであり、
 検索式の改良（Rev.6 第2波）では解決しない。引用ネットワーク経由の回収がこの残余リスクを緩和する。
@@ -908,7 +980,68 @@ python -X utf8 scripts/snowball_search.py --seeds-csv outputs/snowballing_hop2_s
 
 ---
 
-## 11. 期待される知見と貢献
+## 11. Phase 3b: 人手スクリーニングの実施
+
+手続きの定義は `docs/screening_protocol.md`、方針の決定経緯は
+`docs/protocol_changelog.md` Rev.9 / Rev.17。本節は**実行手順**のみ。
+
+### 11.1 判定対象と体制
+
+判定対象 **1,052件**（DB検索795 + 引用探索257）。**liberal accelerated 方式**で、
+**1名の Include で通す / Exclude には2名**を要する。
+
+| 段 | 内容 | 担当 |
+|---|---|---|
+| stage 1 | 全1,052件を著者が判定。うち**校正セット164件（15%）は3名全員** | 著者 1,052 / 他2名 各164 |
+| stage 2 | 著者が Exclude / Unsure にしたものだけ第2評価者が確認 | 2名で分担 |
+
+Phase 3b のエラーは非対称（誤 Exclude は回復不能／誤 Include は Phase 4 の手間が増えるだけ）で、
+単独スクリーニングは関連文献の **13%** を見落とす（2名体制は 3%）という RCT の実測がある。
+**除外の方向にだけ2名を要求**することで、工数を抑えつつ感度を保つ。
+
+### 11.2 手順
+
+```bash
+# stage 1: 判定シートを生成（CSV → Excel）
+python -X utf8 scripts/make_screening_sheets.py
+python -X utf8 scripts/make_screening_xlsx.py
+
+#   → screening/sheet_<id>.xlsx を各評価者に配布
+#   → 記入後に screening/ へ戻してもらう
+
+# stage 2: 著者の記入完了後、Exclude/Unsure だけを第2評価者へ
+python -X utf8 scripts/make_screening_stage2.py
+python -X utf8 scripts/make_screening_xlsx.py --prefix stage2_
+
+# 集計: κ・協議リスト・最終判定
+python -X utf8 scripts/score_screening.py
+```
+
+### 11.3 設計上の要点
+
+- **評価者ごとに独立したファイル**にしている。1枚のシートに両者の判定列を並べると、
+  先に書いた側が後の側から見えて独立性が壊れ、κ が意味を失う。
+  **stage 2 のシートにも著者の判定は入れていない**
+- **割当は決定論的**（校正セットの抽出・第2評価者の振り分けとも文献キーの MD5）。
+  乱数を使わないので再生成しても記入済みの作業は動かない
+- **κ は校正セット164件でのみ算出する。** 除外プールだけで計算すると著者の判定が
+  定義上すべて Exclude で分散が無く、**実際の一致率によらず κ が常に 0** になる
+- `kw_groups`（概念群スコア）は**読む順序のトリアージ専用**。この値による自動除外はしない
+- 判定シートは記入中は git 追跡しない（互いの判定が見えるため）。
+  **完了後に `git add -f` で監査証跡として追跡に加える**
+
+### 11.4 報告に必要な数値
+
+- ペア別 Cohen's κ（3本）とその平均、Landis & Koch の解釈
+  — **校正セット164件で算出したものであることを明記する**
+- liberal accelerated で1名の Include により通過した件数（第2評価者を経ていない分）
+- 一致件数 / 要協議件数、協議で解決した件数 / 解決せず Include に倒した件数
+- Phase 3b の Include 件数（= Phase 4 の対象）と Exclude 件数
+- 取得経路別（database / snowballing）の内訳 — PRISMA の左右カラム別報告用
+
+---
+
+## 12. 期待される知見と貢献
 
 本分類データを用いた分析によって明らかにしたい知見:
 
