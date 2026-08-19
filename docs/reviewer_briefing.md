@@ -73,6 +73,10 @@ VRでアバタを巨大化・縮小化したとき、脳は2通りの解釈が�
 これが**最も直感的な答え**です。以下は著者が事前に「これは確実に対象」と特定している論文
 （gold set、`self_scale_references.csv`）で、検索がこれらを拾えるかで手法の妥当性を検証しています。
 
+> **この17件は、お二人が判定する164件には1件も含まれていません**（2026-08-19 照合済み。
+> `outputs/known_item_in_screening.csv`）。「正解を見せられている」状態にはなっていないので、
+> 安心して例としてご覧ください。
+
 | 年 | 論文（タイトル短縮） | 掲載先 | 介入モダリティ | 評価対象 |
 |---|---|---|---|---|
 | 2015 | Self-characteristics and sound in immersive virtual real… | 2015 IEEE Virtual Reality (VR) | Multisensory-Auditory | Self-scale |
