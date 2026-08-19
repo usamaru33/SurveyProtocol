@@ -22,3 +22,4 @@ VR空間における自己スケール感覚のシステマティック・レビ
 - rule.md 本来の Phase 3（LLM要旨判定）と Phase 4（全文PICOS評価）は**未着手**。
 - 兄弟フォルダ `docs-system/` は Semantic Scholar ベースの文献ブラウザ（Next.js）。サーベイ本体とは未接続。`DocsSystem/` は空（廃棄跡）。
 - 作業終了時は必ず `/survey-log` で PROGRESS_LOG.md に追記する。
+- PR を作るときは必ず `/survey-pr` を通す（全文書への反映漏れを検証する手順）。
