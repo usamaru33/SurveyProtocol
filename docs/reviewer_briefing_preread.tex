@@ -1,0 +1,367 @@
+%% reviewer_briefing_preread.tex
+%% 評価者向け 事前配布資料（Phase 3b スクリーニング）
+%% 内容の正は docs/reviewer_briefing_preread.md。こちらは配布用の組版。
+%% ビルド: lualatex --interaction=nonstopmode reviewer_briefing_preread.tex
+\documentclass[a4paper]{ltjsarticle}
+
+\usepackage{luatexja-fontspec}
+\usepackage[margin=20mm,top=18mm,bottom=20mm]{geometry}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+%% --- 配色 ---
+\definecolor{accent}{HTML}{1F4E79}
+\definecolor{soft}{HTML}{F0F4F8}
+\definecolor{warn}{HTML}{FDF1E7}
+\definecolor{rule}{HTML}{C8D4E0}
+
+%% --- 見出し ---
+\usepackage{titlesec}
+\titleformat{\section}{\normalfont\Large\bfseries\color{accent}}{\thesection.}{0.6em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries\color{accent}}{\thesubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{1.6\baselineskip}{0.6\baselineskip}
+\titlespacing*{\subsection}{0pt}{1.1\baselineskip}{0.4\baselineskip}
+
+%% --- 強調ボックス ---
+\newcommand{\keybox}[1]{%
+  \par\medskip
+  \noindent\colorbox{soft}{%
+    \begin{minipage}{\dimexpr\linewidth-2\fboxsep\relax}
+      \vspace{2pt}\centering\bfseries\large #1\vspace{4pt}
+    \end{minipage}}%
+  \par\medskip}
+
+\newcommand{\notebox}[1]{%
+  \par\medskip
+  \noindent\colorbox{warn}{%
+    \begin{minipage}{\dimexpr\linewidth-2\fboxsep\relax}
+      \vspace{4pt}#1\vspace{4pt}
+    \end{minipage}}%
+  \par\medskip}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\setlist[itemize]{leftmargin=1.4em,itemsep=2pt,topsep=3pt}
+\renewcommand{\arraystretch}{1.25}
+
+\begin{document}
+
+\begin{center}
+  {\LARGE\bfseries\color{accent} 事前お読みいただく資料}\\[4pt]
+  {\large Phase 3b\quad Title/Abstract スクリーニング}\\[10pt]
+  {\small 説明会: 2026年8月20日（30分）\quad|\quad 作成: 2026年8月19日}
+\end{center}
+
+\vspace{4pt}
+\noindent\textcolor{rule}{\rule{\linewidth}{0.8pt}}
+\vspace{6pt}
+
+\noindent
+いただいたご質問のうち、\textbf{文章で答えられるものを先にお答えします。}
+当日は「ファイルの見方」と「実際の論文での判断すり合わせ」に時間を使わせてください。
+
+\noindent
+詳細版は \texttt{reviewer\_briefing.md} にあります（長いので、当日の話が分かりにくかった箇所だけ後から引いてください）。
+
+%% ============================================================
+\section{何を調べる研究か}
+
+\subsection*{いただいた理解}
+
+\begin{quote}
+VR空間においてユーザが自身の身体の大きさをどのように知覚するか
+\end{quote}
+
+\noindent
+\textbf{ほぼその通りです。} そのうえで、本研究の主張はもう一段先にあります。
+
+\medskip
+\noindent
+VRでアバタを巨大化・縮小化したとき、脳は2通りの解釈ができます。
+
+\begin{center}
+\begin{tabularx}{\linewidth}{L{7em} L{13em} X}
+\toprule
+ & 解釈 & 例 \\
+\midrule
+\textbf{自己スケール} & \textbf{自分が}大きく（小さく）なった & 「巨人になった気がする」 \\
+\textbf{環境スケール} & \textbf{世界が}小さく（大きく）なった & 「ミニチュアの街を見ている」 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\noindent
+この2つは\textbf{主観的にはほとんど区別できません。} そして——ここが本研究の出発点ですが——
+\textbf{多くの先行研究が測っているのは後者（環境スケール）のほう}です。
+「自己の身体を操作して、外界の見え方を測る」という構造的なズレが分野全体にあります。
+
+\medskip
+\noindent
+さらに、操作の手段が\textbf{ほぼ視覚に限られている}という偏りもあります。そこで本レビューは、
+
+\begin{enumerate}[leftmargin=1.8em]
+  \item この\textbf{視覚偏重と測定のズレを、網羅的な文献調査で定量的に示し}、
+  \item 聴覚・触覚といった\textbf{非視覚的手がかりが果たしうる役割を、多感覚統合の理論から導く}
+\end{enumerate}
+
+\noindent
+ことを目指しています。
+
+\keybox{「VRで自分の体の大きさをどう感じるか」は、これまでほぼ視覚だけで、\\
+しかも「自分」ではなく「世界」を測る形で研究されてきた。その偏りを可視化する。}
+
+\subsection*{具体的にどういう論文か（実例）}
+
+著者が事前に「これは確実に対象」と特定している論文が17件あります。そのうち3件を挙げます。
+
+\begin{center}
+\begin{tabularx}{\linewidth}{L{9.5em} L{10em} X}
+\toprule
+論文 & 掲載先 & 何をした研究か \\
+\midrule
+Leyrer et al. 2011
+& \textbf{ACM SIGGRAPH SAP}\newline （HCI系国際会議）
+& 眼の高さとアバタの有無を分離して操作し、\textbf{自己中心距離の推定}への影響を測った。\textbf{操作するのは自分の身体、測るのは外界}という、本研究が問題にするズレの典型例 \\
+\addlinespace
+Serino et al. 2020\newline \textit{Gulliver's virtual travels}
+& \textbf{Cognitive Processing}\newline （認知科学系ジャーナル）
+& 極端な体サイズへの能動的身体化。縮小では身体イメージが有意に減少し、拡大では変化なし。\textbf{数少ない「自己」を測った研究} \\
+\addlinespace
+Okada et al. 2025
+& \textbf{IEEE VRW}\newline （HCI系国際会議\newline ・\mbox{\textbf{2ページ}}）
+& セルフタッチの触覚フィードバックと体サイズの交互作用。\textbf{視覚以外}を扱う数少ない例 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\noindent
+ここから読み取っていただきたいのは3点です。
+
+\begin{enumerate}[leftmargin=1.8em]
+  \item \textbf{心理・認知系の雑誌と、HCI系の国際会議の両方が対象}です。「HCIの論文だけ」ではありません。
+  \item \textbf{2ページの短い論文も対象}です。ページ数は除外理由になりません（実験があれば対象）。
+  \item \textbf{視覚だけを扱った研究こそが主要な調査対象}です。「多感覚を扱っていないから物足りない」ということはありません。\textbf{それらが「視覚偏重」という主張の分母になります。}
+\end{enumerate}
+
+%% ============================================================
+\section{なぜこの手順が必要か}
+
+\subsection*{システマティックレビューという形式の要求}
+
+通常の文献紹介は「著者が良いと思った論文を選んで紹介する」ものです。
+これに対しシステマティックレビューは、\textbf{選び方を先に決めて機械的に適用し、
+選定の過程を第三者が再現・監査できる形で公開する}ことを要求します。
+投稿先の ACM Computing Surveys と、報告基準である PRISMA 2020 がこれを求めています。
+
+\medskip
+\noindent
+だから「著者が読んで決める」では足りず、\textbf{複数人が独立に判定した記録}が要ります。
+
+\subsection*{なぜ複数人なのか}
+
+1人でスクリーニングすると、\textbf{関連文献の約13\%を見落とす}という無作為化比較試験の実測があります（感度86.6\%。2名なら97.5\%）。
+
+\begin{quote}\small
+Gartlehner et al. (2020) \textit{J Clin Epidemiol} 121:20--28. DOI: 10.1016/j.jclinepi.2020.01.005
+\end{quote}
+
+\noindent
+ただし全1,052件を2名で見ると工数が単純に倍になります。そこで採っているのが
+\textbf{liberal accelerated} という方式です。
+
+\keybox{1人が Include にすれば通す。Exclude するには2人必要。}
+
+\noindent
+この段階のミスは\textbf{非対称}だからです。
+
+\begin{itemize}
+  \item \textbf{誤って Exclude} → その論文は二度と検討されない（\textbf{回復不能}）
+  \item \textbf{誤って Include} → 次の全文評価で落とせるだけ（\textbf{手間が増えるだけ}）
+\end{itemize}
+
+\noindent
+除外の方向にだけ2名を要求することで、工数を抑えつつ見落としを防いでいます。
+
+%% ============================================================
+\section{164件と1,052件の関係}
+
+いただいたご質問は
+
+\begin{quote}
+164件の後に著者が1,052件を判定する、という流れが十分に理解できておらず
+\end{quote}
+
+\noindent
+というものでした。\textbf{この順番の理解は正確ではありません。} 正しくはこうです。
+
+\keybox{164件は、1,052件の「一部」です。前後関係ではなく、包含関係です。}
+
+\begin{center}
+\begin{minipage}{0.95\linewidth}
+\ttfamily\small
+1,052件 ── 判定対象のすべて\\
+\hspace*{2.0em}│\\
+\hspace*{2.0em}├─ \textbf{164件（15.6\%）「校正セット」}\\
+\hspace*{2.0em}│\hspace*{2.2em}→ 著者・お二人の \textbf{3名全員} が、同じ164件を独立に判定する\\
+\hspace*{2.0em}│\hspace*{2.2em}→ 評価者間一致度（$\kappa$）はこの164件だけで算出する\\
+\hspace*{2.0em}│\\
+\hspace*{2.0em}└─ \textbf{888件}\\
+\hspace*{4.6em}→ stage 1 は著者ひとりが判定する\\
+\hspace*{4.6em}→ そのうち \textbf{著者が Exclude / Unsure にしたものだけ} を\\
+\hspace*{6.6em}stage 2 で第2評価者が確認する（最大 449件 / 439件）
+\end{minipage}
+\end{center}
+
+\medskip
+\noindent
+\textbf{時系列で書くと:}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{L{5.5em} L{5em} X L{9em}}
+\toprule
+ & 誰が & 何件 & いつ \\
+\midrule
+\textbf{stage 1} & 著者 & \textbf{1,052件すべて}（164件を含む） & いま並行して進行 \\
+\textbf{stage 1} & お二人 & \textbf{164件}（校正セット） & いま（〜8/26） \\
+\textbf{stage 2} & お二人 & 著者が Exclude / Unsure にした分だけ & 著者の stage 1 完了後 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\noindent
+つまり——
+
+\begin{itemize}
+  \item \textbf{著者が1,052件を判定するのは「164件の後」ではなく、同時並行です。}
+  \item \textbf{お二人の164件は、その1,052件の中から抜き出した部分集合です。} 別物ではありません。
+  \item \textbf{164件が終わったら第2ラウンド（stage 2）があります。} 件数は著者の判定が終わるまで確定しません。
+\end{itemize}
+
+\subsection*{なぜ164件だけ3人で見るのか}
+
+\textbf{評価者間一致度（$\kappa$）を計算するためです。}
+$\kappa$ は「2人の判定がどれだけ一致したか」を偶然の一致を割り引いて測る指標で、
+\textbf{同じ対象を複数人が判定していないと計算できません。}
+
+\medskip
+\noindent
+stage 2 の除外プールだけで計算しようとすると、そこに入っているのは定義上すべて
+「著者が Exclude / Unsure にしたもの」なので、\textbf{著者側の判定に分散がなく $\kappa$ が構造的に常に0}に
+なってしまいます。そのため、3名全員が同じ集合を判定する部分が別に必要で、それが校正セット164件です。
+
+\notebox{\textbf{この164件も、判定基準は他の888件とまったく同じです。}
+「テストだから厳しく」といった調整は不要で、普段どおり判定してください。}
+
+%% ============================================================
+\section{8月20日に説明すること}
+
+ご依頼いただいた3点を、この順で扱います。
+
+\subsection{ファイルの説明（Excel と CSV の違いなど）}
+
+\keybox{お二人が触るのは \texttt{sheet\_<お名前>.xlsx} の1つだけです。}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{L{13em} X L{7.5em}}
+\toprule
+ファイル & 何か & 触るか \\
+\midrule
+\textbf{\texttt{sheet\_<お名前>.xlsx}} & \textbf{記入用の作業ファイル。} ドロップダウン・色分け・入力チェックが入っている & \textbf{これだけ記入する} \\
+\texttt{sheet\_<お名前>.csv} & 同じ内容の機械可読な元データ。集計スクリプトが読む正本 & 触らない \\
+\texttt{EXAMPLE\_記入見本.xlsx} & 記入例5件。全員に同じものを配布 & 参照のみ \\
+\texttt{assignment.csv} & 誰がどれを担当するかの割当表 & 触らない \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\noindent
+\textbf{なぜ両方あるのか。} CSV は文字だけの単純な形式で、集計プログラムが確実に読めます。
+一方 CSV にはドロップダウンも色分けもセルのロックも作れません。
+そこで\textbf{「記入は Excel、集計は CSV」}と役割を分けています。
+xlsx をご返送いただければ、こちらで CSV に戻して集計します。
+
+\subsection{記入の粒度}
+
+\textbf{「判定」シートの3列だけです。}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{L{6em} L{11em} X}
+\toprule
+列 & 必須か & 粒度の目安 \\
+\midrule
+\textbf{判定} & \textbf{必須} & \texttt{Include} / \texttt{Exclude} / \texttt{Unsure} から選ぶだけ \\
+\addlinespace
+\textbf{除外理由} & \textbf{Exclude のときのみ必須} & 9択のドロップダウンから\textbf{1つ}選ぶ。複数該当するときは\textbf{最も明白なもの1つ}を選び、残りはメモへ \\
+\addlinespace
+\textbf{メモ} & 任意\newline （除外理由が「その他」のときのみ必須） & \textbf{1行で十分。} 後日の協議で「なぜそう判断したか」が復元できる程度。長文は不要 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\noindent
+\textbf{メモの粒度の具体例:}
+
+\begin{itemize}
+  \item 良い例（Unsure に付ける）:「HMD か明記なし。要旨だけでは判断不能」
+  \item 良い例（Exclude・その他）:「同一著者の同一実験の別報告に見えるが確証なし」
+  \item 不要:「この研究は〜という背景のもと〜を目的として\ldots」（要約は書かなくて構いません）
+\end{itemize}
+
+\noindent
+\textbf{判定の原則を1つだけ覚えていただければ十分です。}
+
+\keybox{除外できると確信できないものは残す（Include に倒す）。迷ったら Unsure。}
+
+\noindent
+無理に二択にしないでください。\texttt{Unsure} は後日の協議に回る正しい経路です。
+
+\subsection{実際の論文でのすり合わせ}
+
+ご要望のあった「1〜2件の論文を例に、該当するかどうかと議論の観点をすり合わせたい」を
+当日のメインにします。\textbf{ひとつだけお願いがあります。}
+
+\keybox{例に使うのは、お二人が担当する164件の「外」の論文に\\ 限らせてください。}
+
+\noindent
+担当分の論文を事前に一緒に検討してしまうと、その論文について\textbf{独立した判定ではなくなり}、
+$\kappa$（評価者間一致度）が意味を失います。stage 2 で配られる可能性のある論文も同様です。
+
+\medskip
+\noindent
+そこで当日は、\textbf{判定対象にまったく含まれていない論文}を例に使います。
+すり合わせたい観点は同じように扱えますし、独立性も保てます。具体的には——
+
+\begin{itemize}
+  \item \texttt{EXAMPLE\_記入見本.xlsx} の5件（Include / Exclude 3種 / Unsure）
+  \item 上記17件のうち、判定対象1,052件にまったく含まれていない\textbf{9件}\\（第1節に挙げた3件はすべてこれに該当します）
+\end{itemize}
+
+\notebox{\textbf{判定中に個別の論文で迷われた場合も、ご相談ではなく \texttt{Unsure} にしてください。}
+それが協議に回る正しい経路です（基準そのものへのご質問は、いつでも歓迎です）。}
+
+%% ============================================================
+\section{締切}
+
+\keybox{2026年8月26日（火）}
+
+\noindent
+記入済みの \texttt{sheet\_<お名前>.xlsx} をご返送ください。集計と $\kappa$ の算出はこちらで行います。
+
+\medskip
+\noindent
+164件のうち\textbf{35件は要旨がなくタイトルだけ}です（DOIから外部補完しても取得できなかったもの）。
+判断できなければ \texttt{Unsure} にしてください。件数は論文の Threats to Validity に明記します。
+
+\medskip
+\noindent
+要旨のある129件は\textbf{中央値1,466字}あります。1件1〜2分として3〜5時間程度が目安ですが、
+迷ったものを \texttt{Unsure} に倒していただければその分短くなります。日をまたいで分割して構いません。
+
+\notebox{\textbf{間に合わない見込みが立った時点でご連絡ください。}
+未記入のまま提出されるより、期日を調整するほうが安全です（未記入があると $\kappa$ が算出できません）。}
+
+\end{document}
