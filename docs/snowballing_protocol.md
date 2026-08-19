@@ -338,6 +338,42 @@ step2 で脱落した当の会場であり、回収目的を自ら打ち消す�
 > 5%、Title+Abstract で 91% が成立する。`found_abstract` の取得が
 > トリアージ成立の前提条件である。
 
+### 4.7 実測: Known-Item Test への寄与（2026-08-19 照合、Threats to Validity 転用可）
+
+**§0 が掲げた目的(A)「Venue フィルタで脱落した Known-Item の回収」が実際にどれだけ
+達成されたかの実測値。** 再現は `python -X utf8 scripts/known_item_screening_audit.py`
+（読み取り専用、出力は `outputs/known_item_in_screening.csv`）。
+
+| 対象 | Known-Item(in-scope) 17件のうち残存 | recall |
+|---|---|---|
+| DB検索のみ（`known_item_test.py` の step3 = 795件） | 5 | 29.4% |
+| **判定対象 1,052件（引用探索 257件を加算）** | **8** | **47.1%** |
+
+**引用探索が3件を回収した。**
+
+| 年 | 論文 | 回収経路 |
+|---|---|---|
+| 2011 | Being Barbie: The Size of One's Own Body Determines the Perceived Size of the World | snowballing |
+| 2020 | The plausibility paradox for scaled-down users in virtual environments | snowballing |
+| 2021 | The Plausibility Paradox for Resized Users in Virtual Environments | snowballing |
+
+**Being Barbie は `known_item_analysis.md` が「G1（没入環境）に命中せず、検索式が
+構造的に取りこぼす」と特定していた文献である。** ライブラリを追加しても直らない
+（PLoS ONE は索引済み）と分析されており、**クエリのギャップを引用探索が実際に埋めた**
+ことになる。これは引用探索が「念のため」ではなく**検索式の既知の欠陥に対する
+機能的な補完**であったことの直接的な証拠であり、Threats to Validity で用いる。
+
+> **書くときの注意:** 47.1% は依然として低い。引用探索は recall を改善したが
+> **十分な水準には達していない**。この点は隠さず、残る9件の脱落理由（Venue
+> ホワイトリスト・クエリのG1ギャップ）とあわせて報告すること。
+> 「引用探索で解決した」ではなく「29.4% → 47.1% に改善したが限界が残る」が正確な記述。
+
+> **κ への影響は無い。** 8件のうち **校正セット164件に含まれるものは0件**。
+> gold set の内容を評価者に提示しても評価者間一致度の算出には影響しない
+> （2026-08-19 の説明会資料 `reviewer_briefing.md` で17件を提示する判断の根拠）。
+
+---
+
 ## 5. 完了チェックリスト
 
 - [ ] step2 脱落 Known-Item 6件すべてについて回収可否と最終判断を記録した
