@@ -45,6 +45,7 @@ from __future__ import annotations
 import argparse
 import csv
 import sys
+import unicodedata
 from collections import Counter, defaultdict
 from itertools import combinations
 from pathlib import Path
@@ -57,6 +58,20 @@ sys.path.insert(0, str(_HERE))
 csv.field_size_limit(10 ** 9)
 
 from make_screening_sheets import REVIEWERS, second_reviewer_of  # noqa: E402
+
+# 除外理由の統制語彙は xlsx 生成側が正。openpyxl が無い環境(CSV だけで回す場合)でも
+# 集計自体は動かしたいので、取れなければ語彙チェックだけを黙って落とす。
+try:
+    from make_screening_xlsx import REASON_OTHER, REASON_VALUES  # noqa: E402
+except SystemExit:
+    REASON_VALUES, REASON_OTHER = [], "その他"
+
+
+def _pad(s: str, width: int) -> str:
+    """全角を2桁と数えて右詰めする。f-string の :Ns は文字数で数えるため桁が揃わない。"""
+    w = sum(2 if unicodedata.east_asian_width(ch) in "WF" else 1 for ch in s)
+    return s + " " * max(0, width - w)
+
 
 VALID = {"include", "exclude", "unsure"}
 CANON = {"include": "Include", "exclude": "Exclude", "unsure": "Unsure"}
@@ -164,6 +179,7 @@ def main() -> None:
     # --- 1. 検査 -----------------------------------------------------------
     problems: list[str] = []
     blank = Counter()
+    reason_counts: Counter = Counter()   # PRISMA 用: 理由別の除外件数
     for rev, sheet in sheets.items():
         # stage 1 の担当: 著者は全件、他2名は校正セットのみ
         expected = (set(assignment) if rev == "author"
@@ -180,8 +196,21 @@ def main() -> None:
                 blank[rev] += 1
             elif d not in VALID:
                 problems.append(f"{rev}/{rid}: 不正な decision '{row.get('decision')}'")
-            elif d == "exclude" and not (row.get("reason") or "").strip():
-                problems.append(f"{rev}/{rid}: Exclude だが reason が空")
+            elif d == "exclude":
+                reason = (row.get("reason") or "").strip()
+                if not reason:
+                    problems.append(f"{rev}/{rid}: Exclude だが reason が空")
+                    continue
+                reason_counts[reason] += 1
+                # 統制語彙(make_screening_xlsx.EXCLUDE_REASONS)の外の値は、
+                # ドロップダウンを外して手入力した場合にだけ入りうる。集計不能なので検出する。
+                if REASON_VALUES and reason not in REASON_VALUES:
+                    problems.append(
+                        f"{rev}/{rid}: reason が選択肢に無い '{reason}'")
+                elif (reason == REASON_OTHER
+                      and not (row.get("note") or "").strip()):
+                    problems.append(
+                        f"{rev}/{rid}: reason が「{REASON_OTHER}」だが note が空")
 
     print("=" * 66)
     print("  Phase 3b 集計")
@@ -205,6 +234,19 @@ def main() -> None:
             print(f"    - {p}")
         if len(problems) > 15:
             print(f"    ... 他 {len(problems) - 15} 件")
+
+    # --- 1b. 除外理由の内訳(PRISMA の報告にそのまま転記できる形で出す) -----
+    # 統制語彙にしてある目的がこれ。自由記述のままでは事後の手作業コーディングが要る。
+    # ※ここは評価者ごとの判定を合算した延べ件数。最終的な除外内訳は
+    #   final_decisions.csv が出てから確定する(協議で覆るものがあるため)。
+    if reason_counts:
+        total = sum(reason_counts.values())
+        print(f"\n  [除外理由の内訳 — 延べ {total:,} 件 / 評価者合算]")
+        order = {v: i for i, v in enumerate(REASON_VALUES)}
+        for reason, n in sorted(reason_counts.items(),
+                                key=lambda kv: (order.get(kv[0], 999), -kv[1])):
+            mark = "" if reason in order else "  ← 選択肢外"
+            print(f"    {_pad(reason, 36)} {n:5,d} ({n / total * 100:4.1f}%){mark}")
 
     # --- 2. ペアごとの Cohen's κ(校正セットのみ) --------------------------
     #

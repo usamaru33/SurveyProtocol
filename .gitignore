@@ -23,3 +23,8 @@ raw/IEEE2/
 # 割当表・協議リスト・最終判定は最初から追跡する。
 screening/sheet_*.csv
 screening/sheet_*.xlsx
+
+# Excel の一時ロックファイル(シートを開いている間だけ生成される)。
+# 配布物に紛れると受け取り側が混乱するため、追跡もアーカイブもしない。
+screening/~$*
+~$*.xlsx
