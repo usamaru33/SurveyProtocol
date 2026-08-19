@@ -10,7 +10,9 @@ make_screening_xlsx.py — Phase 3b 判定シートの Excel 版を生成する
 
 【なぜ xlsx にするか】
 1,700件以上を CSV エディタで読み書きするのは現実的でない。Excel なら
-  - decision 列を**ドロップダウン**にでき、表記ゆれ(include/INCLUDE/Inc)が発生しない
+  - decision 列と reason 列を**ドロップダウン**にでき、表記ゆれが発生しない
+    (include/INCLUDE/Inc、「患者対象」/「P: 患者が対象」/「対象者が患者」…)。
+    reason が統制語彙になると、除外理由の内訳をそのまま集計・報告できる
   - 要旨を折り返して読める
   - 見出し固定・フィルタで「未記入だけ表示」などができる
   - メタ列をロックして誤編集を防げる
@@ -75,7 +77,7 @@ C_NOTE = "44546A"
 COLUMNS = [
     ("record_id",    "ID",              13, False, False),
     ("decision",     "判定 ★",          13, False, True),
-    ("reason",       "除外理由 ★",      26, True,  True),
+    ("reason",       "除外理由 ★",      34, True,  True),
     ("note",         "メモ",            22, True,  True),
     ("title",        "タイトル",         52, True,  False),
     ("abstract",     "要旨",             95, True,  False),
@@ -94,9 +96,12 @@ COLUMNS = [
 HEADER_HELP = {
     "判定 ★": "この列を埋めてください。セルを選ぶとドロップダウンが出ます。\n"
               "Include=残す / Exclude=除外 / Unsure=判断保留(協議に回ります)",
-    "除外理由 ★": "Exclude のときは必須です。抵触した PICOS 基準を書いてください。\n"
-                  "例) P: 患者対象 / I: HMDでない / S: ユーザー実験なし",
-    "メモ": "任意。協議で持ち出したい論点があれば。",
+    "除外理由 ★": "Exclude のときは必須です。ドロップダウンから1つ選んでください。\n"
+                  "選択肢の定義は「はじめに」シートにあります。\n"
+                  "複数該当するときは最も明白なものを1つ選び、残りはメモへ。\n"
+                  "「その他」を選んだときはメモに理由を必ず書いてください。",
+    "メモ": "任意。協議で持ち出したい論点があれば。\n"
+            "ただし除外理由が「その他」のときは必須です。",
     "要旨有無": "N = 要旨が無く、タイトルだけで判断することになる文献です。",
     "取得経路": "database = データベース検索で見つけたもの\n"
                 "snowballing = 引用探索(参考文献・被引用)で見つけたもの\n"
@@ -115,6 +120,51 @@ HEADER_HELP = {
 
 DECISIONS = ["Include", "Exclude", "Unsure"]
 
+# --- 除外理由の統制語彙 -------------------------------------------------------
+# なぜ自由記述をやめたか:
+#   (1) PRISMA 2020 は除外理由の記録を求めるが、自由記述だと後から**数えられない**。
+#       統制語彙にしておけば「理由別の除外件数」をそのまま表に載せられる。
+#   (2) 評価者3名で表記が割れると、同じ理由が別物として集計される。
+#   (3) 基準名で選ばせること自体が「PICOS のどれに抵触したか」を毎回考えさせる。
+#
+# なぜ C(比較対象)が無いか:
+#   比較条件は要旨に書かれないことが多く、Title/Abstract 段で C を根拠に落とすと
+#   誤除外(回復不能)を招く。C 抵触の判断は Phase 4(全文)に送る。
+#
+# なぜ「その他」があるか:
+#   閉じた語彙は、当てはまらない事例を無理に既存カテゴリへ押し込ませる。
+#   逃げ道を用意したうえで**メモへの記述を必須**にすれば、事後に語彙を見直せる。
+#
+# (選択肢, 定義) — 選択肢の文字列がそのままセルの値になる。
+# 変更するときは EXAMPLE(make_screening_example.py)と screening_protocol.md も直すこと。
+EXCLUDE_REASONS = [
+    ("P: 対象者が不適合",
+     "健常成人でない(小児・高齢者・患者・特定の専門職集団など)"),
+    ("I: HMD-VR でない",
+     "デスクトップ画面・AR/MR・CAVE・実環境のみなど、HMD を用いた VR でない"),
+    ("I: スケール操作/多感覚刺激が無い",
+     "身体・空間スケールの操作も、多感覚刺激の提示も行っていない"),
+    ("O: スケール知覚の測定が無い",
+     "自己・環境のスケール変容を測る定量指標が無い"),
+    ("S: ユーザー実験が無い",
+     "技術提案・デモ・シミュレーションのみで、実証的なユーザー実験を伴わない"),
+    ("S: 原著論文でない",
+     "総説・サーベイ・抄録のみ・ポスター・基調講演・書籍など"),
+    ("スコープ外(主題が無関係)",
+     "基準を当てるまでもなく、本レビューの主題と無関係"),
+    ("重複(同一研究の別報告)",
+     "既に対象に含まれている研究の別報告・拡張版・重複登録"),
+    ("その他",
+     "上のどれにも当てはまらない。※メモ列に理由を必ず書くこと"),
+]
+REASON_VALUES = [v for v, _ in EXCLUDE_REASONS]
+REASON_OTHER = "その他"
+
+# ドロップダウンの選択肢を置く隠しシート。
+# インラインの選択肢リスト('"a,b,c"')は Excel の仕様で 255 文字までしか入らず、
+# 日本語の選択肢では即座に溢れる。シート上の範囲を参照する形なら制限が無い。
+LIST_SHEET = "_選択肢"
+
 INTRO = [
     ("Phase 3b  Title/Abstract スクリーニング  判定シート", "title"),
     ("", ""),
@@ -122,9 +172,17 @@ INTRO = [
     ("担当件数: {n:,} 件", "lead"),
     ("", ""),
     ("■ やること", "h"),
-    ("「判定」シートの ★ が付いた2列を埋めてください。", ""),
+    ("「判定」シートの ★ が付いた2列を埋めてください。どちらも選択式です。", ""),
     ("  ・判定 … Include(残す) / Exclude(除外) / Unsure(保留) から選ぶ", ""),
-    ("  ・除外理由 … Exclude のときは必須。抵触した PICOS 基準を書く", ""),
+    ("  ・除外理由 … Exclude のときは必須。下の一覧から1つ選ぶ", ""),
+    ("", ""),
+    ("■ 除外理由の選択肢", "h"),
+    ("集計して「理由別の除外件数」を論文に載せるため、選択式にしてあります。", ""),
+    ("__REASON_TABLE__", ""),
+    ("複数該当するときは、最も明白なものを1つ選び、残りはメモに書いてください。", ""),
+    ("当てはまるものが無ければ「その他」を選び、メモに理由を必ず書いてください。", "lead"),
+    ("(C(比較対象)は選択肢にありません。比較条件は要旨に書かれないことが多く、", ""),
+    ("  この段階で C を根拠に落とすと誤除外になるためです。全文評価に送ります。)", ""),
     ("", ""),
     ("■ 判定の考え方", "h"),
     ("除外できると確信できないものは残してください(Include)。", ""),
@@ -169,7 +227,7 @@ def load_rows(path: Path) -> list[dict]:
 
 def build_intro(ws, reviewer: str, n: int) -> None:
     ws.sheet_view.showGridLines = False
-    ws.column_dimensions["A"].width = 92
+    ws.column_dimensions["A"].width = 104
     styles = {
         "title": Font(size=16, bold=True, color=C_HEADER_BG),
         "h":     Font(size=12, bold=True, color=C_HEADER_BG),
@@ -177,13 +235,41 @@ def build_intro(ws, reviewer: str, n: int) -> None:
         "warn":  Font(size=11, bold=True, color="9C0006"),
         "":      Font(size=11),
     }
-    for i, (text, kind) in enumerate(INTRO, start=1):
+    # 語彙表はプレースホルダを実際の選択肢に展開する(EXCLUDE_REASONS と二重管理しない)
+    lines: list[tuple[str, str]] = []
+    for text, kind in INTRO:
+        if text == "__REASON_TABLE__":
+            lines += [(f"  ・{v}  … {d}", "") for v, d in EXCLUDE_REASONS]
+        else:
+            lines.append((text, kind))
+
+    for i, (text, kind) in enumerate(lines, start=1):
         c = ws.cell(row=i, column=1,
                     value=text.format(reviewer=reviewer, n=n) if text else "")
         c.font = styles[kind]
         c.alignment = Alignment(vertical="center", wrap_text=False)
         ws.row_dimensions[i].height = 24 if kind in ("title", "h") else 18
     ws.protection.sheet = True   # 説明シートは編集不可
+
+
+def build_reason_list_sheet(wb) -> str:
+    """除外理由の選択肢を置く隠しシートを用意し、DataValidation 用の参照文字列を返す。
+
+    インラインの選択肢リストは Excel の 255 文字制限に掛かるため、範囲参照にする。
+    定義列も並べて置いておくと、シートを表示すれば語彙表としても読める。
+    """
+    if LIST_SHEET in wb.sheetnames:
+        ws = wb[LIST_SHEET]
+    else:
+        ws = wb.create_sheet(LIST_SHEET)
+        for i, (value, desc) in enumerate(EXCLUDE_REASONS, start=1):
+            ws.cell(row=i, column=1, value=value)
+            ws.cell(row=i, column=2, value=desc)
+        ws.column_dimensions["A"].width = 34
+        ws.column_dimensions["B"].width = 60
+        ws.protection.sheet = True
+        ws.sheet_state = "hidden"     # 作業の邪魔にならないよう既定では隠す
+    return f"={LIST_SHEET}!$A$1:$A${len(EXCLUDE_REASONS)}"
 
 
 def build_sheet(ws, rows: list[dict]) -> None:
@@ -246,6 +332,19 @@ def build_sheet(ws, rows: list[dict]) -> None:
     ws.add_data_validation(dv)
     dv.add(f"{dcol}2:{dcol}{last}")
 
+    # --- 除外理由列のドロップダウン -----------------------------------------
+    # 選択肢が長いのでインラインリスト(255文字上限)は使えない。隠しシートの範囲を参照する。
+    rcol = get_column_letter(1 + [c[0] for c in COLUMNS].index("reason"))
+    ref = build_reason_list_sheet(ws.parent)
+    rv = DataValidation(type="list", formula1=ref, allow_blank=True, showDropDown=False)
+    rv.error = ("一覧から選んでください。当てはまるものが無ければ「その他」を選び、"
+                "メモ列に理由を書いてください。")
+    rv.errorTitle = "入力できない値です"
+    rv.prompt = "Exclude のときは必須。抵触した基準を1つ選ぶ(定義は「はじめに」シート)"
+    rv.promptTitle = "除外理由"
+    ws.add_data_validation(rv)
+    rv.add(f"{rcol}2:{rcol}{last}")
+
     # --- 条件付き書式 -------------------------------------------------------
     # (1) 要旨が無い行を淡く塗る。※色は補助で、「要旨有無」列の N でも判別できる
     hcol = get_column_letter(1 + [c[0] for c in COLUMNS].index("has_abstract"))
@@ -254,10 +353,17 @@ def build_sheet(ws, rows: list[dict]) -> None:
         FormulaRule(formula=[f'${hcol}2="N"'],
                     fill=PatternFill("solid", fgColor=C_NOABS_BG), stopIfTrue=False))
     # (2) Exclude なのに理由が空のセルを目立たせる(提出前の自己チェック用)
-    rcol = get_column_letter(1 + [c[0] for c in COLUMNS].index("reason"))
     ws.conditional_formatting.add(
         f"{rcol}2:{rcol}{last}",
         FormulaRule(formula=[f'AND(${dcol}2="Exclude",LEN(TRIM(${rcol}2))=0)'],
+                    fill=PatternFill("solid", fgColor="FFC7CE"),
+                    font=Font(color="9C0006", bold=True), stopIfTrue=False))
+    # (3) 理由が「その他」なのにメモが空のセルを目立たせる。
+    #     統制語彙の逃げ道は、記述が伴わないと事後に語彙を見直せず意味を失う。
+    ncol = get_column_letter(1 + [c[0] for c in COLUMNS].index("note"))
+    ws.conditional_formatting.add(
+        f"{ncol}2:{ncol}{last}",
+        FormulaRule(formula=[f'AND(${rcol}2="{REASON_OTHER}",LEN(TRIM(${ncol}2))=0)'],
                     fill=PatternFill("solid", fgColor="FFC7CE"),
                     font=Font(color="9C0006", bold=True), stopIfTrue=False))
 

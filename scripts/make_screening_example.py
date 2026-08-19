@@ -55,17 +55,19 @@ EXAMPLES = [
               "理由欄は Include のときは空で構わない"),
     # --- 明確に Exclude(P基準) ---
     dict(no=2, src="excluded", doi="10.1109/VR46266.2020.00078",
-         decision="Exclude", reason="P: 対象が患者・外科医で健常成人でない / スコープ外(手術支援)",
-         note="Exclude のときは**どの PICOS 基準に抵触したか**を書く。"
-              "「関係なさそう」ではなく基準名で書くのが重要(PRISMA が除外理由の記録を求めるため)"),
+         decision="Exclude", reason="P: 対象者が不適合",
+         note="Exclude のときは**どの基準に抵触したか**をドロップダウンから選ぶ。"
+              "対象が患者・外科医で健常成人でないので P。複数該当するとき"
+              "(これは主題もスコープ外)は最も明白なものを1つ選び、残りはこのメモへ"),
     # --- 明確に Exclude(I基準) ---
     dict(no=3, src="excluded", doi="10.1109/TVCG.2015.2440231",
-         decision="Exclude", reason="I: デスクトップモニタ提示で HMD を用いていない",
-         note="介入が HMD-VR でないもの。実験としては良質でも I 基準で落ちる"),
+         decision="Exclude", reason="I: HMD-VR でない",
+         note="デスクトップモニタ提示で HMD を用いていない。"
+              "実験としては良質でも介入が HMD-VR でなければ I 基準で落ちる"),
     # --- 明確に Exclude(S基準) ---
     dict(no=4, src="excluded", doi="10.1109/VR.2017.7892233",
-         decision="Exclude", reason="S: システム提案でユーザー実験による評価が無い",
-         note="技術提案・デモ。ユーザー実験を伴わないものは S 基準で落ちる"),
+         decision="Exclude", reason="S: ユーザー実験が無い",
+         note="システム提案・デモで、ユーザー実験による評価を伴わないもの"),
     # --- Unsure(判断保留) ---
     dict(no=5, src="excluded", doi="10.1145/3533376",
          decision="Unsure", reason="",
@@ -82,7 +84,12 @@ DOC_ROWS = [
     ("", ""),
     ("■ 記入するのは2列だけです", "h"),
     ("  ・判定 ★     … Include(残す) / Exclude(除外) / Unsure(保留) をドロップダウンで選ぶ", ""),
-    ("  ・除外理由 ★ … Exclude のときは必須。**抵触した PICOS 基準を書く**", ""),
+    ("  ・除外理由 ★ … Exclude のときは必須。**こちらもドロップダウンから選ぶ**", ""),
+    ("", ""),
+    ("■ 除外理由が選択式になっています", "h"),
+    ("__REASON_TABLE__", ""),
+    ("複数該当するときは最も明白なものを1つ選び、残りはメモへ(見本 EXAMPLE-2 参照)。", ""),
+    ("当てはまるものが無ければ「その他」を選び、メモに理由を必ず書いてください。", "warn"),
     ("", ""),
     ("■ PICOS 基準(Title/Abstract レベルに緩めたもの)", "h"),
     ("  P 対象者   … 健常成人。小児・高齢者(臨床対象)・患者は除外", ""),
@@ -175,20 +182,33 @@ def main() -> None:
         print("[WARN] openpyxl が無いため xlsx は作らない")
         return
 
-    from make_screening_xlsx import build_sheet, C_HEADER_BG
+    from make_screening_xlsx import EXCLUDE_REASONS, REASON_VALUES, build_sheet, C_HEADER_BG
+
+    # 見本の理由が統制語彙から外れていたら、配ったシートのドロップダウンで再現できない
+    for ex in EXAMPLES:
+        if ex["reason"] and ex["reason"] not in REASON_VALUES:
+            sys.exit(f"[ERROR] 見本 #{ex['no']} の除外理由「{ex['reason']}」は"
+                     f"統制語彙に無い。make_screening_xlsx.EXCLUDE_REASONS と揃えること")
+
+    doc_rows = []
+    for text, kind in DOC_ROWS:
+        if text == "__REASON_TABLE__":
+            doc_rows += [(f"  ・{v}  … {d}", "") for v, d in EXCLUDE_REASONS]
+        else:
+            doc_rows.append((text, kind))
 
     wb = Workbook()
     intro = wb.active
     intro.title = "はじめに"
     intro.sheet_view.showGridLines = False
-    intro.column_dimensions["A"].width = 96
+    intro.column_dimensions["A"].width = 104
     styles = {"h": Font(size=12, bold=True, color=C_HEADER_BG),
               "warn": Font(size=12, bold=True, color="9C0006"),
               "": Font(size=11)}
     intro["A1"] = "Phase 3b 判定シート  記入見本"
     intro["A1"].font = Font(size=16, bold=True, color=C_HEADER_BG)
     intro.row_dimensions[1].height = 26
-    for i, (text, kind) in enumerate(DOC_ROWS, start=3):
+    for i, (text, kind) in enumerate(doc_rows, start=3):
         c = intro.cell(row=i, column=1, value=text)
         c.font = styles[kind]
         c.alignment = Alignment(vertical="center")
