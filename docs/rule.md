@@ -315,8 +315,91 @@ Cochrane Crowd 上で実施された並行群間 RCT。参加者280名が2,000�
   Phase 3b が採る liberal accelerated は**除外側を二重化することでこの差を埋める**という
   構成であり、その旨を Threats to Validity に記述する。
 
-> **未収載（要確認）:** `liberal accelerated` という手法名の一次出典は未確定。
-> Nama et al. (2021, *Syst Rev* 10:98, DOI 10.1186/s13643-021-01632-6) が
-> 本用語を定義したうえで Khangura et al. (2012, *Syst Rev* 1:10,
-> DOI 10.1186/2046-4053-1-10) に帰属させているが、Khangura 2012 本文が実際に
-> 当該語を用いているかは未確認。**本文で用語を引く前に一次資料を確認すること。**
+> **【2026-08-20 解決】** `liberal accelerated` の一次出典は **[R2] Khangura et al. (2012)** で確定した。
+> 本節 [R2]〜[R8] を参照。
+
+### [R2] `liberal accelerated` の一次出典
+
+Khangura S, Konnyu K, Cushman R, Grimshaw J, Moher D.
+**Evidence summaries: the evolution of a rapid review approach.**
+*Systematic Reviews*, 1:10 (2012). DOI: [10.1186/2046-4053-1-10](https://doi.org/10.1186/2046-4053-1-10)
+
+「**1名が Include にすれば全文評価へ進め、Exclude には2名を要する**」という手続きを記述する。
+Nama et al. [R6] が本用語をこの文献に帰属させている。
+
+### [R3] Cochrane による公式ガイダンス（本方式の推奨）
+
+Garritty C, Gartlehner G, Nussbaumer-Streit B, King VJ, Hamel C, Kamel C, Affengruber L, Stevens A.
+**Cochrane Rapid Reviews Methods Group offers evidence-informed guidance to conduct rapid reviews.**
+*Journal of Clinical Epidemiology*, 130, 13–22 (2021).
+DOI: [10.1016/j.jclinepi.2020.10.007](https://doi.org/10.1016/j.jclinepi.2020.10.007)
+
+Cochrane Rapid Reviews Methods Group のガイダンス。一部を二重スクリーニングし、
+残りを1名で判定し、**除外された抄録はすべて第2評価者が確認する**という手続きを推奨する。
+**本プロジェクトの Phase 3b はこの形に該当する。**
+
+### [R4] 更新ガイダンス（推奨割合と、本方式への留保）
+
+Nussbaumer-Streit B, Sommer I, Hamel C, et al.
+**Rapid reviews methods series: Guidance on team considerations, study selection,
+data extraction and risk of bias assessment.**
+*BMJ Evidence-Based Medicine*, 28(6), 418–423 (2023).
+DOI: [10.1136/bmjebm-2022-112185](https://doi.org/10.1136/bmjebm-2022-112185)
+
+- 「We recommend dual assessment on a proportion of records, **for example, 20%**」
+- 単独判定へ移行してよいのは「reviewer agreement is high（**at least 80% agreement**）」のとき
+- 二重判定の段の後、「reviewers must **discuss and resolve conflicting decisions**」
+
+> **⚠️ 本プロジェクトへの留保（引用時に必ず併記すること）:**
+> 1. 本研究の校正セットは **15%（164件）** で、[R4] が例示する20%を下回る
+> 2. 本研究には **80%一致のゲートに相当する規定が無い**
+> 3. [R4] は除外確認方式について「**does not save much time and is often difficult to
+>    implement in SR software**」と述べている。**工数削減を主根拠にすると崩される**
+>
+> 反論の骨子と扱いは `screening_method_alternatives.md` §2-D を参照。
+
+### [R5] liberal accelerated 方式の実証
+
+Gates A, Gates M, DaRosa D, Elliott SA, Pillay J, Rahman S, Vandermeer B, Hartling L.
+**Decoding semi-automated title-abstract screening: findings from a convenience sample of reviews.**
+*Systematic Reviews*, 9:272 (2020). DOI: [10.1186/s13643-020-01528-x](https://doi.org/10.1186/s13643-020-01528-x)
+
+ML併用の liberal-accelerated 方式をシミュレートし、**誤除外 0〜3件（0〜14%）**、
+節約 **中央値26時間（IQR 9–42）**と報告。**本方式を直接検証したほぼ唯一の実証。**
+
+> **注意:** ML併用条件下の数字であり、本プロジェクト（ML不使用）にそのまま当てはまらない。
+> また誤除外は**ゼロではない**。
+
+### [R6] 基準限定の単独除外
+
+Nama N, Hennawy M, Barrowman N, O'Hearn K, Sampson M, McNally JD.
+**Successful incorporation of single reviewer assessments during systematic review screening:
+development and validation of sensitivity and work-saved of an algorithm that considers
+exclusion criteria and count.**
+*Systematic Reviews*, 10:98 (2021). DOI: [10.1186/s13643-021-01632-6](https://doi.org/10.1186/s13643-021-01632-6)
+
+24件のレビューで検証し、**感度低下0%だった除外基準**を特定
+（conference abstract / ineligible age group / case report・series）。
+
+> **⚠️ 流用時の注意:** 検証領域は小児医療。**本サーベイは実験を報告するポスター/
+> ショートペーパーを Include する**（Rev.14 / Rev.20）ため、
+> **「conference abstract」基準はそのまま援用できない。**
+
+### [R7] 能動学習による優先順位付け
+
+Teijema JJ, et al.（ASReview 関連の評価研究群）
+能動学習モデルは **WSS@95 で 63.9〜91.7%**（関連文献の95%を発見した時点で
+読まずに済む割合）を達成すると報告されている。
+
+> **⚠️ 本プロジェクトでは適格性判定に用いない**（`rule.md` Rev.2）。
+> WSS は**早期停止を前提とした指標**であり、停止した時点以降は機械が除外を決めたことになる。
+> **書誌情報は未確定。引用する場合は一次資料を特定すること。**
+
+### [R8] 早期停止基準の未解決性
+
+自動スクリーニングの停止基準については、**信頼度の較正（confidence が実際に当たっているか）が
+未解決の課題**であるとする系統的な検討がある（`Systematic Reviews` 誌ほか）。
+本プロジェクトが早期停止を採らない根拠のひとつ。
+
+> **書誌情報は未確定。引用する場合は一次資料を特定すること。**
+
