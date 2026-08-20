@@ -2,7 +2,10 @@
 
 > **【Rev.11 注記(2026-08-11)】本文書の gold set 関連の数値はすべて in-scope 13件時点のもの。**
 > Rev.11 で #3 Kilteni 2012 を background に移した(用語定義論文でPICOS上Phase4で除外されるため)。
-> 現行は **in-scope 12件 / step0 recall 66.67%(8/12) / venue脱落 5件(#7/#8/#10/#13/#14)**。
+> **現行(2026-08-20 時点、Rev.14 で gold set を17件へ拡充後): in-scope 17件 /
+> step0 recall 76.5%(13/17) / venue脱落 6件(#7/#8/#10/#13/#14/#23)**。
+> (2026-08-11 の本注記作成時は in-scope 12件 / 66.67%(8/12) / venue脱落5件 と記載していた。
+>  gold set が変わるとこの行も古くなるため、更新時は日付を書き換えること。)
 > 本文書は Rev.7 時点の分析記録として保存しており、数値は遡及更新していない。
 > 最新値は `protocol_changelog.md` Rev.11 と `known_item_analysis.md` を参照。
 
