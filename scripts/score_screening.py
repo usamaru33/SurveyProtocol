@@ -107,6 +107,41 @@ def landis_koch(k: float) -> str:
     return "almost perfect"
 
 
+def kappa_action(mean_k: float, pair_ks: list[float]) -> list[str]:
+    """κ の実測値から、Rev.21 で事前に定めた対応を返す。
+
+    方針は 2026-08-20 に**判定結果を見る前**に確定した(`rule.md` §Phase 3b / Rev.21)。
+    低い値が出てから基準を決めると後付けに見えるため、ここに実装して忘れられないようにする。
+    判断は**3カテゴリ版のペア平均**で行う(2カテゴリ版は参考であり閾値判断に使わない)。
+    """
+    out: list[str] = []
+    if mean_k != mean_k:
+        out.append("κ が算出不能。校正セットの記入状況を確認すること")
+        return out
+
+    if mean_k >= 0.61:
+        out.append("[≥0.61 substantial以上] 予定どおり続行してよい。κ を本文に報告する")
+    elif mean_k >= 0.41:
+        out.append("[0.41-0.60 moderate] 次を実施する:")
+        out.append("  1. 不一致・Unsure を全件協議(通常運用)")
+        out.append("  2. **不一致文献の除外理由の分布を検査**し、特定基準に集中していないか調べる")
+        out.append("  3. 集中していれば、その基準に該当する判定対象の全件を3名で再判定する")
+    else:
+        out.append("[<0.41 fair以下] stage 2 の範囲を拡大する:")
+        out.append("  著者が Include にしたものも第2評価者が確認する(実質的な全件二重化)")
+        out.append("  工数増は受け入れる")
+
+    low = [k for k in pair_ks if k == k and k < 0.41]
+    if low and mean_k >= 0.41:
+        out.append(f"※ 平均は基準を満たすが、{len(low)}ペアが単独で 0.41 未満。")
+        out.append("   該当ペアの stage 2 分には下位段の対応を適用すること")
+
+    out.append("")
+    out.append("いずれの場合も κ の実測値・解釈・発動した対応を必ず本文に記載する。")
+    out.append("校正セットの一部を除いた再計算 / 2カテゴリ版への切り替え / κ の不報告は禁止。")
+    return out
+
+
 def _load_csv(path: Path) -> dict[str, dict]:
     with path.open(encoding="utf-8-sig", newline="", errors="replace") as f:
         return {r["record_id"]: r for r in csv.DictReader(f) if r.get("record_id")}
@@ -279,6 +314,11 @@ def main() -> None:
         mean_k = sum(valid_k) / len(valid_k)
         print(f"    {'平均':40s}          κ={mean_k:6.3f}  {landis_koch(mean_k)}"
               "   ← 本文で報告する値(Rev.9)")
+
+        # Rev.21: 事前に定めた対応を表示する(方針は 2026-08-20 確定・結果を見る前)
+        print("\n  --- κ の閾値判定(Rev.21・2026-08-20 事前確定) ---")
+        for line in kappa_action(mean_k, kappas):
+            print(f"    {line}" if line else "")
 
     # 参考: Unsure を Include に寄せた2カテゴリ版
     print("\n  --- 参考: Unsure→Include とみなした2カテゴリ版 ---")
