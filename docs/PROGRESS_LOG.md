@@ -94,13 +94,14 @@
 - Phase 2 出力に `Match_Stage` / `Match_Guard_Note` を追加（誤照合を可視化する監査列）。
   unmatched 9,066件のうちガード起因は 865件（9.5%）。
 - **Phase 3b の判定対象は 1,052件**（DB検索795 + 引用探索257）。liberal accelerated により
-  著者1,052件 / 他2名は校正セット164件 + 著者の Exclude 分担（模擬実行で 182 / 144件）。
+  著者1,052件 / 他2名は校正セット164件 + 著者の Exclude/Unsure 分担（割当上限 Kataoka 449 / WATANABE 439。
+  実数は著者の stage 1 完了時に確定）。
   引用探索分には venue フィルタとフィルタ層を適用していない（`snowballing_protocol.md` §4.3b）。
 
 ### 3b. Phase 3b の実施基盤（**配布可能な状態**）
 - 判定対象 **1,052件**（DB検索795 + 引用探索257）。**liberal accelerated 方式**（Rev.17）:
   1名の Include で通す / Exclude には2名。stage 1 は著者1,052件 + 他2名が校正セット164件、
-  stage 2 で著者の Exclude 分を2名が分担（模擬実行で 182 / 144件）。
+  stage 2 で著者の Exclude/Unsure 分を2名が分担（割当上限 Kataoka 449 / WATANABE 439）。
 - `screening/` に判定シート一式（CSV + xlsx、`source` 列つき）。
   評価者ごとに独立したファイル（互いの判定が見えると κ が意味を失うため）。
   ブロック割当は決定論的（キーの MD5 mod 3）で、再生成しても既存の割当は動かない。
