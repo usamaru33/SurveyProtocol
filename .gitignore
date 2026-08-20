@@ -28,3 +28,11 @@ screening/sheet_*.xlsx
 # 配布物に紛れると受け取り側が混乱するため、追跡もアーカイブもしない。
 screening/~$*
 ~$*.xlsx
+
+# LaTeX build artifacts (docs/ の配布資料組版)
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
