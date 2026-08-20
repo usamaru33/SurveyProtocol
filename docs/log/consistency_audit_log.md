@@ -103,6 +103,11 @@ ResearchVR4.csv  26,434
 
 > 評価者向けの配布物は当初から 449/439 を使っており、**誤った期待を与えてはいない。**
 
+> **【2026-08-20 追記】Rev.22 で校正セットを 15% → 20% に引き上げたため、
+> stage 2 の割当上限は Kataoka 449 / WATANABE 439 → **Kataoka 420 / WATANABE 409** に変わった。
+> 本エントリの 449/439 は決定時点(Rev.22 適用前)の値であり、当時の記録として残す。
+> 現行値は `screening/assignment.csv` を正とする。**
+
 ---
 
 ### [4] `methodology_decision_Rev7.md` の Rev.11 注記が古い

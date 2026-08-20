@@ -207,6 +207,22 @@ def main() -> None:
         assignment = {r["record_id"]: r for r in csv.DictReader(f)}
 
     sheets = {rid: load_sheet(args.dir / f"sheet_{rid}.csv") for rid in REVIEWERS}
+
+    # Rev.22: 校正セットを 15% → 20% に広げた分(59件)は、配布済みシートを作り直さず
+    # supplement_sheet_<id> として別に配った。両方を読んで1人分としてまとめる。
+    # 既存シートの判定を捨てないための措置(閾値が単調なので既出は外れない)。
+    for rid in REVIEWERS:
+        sup = load_sheet(args.dir / f"supplement_sheet_{rid}.csv")
+        if not sup:
+            continue
+        dup = set(sheets[rid]) & set(sup)
+        if dup:
+            print(f"[WARN] {rid}: 本体と補足で {len(dup)} 件が重複。本体側を優先する")
+        merged = dict(sup)
+        merged.update(sheets[rid])      # 本体を優先
+        sheets[rid] = merged
+        print(f"[INFO] {rid}: 補足シート {len(sup)} 件を統合(計 {len(merged)} 件)")
+
     missing_files = [r for r, s in sheets.items() if not s]
     if missing_files:
         print(f"[WARN] 判定シートが見つからない/空: {', '.join(missing_files)}")
