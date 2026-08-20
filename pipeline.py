@@ -134,7 +134,7 @@ def normalize_venue(name: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Venue 正規化の構造ガード(Rev.12、docs/normalization_design.md の案1/3/4/6)
+# Venue 正規化の構造ガード(Rev.12、docs/reference/normalization_design.md の案1/3/4/6)
 #
 # 現行の積極的な正規化はストップワードで種別語(journal of / transactions on /
 # conference on / symposium on / workshop)まで落とすため、**ジャーナルと会議が

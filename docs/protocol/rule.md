@@ -54,7 +54,7 @@
 > - ~~**PsycInfo**~~ — アクセス制約により利用不可（Rev.5 で未実行が確定）。心理系文献の捕捉は
 >   Scopus に依拠し、その妥当性は Known-Item Test で実証済み。残余リスクはスノーボーリングで緩和する。
 >
-> 正当化の全文は `docs/methodology_decision_Rev7.md` §Rev.8追記（Threats to Validity へ転用可）。
+> 正当化の全文は `docs/reference/methodology_decision_Rev7.md` §Rev.8追記（Threats to Validity へ転用可）。
 
 検索クエリは、「没入環境」「身体表象」「知覚評価」の3つのコンセプトをAND条件で結合し、
 **Title および Abstract（TA scope）**を対象に実行する。

@@ -3,9 +3,9 @@
 このフォルダは、システマティック・レビューの **Phase 3b（Title/Abstract スクリーニング）**
 の作業ファイルと記録一式です。**監査可能性のため supplementary material として公開します。**
 
-- 手順の詳細: [`../docs/screening_protocol.md`](../docs/screening_protocol.md)
-- プロトコル本体: [`../docs/rule.md`](../docs/rule.md) §Phase 3b
-- 変更履歴: [`../docs/protocol_changelog.md`](../docs/protocol_changelog.md) Rev.17 / Rev.18
+- 手順の詳細: [`../docs/protocol/screening_protocol.md`](../docs/protocol/screening_protocol.md)
+- プロトコル本体: [`../docs/protocol/rule.md`](../docs/protocol/rule.md) §Phase 3b
+- 変更履歴: [`../docs/log/protocol_changelog.md`](../docs/log/protocol_changelog.md) Rev.17 / Rev.18
 
 > **判定に LLM は一切使用していません**（`rule.md` Rev.2）。
 > このフォルダの判定はすべて人間の評価者3名によるものです。
@@ -22,7 +22,7 @@
 >   **κ も除外理由の集計も意味を失う**（プロトコル違反）
 >
 > 変更が必要になった場合は、シートを作り直すのではなく
-> `docs/protocol_changelog.md` に逸脱として記録し、Threats to Validity で報告する。
+> `docs/log/protocol_changelog.md` に逸脱として記録し、Threats to Validity で報告する。
 > 凍結解除は著者の明示的な指示があるときだけ。
 >
 > **読み取りは自由。** `score_screening.py` による記入状況の確認、
@@ -59,7 +59,7 @@
 スクリーニングが関連文献を見落とす率には RCT の実測があります。そこで
 **除外の方向にだけ2名を要求**し、全件二重化の工数を避けつつ感度を保っています。
 
-> 見落とし率の数値と出典は [`../docs/rule.md` §5 [R1]](../docs/rule.md#5-方法論の参考文献)
+> 見落とし率の数値と出典は [`../docs/protocol/rule.md` §5 [R1]](../docs/protocol/rule.md#5-方法論の参考文献)
 > に集約してあります。
 
 **κ は校正セット 164 件でのみ算出します。** 除外プールだけで計算すると著者の判定に
@@ -118,7 +118,7 @@
 | `重複(同一研究の別報告)` | 既に対象に含まれている研究の別報告・拡張版 |
 | `その他` | 上のどれにも当てはまらない。**メモへの記述必須** |
 
-> **`S: 原著論文でない` の解釈（2026-08-20 補足 / `../docs/protocol_changelog.md` Rev.20）**
+> **`S: 原著論文でない` の解釈（2026-08-20 補足 / `../docs/log/protocol_changelog.md` Rev.20）**
 >
 > 上表に含まれる「ポスター」は、**実験を伴わない**ポスター発表を指す。
 > **実験を報告しているポスター/ショートペーパーは Include**（Rev.14 の S 基準運用。

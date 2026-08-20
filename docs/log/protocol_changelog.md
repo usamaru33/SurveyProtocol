@@ -44,7 +44,7 @@
 一次出典も [R2] Khangura et al. 2012 で確定し、Rev.18 時点で「未確認」としていた
 穴が塞がった。
 
-代替手法10件の比較検討を `docs/screening_method_alternatives.md` に記録した。
+代替手法10件の比較検討を `docs/reference/screening_method_alternatives.md` に記録した。
 
 **同時に判明した、本設計への指摘材料（[R4] Nussbaumer-Streit et al. 2023）:**
 
@@ -67,11 +67,11 @@
 
 | 対象 | 変更 |
 |---|---|
-| `docs/rule.md` §Phase 3b | κ 閾値方針を追加 |
-| `docs/rule.md` §5 | [R2]–[R8] を追加（[R7][R8] は書誌未確定と明記） |
-| `docs/screening_protocol.md` §4 | 運用版の閾値表を追加 |
+| `docs/protocol/rule.md` §Phase 3b | κ 閾値方針を追加 |
+| `docs/protocol/rule.md` §5 | [R2]–[R8] を追加（[R7][R8] は書誌未確定と明記） |
+| `docs/protocol/screening_protocol.md` §4 | 運用版の閾値表を追加 |
 | `scripts/score_screening.py` | `kappa_action()` を実装 |
-| `docs/screening_method_alternatives.md` | **新設**（候補10件の比較） |
+| `docs/reference/screening_method_alternatives.md` | **新設**（候補10件の比較） |
 | 判定シート | **変更なし**（Rev.19 の凍結を維持） |
 
 
@@ -92,8 +92,8 @@
 Rev.18 で自由記述を統制語彙に置き換えた際、Rev.14 の運用判断が語彙定義に反映されず脱落した。
 
 配布物のうち、`screening/sheet_*.xlsx` の `_選択肢` シートと「はじめに」シート、
-`docs/screening_protocol.md` §139、本 changelog Rev.18 の表に「ポスター」が入っている。
-一方 `docs/reviewer_briefing.md` §2.4 の表には「ポスター」が無く、同 §2.1(2)・§2.5 は
+`docs/protocol/screening_protocol.md` §139、本 changelog Rev.18 の表に「ポスター」が入っている。
+一方 `docs/reference/reviewer_briefing.md` §2.4 の表には「ポスター」が無く、同 §2.1(2)・§2.5 は
 「2ページのポスター・アブストラクトも実験があれば Include」と明記している。
 **配布物どうしが食い違っている状態だった。**
 
@@ -112,11 +112,11 @@ Rev.18 で自由記述を統制語彙に置き換えた際、Rev.14 の運用判
 
 | 文書 | 対応 |
 |---|---|
-| `docs/reviewer_briefing_preread.md` / `.tex` / `.pdf` | 解釈を明記（配布物） |
-| `docs/reviewer_briefing.md` §2.4 | 語彙表に注記を追加 |
+| `docs/reference/reviewer_briefing_preread.md` / `.tex` / `.pdf` | 解釈を明記（配布物） |
+| `docs/reference/reviewer_briefing.md` §2.4 | 語彙表に注記を追加 |
 | `screening/README.md` §除外理由の統制語彙 | 同上 |
 | `screening/sheet_*.xlsx` | **変更しない**（凍結維持） |
-| `docs/screening_protocol.md` §139 の語彙表 | 注記を追加（語彙自体は変えない） |
+| `docs/protocol/screening_protocol.md` §139 の語彙表 | 注記を追加（語彙自体は変えない） |
 
 ### 変更理由
 
@@ -201,7 +201,7 @@ Threats to Validity で報告する。凍結解除は著者の明示的な指示
 | 対象 | 内容 |
 |---|---|
 | `rule.md` §Phase 3b | 凍結の事実と理由を日付つきで記載 |
-| `docs/screening_protocol.md` | 冒頭に凍結告知 |
+| `docs/protocol/screening_protocol.md` | 冒頭に凍結告知 |
 | `screening/README.md` | 冒頭に凍結告知（supplementary material として公開されるため） |
 | `.claude/skills/survey-pipeline/SKILL.md` | 冒頭に凍結告知（再実行コマンドの直前） |
 
@@ -257,7 +257,7 @@ Phase 3b 判定シートの `reason` 列を**自由記述から9択のドロッ�
 | `scripts/make_screening_xlsx.py` | `EXCLUDE_REASONS` 追加。`reason` 列に DataValidation。「その他なのに note が空」の条件付き書式。「はじめに」シートに語彙表 |
 | `scripts/make_screening_example.py` | 見本の理由を統制語彙の値に差し替え。語彙外の値があれば生成をエラーで停止 |
 | `scripts/score_screening.py` | 語彙外の値と「その他なのに note が空」を検査に追加。**理由別の除外件数を出力** |
-| `docs/screening_protocol.md` | §2 記入方法、§7 配布物を更新 |
+| `docs/protocol/screening_protocol.md` | §2 記入方法、§7 配布物を更新 |
 | 判定データ | **影響なし**（配布前・記入0件） |
 
 > 選択肢の文字列は Excel の隠しシート `_選択肢` に置き、DataValidation は範囲参照で
@@ -372,7 +372,7 @@ stage 1 とあわせて **346 / 308件**となり、**旧方式の約半分**。
 ### 影響範囲
 
 - 判定対象1,052件は不変。**変わるのは誰が何件見るかだけ**
-- `rule.md` Phase 3b、`docs/screening_protocol.md` を全面改訂
+- `rule.md` Phase 3b、`docs/protocol/screening_protocol.md` を全面改訂
 - **Rev.9(ペア分担・ペアワイズκ平均)を置き換える**。κ の報告形式(ペア別3本＋平均)は維持
 - 本文には「liberal accelerated 方式を採用した。Include は1名の判断で通し、Exclude には
   2名を要した。κ は3名全員が判定した校正セット164件で算出した」と明記すること

@@ -13,8 +13,8 @@
 > 1. **プロトコルは Rev.13 まで確定。`step*.csv` は Rev.13 で再実行済み**（2026-07-17 以来の凍結は解除）。
 > 2. **§7 の追加分析の表は 2026-08-20 に現行データ（795件）で再実行済み**（旧版は 2026-05-25・1,784件時点だった）。
 >    再実行が必要（§7 冒頭の注記参照）。
-> 3. プロトコルの決定経緯・最新方針は `docs/protocol_changelog.md`（〜Rev.13）と
->    `docs/search_strings.md` が一次情報。本 README と食い違う場合は **docs/ 側が正**。
+> 3. プロトコルの決定経緯・最新方針は `docs/log/protocol_changelog.md`（〜Rev.13）と
+>    `docs/protocol/search_strings.md` が一次情報。本 README と食い違う場合は **docs/ 側が正**。
 
 ---
 
@@ -82,7 +82,7 @@
 | ~~PubMed~~ | 医学・生命科学 | ❌ **Rev.8 で不使用に確定**（医学・治療目的の文献はスコープ外で主題適合性が低い）。初回検索は実施済み（781件、`raw/PubMed.csv`）だが **PRISMA報告からは除外** |
 | ~~PsycInfo~~ | 心理学・認知科学 | ❌ **未実行**（アクセス制約）。心理系文献の捕捉は Scopus に依拠し、Known-Item Test で実証（#5/#6/#14 は Scopus 捕捉・#10 は Scopus 単独源） |
 
-> 正当化ドラフト（Threats to Validity へ転用可）は `docs/methodology_decision_Rev7.md` §Rev.8追記。
+> 正当化ドラフト（Threats to Validity へ転用可）は `docs/reference/methodology_decision_Rev7.md` §Rev.8追記。
 
 ### 統合検索クエリ
 
@@ -96,7 +96,7 @@ AND ("Size" OR "Scale" OR "Height" OR "Distance")
 
 > ⚠️ rule.md 旧版・本README旧版に載っていた詳細クエリ（`"Virtual Environment"` `"Body ownership"`
 > `"Size perception"` 等の複合語を含むもの）は**計画段階のものであり実行されていない**
-> （`docs/protocol_changelog.md` Rev.5 で訂正）。
+> （`docs/log/protocol_changelog.md` Rev.5 で訂正）。
 
 **Rev.6 改訂クエリ（第2波、G1のみ拡張。3DB分の再検索は完了 — ACM 9,630 / IEEE 361 / Scopus 2,542）:**
 
@@ -110,7 +110,7 @@ AND ("Size" OR "Scale" OR "Height" OR "Distance")
 G1 拡張の理由は Known-Item Test の脱落分析（Frontiers in Virtual Reality のDBカバレッジ欠落、
 `"Virtual Environment"` 系の表記ゆれ取りこぼし）。DB別の verbatim 構文は
 `scripts/api_search_common.py` の `CONCEPT_GROUPS_REV6` から機械生成し、手書きによる
-DB間の表記不一致を防いでいる（§4・`docs/search_strings.md`）。
+DB間の表記不一致を防いでいる（§4・`docs/protocol/search_strings.md`）。
 
 **検索対象フィールド: Title + Abstract（TA基準、Rev.7/8 で確定）**
 
@@ -197,19 +197,34 @@ SurveyProtocol/
 ├── .env.example                 # 変数名テンプレート（コミット可・値は空）
 ├── venue_aliases.csv            # 著者確認済みVenueエイリアス表（Phase 2 の最優先照合）
 ├── self_scale_references.csv    # ★正式 gold set（SearchScope列: in-scope 17件 / background 8件）
-├── known_items.md               # 拡充用の下書き（現在は有効行0のテンプレート、下記注参照）
-├── known_item_analysis.md       # ★自動生成: 脱落分析（known_item_test.py が書く）
 ├── README.md                    # このファイル
-└── docs/                        # プロトコル文書（2026-07-21 集約）
-    ├── rule.md                  # 研究プロトコル・方針文書（Rev.8/10/11 を本文へ反映済み）
-    ├── protocol_changelog.md    # ★プロトコル変更履歴（〜Rev.13）— 方針の一次情報
-    ├── PROGRESS_LOG.md          # ★進捗ログ（セッションログ・次回タスク）
-    ├── methodology_decision_Rev7.md  # 検索方法論のデータ検証・確定（§Rev.8追記含む）
-    ├── search_strings.md        # DB別検索式の記録（PRISMA Item #7）
-    ├── search_replication.md    # 検索記録の復元・再実行手順
-    ├── snowballing_protocol.md  # 引用探索による補完手続き
-    └── normalization_design.md  # Venue正規化の設計案（案1〜6、未適用）
+└── docs/                        # 全文書（2026-08-20 に3分類へ再編）
+    ├── protocol/                # ★ルールを定める文書。ここが一次情報
+    │   ├── rule.md                    # 研究プロトコル本体（目的・RQ・PICOS・κ閾値方針・参考文献§5）
+    │   ├── screening_protocol.md      # Phase 3b の運用手順
+    │   ├── snowballing_protocol.md    # 引用探索の手続き
+    │   ├── search_strings.md          # DB別検索式の記録（PRISMA Item #7）
+    │   └── search_replication.md      # 検索記録の復元・再実行手順
+    ├── log/                     # ★記録。時系列で追記し、過去分は遡及修正しない
+    │   ├── protocol_changelog.md      # プロトコル変更履歴（Rev.1〜21）— 方針の一次情報
+    │   ├── PROGRESS_LOG.md            # 進捗ログ（セッションログ・次回タスク）
+    │   └── consistency_audit_log.md   # 文書間の不整合と、その決定ログ
+    └── reference/               # 分析・検討・配布物・入出力
+        ├── methodology_rationale.md      # Phase 3b までの手法と意図・想定質問
+        ├── screening_method_alternatives.md # 代替手法10件の比較検討
+        ├── methodology_decision_Rev7.md  # 検索方法論のデータ検証・確定
+        ├── normalization_design.md       # Venue正規化の設計案（案1〜6、未適用）
+        ├── reviewer_briefing.md          # 評価者向け説明資料（詳細版）
+        ├── reviewer_briefing_preread.{md,tex,pdf}  # 事前配布資料
+        ├── known_items.md                # 既知文献リスト（known_item_test.py が読む）
+        └── known_item_analysis.md        # ★自動生成: 脱落分析
 ```
+
+> **文書の3分類（2026-08-20）:**
+> **`protocol/`** はルールを定める文書で、ここが一次情報。
+> **`log/`** は時系列の記録で、**過去のエントリは遡及修正しない**（当時の記述として正しいため。
+> 訂正が要る場合は注記を追加する）。
+> **`reference/`** はそれ以外（分析・検討・配布物・スクリプトの入出力）。
 
 ### 4.1 データ取り込みの検証（2026-08-03 追加）
 
@@ -242,8 +257,8 @@ recall を過大評価させる要因なので、`SUSPECT` は `HIT` として�
 > in-scope を 15〜25件へ拡充する際は `self_scale_references.csv` に `SearchScope=in-scope` 行を追加すること。
 
 > **注（`rule.md` の反映状況）:** DB構成=3DB・scope=TA・Threats への追記は Rev.8 で確定済みだが、
-> **`rule.md` 本文への反映は第2波再検索の完了後にまとめて行う**予定（`docs/PROGRESS_LOG.md` の
-> 「次回やること」）。それまでの間、方針の最新状態は `docs/protocol_changelog.md` を見ること。
+> **`rule.md` 本文への反映は第2波再検索の完了後にまとめて行う**予定（`docs/log/PROGRESS_LOG.md` の
+> 「次回やること」）。それまでの間、方針の最新状態は `docs/log/protocol_changelog.md` を見ること。
 
 > **注（2026-07-21 のファイル整理）:** 手書きのプロトコル文書は `docs/` に集約した。
 > `README.md`（入口）と、`known_item_test.py` が直接読み書きする `known_items.md` /
@@ -318,7 +333,7 @@ recall を過大評価させる要因なので、`SUSPECT` は `HIT` として�
 > 却下の理由は下記(a)(b)のとおり構造的で、件数に依存しない）。
 > 理由は構造的で、(a) スコアは「関連性」ではなく「検索クエリと同じ語彙を使っているか」を
 > 測っている（スケール知覚カテゴリのヒット率2.5%）、(b) 要旨欠落と交絡し、要旨なし文献の
-> 95.1% がスコア1点以下になる。詳細は `docs/protocol_changelog.md` Rev.13。
+> 95.1% がスコア1点以下になる。詳細は `docs/log/protocol_changelog.md` Rev.13。
 
 ### Phase 2: 学会ランクスクリーニング (`pipeline.py`)
 
@@ -345,7 +360,7 @@ recall を過大評価させる要因なので、`SUSPECT` は `HIT` として�
 > （SJR に完全一致があるのに CORE fuzzy が先に拾ってしまう）。全数監査の結果、
 > 正規化の同名衝突は 899キー・採否が反転するもの 426件（うちデータ出現 74キー）で、
 > `venue_aliases.csv` に MANUAL 行として自動追記済み。恒久対策は
-> `docs/normalization_design.md` の6案（推奨: 案6 順序修正 + 案1 種別マーカー +
+> `docs/reference/normalization_design.md` の6案（推奨: 案6 順序修正 + 案1 種別マーカー +
 > 案3 短キーガード + 案4 サニティチェック）で、**適用は公式再実行時**。
 
 #### 採用基準
@@ -390,7 +405,7 @@ recall を過大評価させる要因なので、`SUSPECT` は `HIT` として�
 
 > 通過 1,179 + 除外 5,138 = 6,317（Phase 1.5 通過分）と一致する。
 > **除外の60%は「ランクが低いから」ではなく「照合できなかったから」**であり、
-> Threats to Validity の筆頭項目になる（`docs/methodology_rationale.md` §3）。
+> Threats to Validity の筆頭項目になる（`docs/reference/methodology_rationale.md` §3）。
 
 > 入力は Phase 1.5 通過分の 6,317件。Rev.12 の正規化改修（種別マーカー・短キーガード・
 > サニティチェック・照合順序の修正）が適用されており、`Match_Stage` 列でどの段で照合したかを追える。
@@ -512,14 +527,14 @@ Title + Abstract Note を結合したテキストに対して正規表現マッ�
 | stage 2 | 著者が Exclude / Unsure にしたものだけ第2評価者が確認 | 2名で分担 |
 
 **κ は校正セット164件でのみ算出する。** 除外プールだけで計算すると著者の判定に分散が無く
-**κ が常に 0** になるため（`docs/protocol_changelog.md` Rev.17）。
+**κ が常に 0** になるため（`docs/log/protocol_changelog.md` Rev.17）。
 判定シートは `screening/`（§10）。
 要旨欠落は **191件（18.2%）**＝左63 + 右128。Rev.16 で DOI から **134件**を外部補完した結果
 （補完前は325件・30.9%）。`abstract_source` 列で `database` / `enriched` / `none` を識別できる。
 
 > **補完した要旨で自動除外を掛け直していない。** 補完は人手判定を助けるためのもので、
 > 既に「判定不能なので人手に委ねる」と決めたレコードの扱いを機械側に巻き戻さない。
-> 理由は `docs/protocol_changelog.md` Rev.16（要約: PRISMA 2020 は自動ツールによる除外を
+> 理由は `docs/log/protocol_changelog.md` Rev.16（要約: PRISMA 2020 は自動ツールによる除外を
 > スクリーニングの手前に置き人手除外と分けて報告することを求めており、補完後の再適用は
 > 検索が一度も見ていないテキストで自動除外を発動させることになる）。
 
@@ -556,7 +571,7 @@ PubMed∩Scopus 606 / Scopus∩IEEE 352 / Scopus∩ACM 142 / PubMed∩IEEE 39 / 
 **読み取り専用・ファイル出力なし**でコンソールに集計結果を表示するツール。
 
 > **本節の数値は 2026-08-20 に現行データ（`step3_kw_included.csv` = 795件）で再実行した結果。**
-> 旧版は 2026-05-25・1,784件時点の集計だった（`docs/consistency_audit_log.md` 論点6）。
+> 旧版は 2026-05-25・1,784件時点の集計だった（`docs/log/consistency_audit_log.md` 論点6）。
 
 実行方法:
 ```bash
@@ -685,7 +700,7 @@ URL列のドメイン、DOIプレフィックス、Publisher列を優先順位�
 ## 8. スノーボーリング（引用探索）
 
 `scripts/snowball_search.py` — Semantic Scholar Graph API + Crossref による前方・後方引用探索の自動化。
-手続きの定義は `docs/snowballing_protocol.md`、本節はその**実装**の説明。
+手続きの定義は `docs/protocol/snowballing_protocol.md`、本節はその**実装**の説明。
 
 > ⚠️ **外部APIに通信する**（Semantic Scholar / Crossref）。既定では著者が実行する。
 > スクリプトが行うのは「取得」と「機械的に分かる情報の付与」までで、**PICOS採否は人が判断する**。
@@ -697,7 +712,7 @@ URL列のドメイン、DOIプレフィックス、Publisher列を優先順位�
 >       → Phase 3a キーワード除外 -28 → 257件（判定対象）
 > ```
 >
-> **右カラムに適用する段・しない段**（`docs/snowballing_protocol.md` §4.3b）:
+> **右カラムに適用する段・しない段**（`docs/protocol/snowballing_protocol.md` §4.3b）:
 >
 > | 段 | 適用 | 理由 |
 > |---|---|---|
@@ -707,7 +722,7 @@ URL列のドメイン、DOIプレフィックス、Publisher列を優先順位�
 > | Phase 3b 人手判定 | **する** | PRISMA 公式フロー図は右カラムで Title/Abstract 段を省略し全文評価へ直行する想定だが、本レビューの右カラムは機械生成で人手フィルタを経ていないため、**規定より慎重に**この段を設ける |
 >
 > ⚠️ **この非対称な運用に明確な前例は確認できていない。** 詳細と報告義務は
-> `docs/protocol_changelog.md` Rev.15 を参照。
+> `docs/log/protocol_changelog.md` Rev.15 を参照。
 
 ### 8.1 なぜ必要か
 
@@ -769,7 +784,7 @@ S2 は1リクエスト最大1,000件・`offset+limit ≤ 10,000` の制約があ
 
 `--seeds-csv` で任意のCSVに差し替え可能（`Title`/`DOI` 列。列名は `#`/`ID`/`seed_id`、
 `DOI`/`DOI_or_URL` 等のエイリアス解決あり）。2ホップ目に著者が選んだ候補を再投入する用途を想定。
-ホップ数は `docs/snowballing_protocol.md` §2.3 のとおり **2ホップまで**。**現在は1ホップのみ実施済み。**
+ホップ数は `docs/protocol/snowballing_protocol.md` §2.3 のとおり **2ホップまで**。**現在は1ホップのみ実施済み。**
 
 ### 8.4 重複判定の基準
 
@@ -786,7 +801,7 @@ S2 は1リクエスト最大1,000件・`offset+limit ≤ 10,000` の制約があ
 DOI は `https://doi.org/` `dx.doi.org/` `doi:` の接頭辞を剥がしてから比較する。
 
 > **限界:** 発見側に DOI が無いレコード（初回実行で **135件**）はタイトル一致でしか判定できず、
-> 表記ゆれがあると既出を見逃す。手作業での照合が必要（`docs/snowballing_protocol.md` §4.4）。
+> 表記ゆれがあると既出を見逃す。手作業での照合が必要（`docs/protocol/snowballing_protocol.md` §4.4）。
 
 ### 8.5 Venueランクの付与 — 採否には使わない
 
@@ -821,7 +836,7 @@ Venue フィルタを適用すると**シード自身すら通らない**。
 
 スノーボーリングで得た文献は PRISMA 2020 の**右カラム**（Identification of studies via other methods）を通り、
 **Phase 4 の適格性評価で左カラムと合流**する。フロー図と各段階の定義は
-`docs/snowballing_protocol.md` §4（Mermaid 図あり）を正とする。
+`docs/protocol/snowballing_protocol.md` §4（Mermaid 図あり）を正とする。
 
 初回実行（2026-08-06、1ホップ）の実測値:
 
@@ -911,7 +926,7 @@ python -X utf8 pipeline.py --input ResearchVR3.csv --core CORE.csv --sjr "scimag
 
 > ⚠️ 実行すると `step*.csv` と `pipeline_log.txt` が**上書きされる**。現行の step ファイルは
 > Rev.6 以前の状態で凍結中（§6）なので、公式再実行のタイミングは
-> `docs/PROGRESS_LOG.md` の方針に従うこと。
+> `docs/log/PROGRESS_LOG.md` の方針に従うこと。
 
 ### 追加分析（足切りシミュレーション・DB集計）
 
@@ -937,7 +952,7 @@ python -X utf8 scripts/known_item_test.py
 ### 第2波再検索（API検索）
 
 > 外部APIに通信する。著者が実行すること。出力は RIS で、Zotero に専用コレクションで
-> 取り込んでから CSV エクスポートし `raw/` に置く運用（`docs/search_replication.md` Option A/B）。
+> 取り込んでから CSV エクスポートし `raw/` に置く運用（`docs/protocol/search_replication.md` Option A/B）。
 > **ACM には一般利用可能な検索APIが無いため手動エクスポートを継続する。**
 
 ```bash
@@ -954,7 +969,7 @@ Scopus は既定 `--scope TITLE-ABS`（TA基準）。`--scope TITLE-ABS-KEY` も
 scope 方針の変更にあたるので**プロトコル改訂なしに使わない**こと。
 
 実行記録は `outputs/api_search_log.csv` に追記されるので、
-これを下書きとして `docs/search_strings.md` の DB別記録表に verbatim で転記する。
+これを下書きとして `docs/protocol/search_strings.md` の DB別記録表に verbatim で転記する。
 
 ### Abstract の補完（ACM 対策）
 
@@ -994,8 +1009,8 @@ python -X utf8 scripts/snowball_search.py --seeds-csv outputs/snowballing_hop2_s
 
 ## 11. Phase 3b: 人手スクリーニングの実施
 
-手続きの定義は `docs/screening_protocol.md`、方針の決定経緯は
-`docs/protocol_changelog.md` Rev.9 / Rev.17。本節は**実行手順**のみ。
+手続きの定義は `docs/protocol/screening_protocol.md`、方針の決定経緯は
+`docs/log/protocol_changelog.md` Rev.9 / Rev.17。本節は**実行手順**のみ。
 
 ### 11.1 判定対象と体制
 
@@ -1084,7 +1099,7 @@ params = {"fields": "citationCount"}   # GET /graph/v1/paper/DOI:{doi}
 ```
 
 なお引用数による足切り自体はプロトコル未確定の検討案であり、
-採用する場合は `docs/protocol_changelog.md` に改訂として記録すること
+採用する場合は `docs/log/protocol_changelog.md` に改訂として記録すること
 （Known-Item Test で recall への影響を測るのが前提）。
 
 ---

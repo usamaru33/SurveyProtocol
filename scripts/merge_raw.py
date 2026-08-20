@@ -156,7 +156,7 @@ def main() -> None:
     print("[NEXT] パイプラインへの投入は "
           f"`python -X utf8 pipeline.py --input {args.out.name}`。")
     print("       ただし step ファイルは凍結中のため、公式再実行のタイミングは "
-          "docs/PROGRESS_LOG.md の方針に従うこと。")
+          "docs/log/PROGRESS_LOG.md の方針に従うこと。")
 
 
 if __name__ == "__main__":
