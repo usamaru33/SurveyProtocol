@@ -43,3 +43,11 @@ screening/~$*
 *.fls
 *.fdb_latexmk
 *.synctex.gz
+
+# 閲覧アプリの生成物と、そこから書き出す判定 CSV。
+# 判定シートと同じ理由で追跡しない（3人分が入ると互いの判定が見え独立性が壊れる）。
+# HTML はコーパス全文を埋め込んだ生成物でもあるため、リポジトリには置かない。
+screening/review_*.html
+decisions_*.csv
+screening/decisions_*.csv
+screening/*.bak.xlsx
