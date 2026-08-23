@@ -127,13 +127,33 @@ def main() -> None:
     ap.add_argument("--id", default="author")
     ap.add_argument("--engine", choices=sorted(ENGINES), help="省略時は見積もりのみ")
     ap.add_argument("--only-calibration", action="store_true",
-                    help="校正セットだけ翻訳する（無料枠に収まりやすい）")
+                    help="校正セットだけ翻訳する")
+    ap.add_argument("--exclude-calibration", action="store_true",
+                    help="校正セットを翻訳しない。κ は校正セットで著者×各評価者について"
+                         "算出するため、そこだけ原文で揃えれば3名が同一の刺激を判定できる")
+    ap.add_argument("--usage", action="store_true",
+                    help="DeepL の残り文字数を表示して終了（本文は送信しない）")
     ap.add_argument("--limit", type=int, help="翻訳する件数の上限")
     ap.add_argument("--estimate", action="store_true", help="文字数を数えるだけ（通信しない）")
     ap.add_argument("--yes", action="store_true", help="確認プロンプトを出さない")
     args = ap.parse_args()
 
     load_env()
+
+    if args.usage:
+        import requests
+        key = os.environ.get("DEEPL_API_KEY", "").strip()
+        if not key:
+            sys.exit("[ERROR] DEEPL_API_KEY が未設定")
+        base = "https://api-free.deepl.com" if key.endswith(":fx") else "https://api.deepl.com"
+        r = requests.get(f"{base}/v2/usage",
+                         headers={"Authorization": f"DeepL-Auth-Key {key}"}, timeout=30)
+        r.raise_for_status()
+        d = r.json()
+        used, lim = d.get("character_count", 0), d.get("character_limit", 0)
+        print(f"[INFO] DeepL: 使用済み {used:,} / 上限 {lim:,}（残り {lim - used:,} 字）")
+        return
+
     rows = load_records(args.id)
     cache = load_cache()
 
@@ -144,6 +164,8 @@ def main() -> None:
             continue
         if args.only_calibration and r.get("calibration") != "Y":
             continue
+        if args.exclude_calibration and r.get("calibration") == "Y":
+            continue
         got = cache.get(r["record_id"])
         if got and got.get("src_sha1") == sha1(ab):
             continue                       # 既訳・原文も変わっていない
@@ -153,7 +175,8 @@ def main() -> None:
         todo = todo[:args.limit]
 
     chars = sum(len(t) for _, t in todo)
-    scope = "校正セット" if args.only_calibration else "全件"
+    scope = ("校正セット" if args.only_calibration
+             else "校正セット以外" if args.exclude_calibration else "全件")
     print(f"[INFO] 対象 {scope}: 未翻訳 {len(todo):,} 件 / {chars:,} 字"
           f"（キャッシュ済み {len(cache):,} 件）")
     if chars:
