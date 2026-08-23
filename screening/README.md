@@ -184,6 +184,36 @@ python -X utf8 scripts/apply_review_decisions.py --id author --input decisions_a
 >
 > `--rules` で渡すキーワードは**ハイライトと並べ替えにのみ**使われる。判定は書き込まない。
 
+### 要旨の日本語訳（任意）
+
+```bash
+python -X utf8 scripts/translate_abstracts.py --estimate                    # 見積もり(通信なし)
+python -X utf8 scripts/translate_abstracts.py --engine deepl --only-calibration
+python -X utf8 scripts/make_review_app.py --translations screening/abstract_ja.json
+```
+
+閲覧アプリで **`t`** を押すと 原文のみ → **対訳** → 訳のみ を切り替える。**既定は対訳**で、
+訳文には常に「機械翻訳（参考）」の見出しが付く。
+
+- 訳文は `screening/abstract_ja.json` に固定する。各エントリに **原文の SHA-1・エンジン名・
+  実行日**を記録するので、**著者が実際に読んだ訳文を第三者が再現できる**
+- 原文が差し替わったのに古い訳が残っている場合、アプリは**その訳を採用しない**
+  （SHA-1 が一致しないため。読んでいる訳と判定対象がズレるのを防ぐ）
+- 再実行しても既訳は翻訳し直さない。中断してもそこまでは保存される
+- 分量: 要旨のある861件で **約128万字**（DeepL 無料枠 50万字/月の 2.6 倍）。
+  校正セットだけなら 179件・約27万字で無料枠に収まる
+
+> ### ⚠️ 判定は原文に対して下す
+>
+> 機械翻訳は `head-mounted display` と `desktop display`、`patients` と `participants` のような
+> **適格性を反転させる語**を取り違えうる。訳文だけで判定すると、その誤りが判定の誤りに
+> そのまま化ける。だから「訳のみ」を既定にしていない。
+>
+> **さらに κ への影響がある。** κ は校正セット223件で **著者 × 各評価者** について算出する。
+> 著者だけが訳文を読み、評価者2名が原文を読むと、**3名が別の刺激を判定している**ことになり、
+> κ に翻訳のブレが混入する。訳を使うなら、
+> **(a) 3名に同じ訳を配る か (b) 使用を Threats に開示する** のどちらかが要る。
+
 **要旨中のハイライトについて（開示事項）。** 検索クエリの3概念群（`search_strings.md` Rev.6）と、
 PICOS の判断材料になりやすい語を色分けする。**残す手がかりと落とす手がかりを対称に**入れてある
 （`participants`/`we conducted` と `desktop`/`patients`/`we propose` の両方）。片側だけを

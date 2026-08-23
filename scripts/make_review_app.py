@@ -30,10 +30,15 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import html
 import json
 import sys
 from pathlib import Path
+
+
+def _sha1(s: str) -> str:
+    return hashlib.sha1(s.encode("utf-8")).hexdigest()
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 csv.field_size_limit(10 ** 9)
@@ -125,13 +130,21 @@ def load_records(sheet_id: str) -> list[dict]:
     return rows
 
 
-def build_payload(rows: list[dict]) -> list[dict]:
+def build_payload(rows: list[dict], translations: dict | None = None) -> list[dict]:
     keep = ("record_id", "title", "abstract", "venue", "year", "rank", "has_abstract",
             "source", "calibration", "abstract_source", "kw_groups", "doi",
             "decision", "reason", "note")
+    tr = translations or {}
     out = []
     for r in rows:
-        out.append({k: (r.get(k) or "") for k in keep})
+        rec = {k: (r.get(k) or "") for k in keep}
+        got = tr.get(r["record_id"])
+        # 訳文は原文が一致するものだけ載せる。原文が差し替わったのに古い訳が
+        # 残っていると、読んでいる訳と判定対象がズレる。
+        if got and got.get("src_sha1") == _sha1((r.get("abstract") or "").strip()):
+            rec["ja"] = got.get("ja", "")
+            rec["ja_engine"] = got.get("engine", "")
+        out.append(rec)
     return out
 
 
@@ -181,6 +194,11 @@ h1{font-size:21px;line-height:1.5;margin:6px 0 12px;font-weight:700}
 .abs{font-size:15px;line-height:1.95;white-space:pre-wrap;
   border-left:3px solid var(--line);padding:2px 0 2px 16px;max-width:74ch}
 .abs.empty{color:var(--muted);font-style:italic;border-left-color:var(--exc)}
+.panelab{font-size:11.5px;letter-spacing:.04em;color:var(--muted);text-transform:uppercase;
+  margin:18px 0 5px;font-weight:700}
+.panelab .src{text-transform:none;letter-spacing:0;font-weight:400}
+.abs.ja{border-left-color:var(--accent);background:var(--soft);border-radius:0 6px 6px 0;
+  padding:10px 16px;line-height:1.9}
 mark{padding:0 2px;border-radius:3px;background:var(--soft);color:inherit}
 mark.g1{background:var(--g1)} mark.g2{background:var(--g2)}
 mark.g3{background:var(--g3)} mark.cue{background:var(--cue)}
@@ -221,6 +239,7 @@ select{font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);
     <option value="noabs">要旨なしのみ</option>
     <option value="flag">ルール該当のみ</option>
   </select>
+  <button id="jamode" hidden>訳 対訳</button>
   <button id="exp">CSV書き出し (E)</button>
   <button id="hlp">? ヘルプ</button>
 </div>
@@ -232,7 +251,10 @@ select{font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);
   </div>
   <div class="meta" id="meta"></div>
   <h1 id="title"></h1>
+  <div class="panelab" id="lab-en" hidden>原文（判定はこちらに対して行う）</div>
   <div class="abs" id="abs"></div>
+  <div class="panelab" id="lab-ja" hidden>機械翻訳（参考） <span class="src" id="ja-eng"></span></div>
+  <div class="abs ja" id="absja" hidden></div>
   <div id="state">未判定</div>
   <input id="note" placeholder="メモ（任意。除外理由が「その他」のときは必須）">
 </main>
@@ -285,6 +307,10 @@ function rebuild(keepId){
 
 function esc(s){return (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]))}
 let hlOn=true;
+// 0=原文のみ / 1=対訳 / 2=訳のみ。既定は対訳。
+// 「訳のみ」を既定にしないのは、判定を原文に対して下すため(README §4.5)。
+let jaMode=1;
+const JA_MODE_LABEL=["原文のみ","対訳","訳のみ"];
 function highlight(text){
   let out=esc(text);
   if(!hlOn) return out;
@@ -320,6 +346,15 @@ function draw(){
   const a=document.getElementById("abs");
   if(r.abstract){a.className="abs";a.innerHTML=highlight(r.abstract);}
   else{a.className="abs empty";a.textContent="（要旨なし — タイトルだけで判断できなければ Unsure に）";}
+  // 対訳。訳文だけの表示(mode=2)でも原文の見出しは残さない代わりに、
+  // 訳文側に「参考」と明示し続ける。判定は原文に対して行うため。
+  const hasJa=!!r.ja, showEn=(jaMode!==2), showJa=hasJa&&(jaMode!==0);
+  document.getElementById("lab-en").hidden=!(hasJa&&showEn);
+  document.getElementById("abs").hidden=!showEn;
+  document.getElementById("lab-ja").hidden=!showJa;
+  document.getElementById("absja").hidden=!showJa;
+  document.getElementById("ja-eng").textContent=hasJa&&r.ja_engine?("／"+r.ja_engine):"";
+  if(showJa) document.getElementById("absja").textContent=r.ja;
   const st=document.getElementById("state");
   if(!s.decision) st.innerHTML='<span style="color:var(--muted)">未判定</span>';
   else if(s.decision==="Include") st.innerHTML='<span class="inc">✓ Include</span>';
@@ -380,13 +415,20 @@ const KEYMAP=[
   ["i","Include"],["u","Unsure"],
   ...REASONS.map((x,n)=>[String(n+1),"Exclude — "+x.value]),
   ["j / →","次へ"],["k / ←","前へ"],["m","メモ欄へ"],["z","直前を取り消し"],
-  ["h","ハイライト切替"],["e","CSV書き出し"],["?","このヘルプ"],
+  ["h","ハイライト切替"],["t","訳の表示切替（原文のみ → 対訳 → 訳のみ）"],
+  ["e","CSV書き出し"],["?","このヘルプ"],
 ];
+// 訳が1件でも載っていれば切替ボタンを出す。
+if(RECORDS.some(r=>r.ja)){
+  const b=document.getElementById("jamode");
+  b.hidden=false; b.textContent="訳 "+JA_MODE_LABEL[jaMode];
+  b.onclick=()=>{jaMode=(jaMode+1)%3;b.textContent="訳 "+JA_MODE_LABEL[jaMode];draw()};
+}
 document.getElementById("keys").innerHTML=
   ['<kbd>i</kbd> Include','<kbd>u</kbd> Unsure',
    '<kbd>1</kbd>–<kbd>'+REASONS.length+'</kbd> Exclude+理由',
    '<kbd>j</kbd>/<kbd>k</kbd> 移動','<kbd>m</kbd> メモ','<kbd>z</kbd> 取消',
-   '<kbd>e</kbd> 書き出し','<kbd>?</kbd> ヘルプ'].join("　");
+   '<kbd>t</kbd> 訳','<kbd>e</kbd> 書き出し','<kbd>?</kbd> ヘルプ'].join("　");
 document.getElementById("helptable").innerHTML=
   KEYMAP.map(([k,v])=>"<tr><td><kbd>"+k+"</kbd></td><td>"+esc(v)+"</td></tr>").join("")
   +REASONS.map((x,n)=>"<tr><td><kbd>"+(n+1)+"</kbd></td><td><b>"+esc(x.value)+"</b><br><span style='color:var(--muted)'>"+esc(x.desc)+"</span></td></tr>").join("");
@@ -407,6 +449,9 @@ document.addEventListener("keydown",e=>{
   if(k==="k"||k==="ArrowLeft"){prev();e.preventDefault();return}
   if(k==="m"||k==="M"){document.getElementById("note").focus();e.preventDefault();return}
   if(k==="h"||k==="H"){hlOn=!hlOn;draw();return}
+  if(k==="t"||k==="T"){jaMode=(jaMode+1)%3;draw();
+    const b=document.getElementById("jamode"); if(b)b.textContent="訳 "+JA_MODE_LABEL[jaMode];
+    return}
   if(k==="e"||k==="E"){exportCSV();return}
   if(k==="z"||k==="Z"){const u=undo.pop(); if(u){ if(u.prev&&u.prev.decision)store[u.id]=u.prev; else delete store[u.id];
     save(); rebuild(u.id);} return}
@@ -429,6 +474,9 @@ def main() -> None:
     ap.add_argument("--rules", type=Path,
                     help='キーワードルールJSON: [{"label":"臨床?","any":["patient","surgery"]}] '
                          "— ハイライトと並べ替えにのみ使う。判定は書き込まない")
+    ap.add_argument("--translations", type=Path,
+                    help="scripts/translate_abstracts.py が作る日本語訳キャッシュ JSON。"
+                         "指定すると原文と並べて表示する（訳文だけの表示は既定にしない）")
     ap.add_argument("--out", type=Path, help="出力先HTML")
     args = ap.parse_args()
 
@@ -438,14 +486,26 @@ def main() -> None:
         if not isinstance(rules, list):
             sys.exit("[ERROR] --rules は配列であること")
 
+    translations = {}
+    if args.translations:
+        if not args.translations.exists():
+            sys.exit(f"[ERROR] {args.translations} が無い。先に translate_abstracts.py を実行すること。")
+        translations = json.loads(args.translations.read_text(encoding="utf-8"))
+
     rows = load_records(args.id)
+    payload = build_payload(rows, translations)
     out = args.out or (SCREENING / f"review_{args.id}.html")
-    out.write_text(render(args.id, build_payload(rows), rules), encoding="utf-8")
+    out.write_text(render(args.id, payload, rules), encoding="utf-8")
 
     ndone = sum(1 for r in rows if (r.get("decision") or "").strip())
     ncal = sum(1 for r in rows if r.get("calibration") == "Y")
+    nja = sum(1 for r in payload if r.get("ja"))
     print(f"[OK] {out}")
     print(f"     {len(rows):,} 件（校正セット {ncal:,} 件 / 既存の判定 {ndone:,} 件）")
+    if args.translations:
+        stale = len(translations) - nja
+        print(f"     日本語訳 {nja:,} 件を対訳表示"
+              + (f"（原文と不一致で不採用 {stale:,} 件）" if stale > 0 else ""))
     print(f"     ブラウザで開いて判定 → E キーで decisions_{args.id}.csv を書き出す")
     print(f"     反映: python -X utf8 scripts/apply_review_decisions.py "
           f"--id {args.id} --input decisions_{args.id}.csv")
