@@ -9,8 +9,8 @@ db_search_ieee.py — IEEE Xplore Metadata API による自動検索(Rev.6 第2�
 
 【背景 / なぜ】
 `protocol_changelog.md` Rev.8 で DB構成を ACM/IEEE/Scopus の3DBに確定。
-`docs/rule.md` Rev.6 で G1 拡張クエリが確定済みだが、実際の再検索(第2波)はまだ
-実施されていない(`docs/PROGRESS_LOG.md` 次回やること#3)。本スクリプトは
+`docs/protocol/rule.md` Rev.6 で G1 拡張クエリが確定済みだが、実際の再検索(第2波)はまだ
+実施されていない(`docs/log/PROGRESS_LOG.md` 次回やること#3)。本スクリプトは
 IEEE Xplore 分の再検索を IEEE Xplore Metadata API 経由で自動化する。
 
 【前提・取得方法】
@@ -19,8 +19,8 @@ IEEE Xplore 分の再検索を IEEE Xplore Metadata API 経由で自動化する
 2. 環境変数 `IEEE_API_KEY` に設定する。
 3. verbatim クエリは `scripts/api_search_common.py` の `build_ieee_querytext()` で
    生成するか、著者が Command Search 構文で直接指定する。
-   **生成後は必ず結果の文字列を `docs/search_strings.md` に verbatim として転記すること**
-   (`docs/search_strings.md` Rev.7 運用ルール: フィールドは "Document Title":/"Abstract":、
+   **生成後は必ず結果の文字列を `docs/protocol/search_strings.md` に verbatim として転記すること**
+   (`docs/protocol/search_strings.md` Rev.7 運用ルール: フィールドは "Document Title":/"Abstract":、
    "All Metadata" は使わない)。
 
 【使い方】
@@ -172,7 +172,7 @@ def main() -> None:
         query = build_ieee_querytext(CONCEPT_GROUPS_REV6, fields=("Document Title", "Abstract"))
         fields_desc = "Document Title, Abstract"
         print(f"[INFO] 生成クエリ:\n{query}\n")
-        print("[INFO] ↑ このクエリを docs/search_strings.md に verbatim として転記すること。")
+        print("[INFO] ↑ このクエリを docs/protocol/search_strings.md に verbatim として転記すること。")
     else:
         sys.exit("[ERROR] --query か --use-default-query のどちらかを指定してください。")
 
@@ -195,7 +195,7 @@ def main() -> None:
                                total, len(records), str(out_path))
     print(f"[INFO] 実行記録: {log_path}")
     print("[NEXT] Zotero: ファイル→インポート→上記 .ris を選択し、専用コレクション"
-          "(例: ieee_wave2)へ取り込む。取り込み後 docs/search_strings.md を更新すること。")
+          "(例: ieee_wave2)へ取り込む。取り込み後 docs/protocol/search_strings.md を更新すること。")
 
 
 if __name__ == "__main__":

@@ -375,8 +375,8 @@ A. **2026年8月26日（火）** です。説明会（8/20）から6日間にな
 
 | 文書 | 内容 |
 |---|---|
-| `docs/rule.md` | プロトコル本体（目的・RQ・PICOS・Taxonomy・参考文献） |
-| `docs/screening_protocol.md` | Phase 3b の運用手順 |
+| `docs/protocol/rule.md` | プロトコル本体（目的・RQ・PICOS・Taxonomy・参考文献） |
+| `docs/protocol/screening_protocol.md` | Phase 3b の運用手順 |
 | `screening/README.md` | `screening/` フォルダの読み方 |
-| `docs/protocol_changelog.md` | 全改訂履歴（Rev.1〜19） |
+| `docs/log/protocol_changelog.md` | 全改訂履歴（Rev.1〜19） |
 | `EXAMPLE_記入見本.xlsx` | 記入例5件 |

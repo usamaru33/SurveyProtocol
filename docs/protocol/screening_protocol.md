@@ -14,7 +14,7 @@
 >   **κ も除外理由の集計も意味を失う**（プロトコル違反）
 >
 > 変更が必要になった場合は、シートを作り直すのではなく
-> `docs/protocol_changelog.md` に逸脱として記録し、Threats to Validity で報告する。
+> `docs/log/protocol_changelog.md` に逸脱として記録し、Threats to Validity で報告する。
 > 凍結解除は著者の明示的な指示があるときだけ。
 >
 > **読み取りは自由。** `score_screening.py` による記入状況の確認、

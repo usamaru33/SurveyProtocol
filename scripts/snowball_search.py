@@ -6,10 +6,10 @@ snowball_search.py — Semantic Scholar API によるスノーボーリング(�
 
 ⚠️ 本スクリプトは **外部 API に通信する**(Semantic Scholar / Crossref)。
    既定では著者が手元環境で実行する。2026-08-06 に著者の明示的な指示により
-   初回実行を行った(実行記録は `docs/PROGRESS_LOG.md`)。
+   初回実行を行った(実行記録は `docs/log/PROGRESS_LOG.md`)。
 
 【背景 / なぜ】
-`docs/snowballing_protocol.md` は前方・後方引用探索の手順を定義しているが、
+`docs/protocol/snowballing_protocol.md` は前方・後方引用探索の手順を定義しているが、
 従来は Google Scholar / Semantic Scholar の Web UI を手作業で辿る前提だった。
 本スクリプトは `docs-system/`(Semantic Scholar 連携の Next.js アプリ、
 `lib/semantic-scholar.ts` の getCitations/getReferences)と同じ Semantic Scholar
@@ -22,7 +22,7 @@ Graph API を Python から叩き、シード論文の被引用・引用文献�
 著者はこの一覧を見て Title/採否/理由を判断し、`picos_decision` 列に記入する。
 
 【シードの既定】
-`docs/snowballing_protocol.md` §1.1 のとおり、既定シードは
+`docs/protocol/snowballing_protocol.md` §1.1 のとおり、既定シードは
 `outputs/venue_dropped_known_items.csv`(step2脱落6件)を
 `self_scale_references.csv`(# ↔ ID で結合)から DOI を引いて使う。
 `--seeds-csv` で任意のCSV(Title/DOI列、エイリアス解決あり)に差し替え可能
@@ -39,7 +39,7 @@ Graph API を Python から叩き、シード論文の被引用・引用文献�
 
 【出力】
   outputs/snowballing_log.csv  — 累積ログ(実行のたびに追記、既存行は保持)。
-  列は docs/snowballing_protocol.md §4 の推奨列に、venue_rank_note の自動付与を加えたもの:
+  列は docs/protocol/snowballing_protocol.md §4 の推奨列に、venue_rank_note の自動付与を加えたもの:
   seed_id, seed_title, direction, found_title, found_doi, found_year, found_venue,
   in_db_already, venue_rank_note, ref_source, picos_decision(空欄・著者記入), reason(空欄・著者記入)
 
@@ -588,7 +588,7 @@ def main() -> None:
     print("[NEXT] kw_groups の降順に読み、picos_decision 列に include/exclude、"
           "reason 列に理由を著者が記入すること。")
     print("       kw_groups は**順序付け専用**。これで機械的に除外する場合は"
-          "逸脱として PRISMA-S に明記すること(docs/snowballing_protocol.md §4.3/§4.6)。")
+          "逸脱として PRISMA-S に明記すること(docs/protocol/snowballing_protocol.md §4.3/§4.6)。")
 
 
 if __name__ == "__main__":

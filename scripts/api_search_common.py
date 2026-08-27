@@ -19,9 +19,9 @@ Rev.6 で確定した G1 拡張クエリ(3コンセプト群)を、IEEE Xplore �
 記録すること(このツールが生成した、で終わらせず、著者が確認のうえ記録する)。
 
 【なぜ】
-- `docs/search_strings.md` Rev.7 運用ルール: Scopus は `TITLE-ABS`(`TITLE-ABS-KEY` ではない)、
+- `docs/protocol/search_strings.md` Rev.7 運用ルール: Scopus は `TITLE-ABS`(`TITLE-ABS-KEY` ではない)、
   IEEE は `"Document Title":`/`"Abstract":`(`"All Metadata"` ではない)を使うこと、と規定済み。
-- `docs/protocol_changelog.md` Rev.8: DB構成は ACM/IEEE/Scopus の3DB。PubMed 不使用。
+- `docs/log/protocol_changelog.md` Rev.8: DB構成は ACM/IEEE/Scopus の3DB。PubMed 不使用。
 - 本モジュールはこの2点を踏まえた検索クエリ生成・実行・出力(RIS)を担う。
 
 【提供する関数】

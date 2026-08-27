@@ -10,7 +10,7 @@ db_search_scopus.py — Scopus Search API による自動検索(Rev.6 第2波再
 【背景 / なぜ】
 `protocol_changelog.md` Rev.8 で DB構成を ACM/IEEE/Scopus の3DBに確定。Scopus は
 特に、known-item の心理系文献(#5/#6/#14)を捕捉し、#10 の唯一の情報源でもある
-最重要DB(`docs/methodology_decision_Rev7.md` §B)。本スクリプトは Scopus 分の
+最重要DB(`docs/reference/methodology_decision_Rev7.md` §B)。本スクリプトは Scopus 分の
 第2波再検索(Rev.6 G1拡張クエリ)を Scopus Search API 経由で自動化する。
 副産物として、Rev.7 §D で欠陥として特定された **Author/Index Keywords の欠落(1.2%)**
 を、`view=COMPLETE` 指定によりできる範囲で補う(entitlement 次第、下記参照)。
@@ -198,7 +198,7 @@ def main() -> None:
     elif args.use_default_query:
         query = build_scopus_query(CONCEPT_GROUPS_REV6, scope=args.scope)
         print(f"[INFO] 生成クエリ:\n{query}\n")
-        print("[INFO] ↑ このクエリを docs/search_strings.md に verbatim として転記すること。")
+        print("[INFO] ↑ このクエリを docs/protocol/search_strings.md に verbatim として転記すること。")
     else:
         sys.exit("[ERROR] --query か --use-default-query のどちらかを指定してください。")
 
@@ -223,13 +223,13 @@ def main() -> None:
     if records and no_abstract / len(records) > 0.5:
         print(f"[WARN] Abstract 欠落率が高い({no_abstract}/{len(records)})。"
               "view=COMPLETE の entitlement(機関アクセス/Insttoken)が無い可能性が高い。"
-              "docs/search_replication.md §欠陥1/2 のフォールバック手順を参照。")
+              "docs/protocol/search_replication.md §欠陥1/2 のフォールバック手順を参照。")
 
     log_path = append_hit_log("Scopus(第2波)", query, args.scope, filters,
                                total, len(records), str(out_path))
     print(f"[INFO] 実行記録: {log_path}")
     print("[NEXT] Zotero: ファイル→インポート→上記 .ris を選択し、専用コレクション"
-          "(例: scopus_wave2)へ取り込む。取り込み後 docs/search_strings.md を更新すること。")
+          "(例: scopus_wave2)へ取り込む。取り込み後 docs/protocol/search_strings.md を更新すること。")
 
 
 if __name__ == "__main__":

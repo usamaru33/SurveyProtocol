@@ -46,10 +46,10 @@ git -C SurveyProtocol diff --stat origin/main..HEAD | grep -i "sheet_"
 
 | 数値 | 出てくる場所 |
 |---|---|
-| PRISMA の各段の件数 | `README.md`・`docs/PROGRESS_LOG.md`・`docs/rule.md`・`docs/protocol_changelog.md` |
-| Phase 3b の判定対象・内訳 | 上記 + `screening/README.md`・`docs/screening_protocol.md` |
-| 割当件数（校正セット・第2評価者） | `screening/README.md`・`docs/screening_protocol.md`・`screening/assignment.csv` |
-| 要旨欠落・補完件数 | `docs/screening_protocol.md`・`screening/README.md` |
+| PRISMA の各段の件数 | `README.md`・`docs/log/PROGRESS_LOG.md`・`docs/protocol/rule.md`・`docs/log/protocol_changelog.md` |
+| Phase 3b の判定対象・内訳 | 上記 + `screening/README.md`・`docs/protocol/screening_protocol.md` |
+| 割当件数（校正セット・第2評価者） | `screening/README.md`・`docs/protocol/screening_protocol.md`・`screening/assignment.csv` |
+| 要旨欠落・補完件数 | `docs/protocol/screening_protocol.md`・`screening/README.md` |
 
 ```bash
 cd SurveyProtocol
@@ -80,12 +80,12 @@ print('校正セット:', sum(1 for r in rows if r['calibration']=='Y'))
 ## 2. プロトコル変更が記録されているか
 
 判定基準・体制・DB構成・語彙など**プロトコルに触れる変更は必ず**
-`docs/protocol_changelog.md` に `Rev.N` として記録する（ACM CSUR の protocol deviations 報告に転用する）。
+`docs/log/protocol_changelog.md` に `Rev.N` として記録する（ACM CSUR の protocol deviations 報告に転用する）。
 
 各エントリに「変更内容 / 変更理由 / 影響範囲」が揃っているか確認する。
 **理由は「なぜそれが妥当か」まで書く。** 後で査読者に説明する材料になる。
 
-対応する本体（`docs/rule.md`）も更新されているか。changelog だけ増えて rule.md が
+対応する本体（`docs/protocol/rule.md`）も更新されているか。changelog だけ増えて rule.md が
 古いままだと、どちらが正か分からなくなる。
 
 ---
@@ -96,9 +96,9 @@ print('校正セット:', sum(1 for r in rows if r['calibration']=='Y'))
 
 | 正（single source of truth） | 写し |
 |---|---|
-| `scripts/make_screening_xlsx.py` の `EXCLUDE_REASONS` | xlsx の「はじめに」シート・記入見本・`docs/screening_protocol.md`・`screening/README.md` |
+| `scripts/make_screening_xlsx.py` の `EXCLUDE_REASONS` | xlsx の「はじめに」シート・記入見本・`docs/protocol/screening_protocol.md`・`screening/README.md` |
 | `scripts/make_screening_sheets.py` の `REVIEWERS` | 各文書の評価者名 |
-| `docs/rule.md` §5 の参考文献 | 各文書はここを `[R1]` 等で参照する |
+| `docs/protocol/rule.md` §5 の参考文献 | 各文書はここを `[R1]` 等で参照する |
 
 語彙や定義を変えたら**再生成して**写しを更新する。
 
@@ -124,7 +124,7 @@ python -X utf8 scripts/make_screening_example.py
 ## 4. 出典が付いているか
 
 方法論上の主張（数値・手法名・「〜という実測がある」）を書いたなら、
-**出典は `docs/rule.md` §5 に集約**し、他文書はそこを参照する。
+**出典は `docs/protocol/rule.md` §5 に集約**し、他文書はそこを参照する。
 
 - 出典なしの数値を新たに増やさない。
 - 一次資料を確認できていないものは、**確認できていないと明記**して正式収載しない。
