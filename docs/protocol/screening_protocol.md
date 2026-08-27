@@ -40,7 +40,7 @@
 | 段 | 内容 | 担当 |
 |---|---|---|
 | **stage 1** | 全1,052件を著者が判定 | 著者 1,052件 |
-| | うち**校正セット164件（15%）は3名全員**が判定 | Kataoka 164 / WATANABE 164 |
+| | うち**校正セット223件（20%）は3名全員**が判定 | Kataoka 223 / WATANABE 223 |
 | **stage 2** | 著者が Exclude / Unsure にしたものだけ第2評価者が確認 | 2名で分担 |
 
 **なぜこの方式か:** Phase 3b のエラーは非対称で、誤 Exclude は回復不能（全文を読む機会が
@@ -51,7 +51,7 @@
 > 見落とし率の具体的な数値と出典、および**引用時の過剰主張を避けるための注意**は
 > [`rule.md` §5 [R1]](rule.md#5-方法論の参考文献) に集約してある。ここでは再掲しない。
 
-**κ は校正セットでのみ算出する。** 除外プールだけで計算すると著者の判定に分散が無く
+**κ は校正セット223件（20%）でのみ算出する。** 除外プールだけで計算すると著者の判定に分散が無く
 **κ が常に 0** になるため（`protocol_changelog.md` Rev.17）。
 
 **割当は決定論的**（校正セットの抽出・第2評価者の振り分けとも文献キーの MD5）。
@@ -252,7 +252,7 @@ python -X utf8 scripts/score_screening.py
 PRISMA / 本文に載せるため、以下を `score_screening.py` の出力から転記する。
 
 - ペア別 Cohen's κ（3本）とその平均、Landis & Koch の解釈
-  **— 校正セット164件で算出したものであることを明記する**
+  **— 校正セット223件（20%）で算出したものであることを明記する**
 - liberal accelerated で1名の Include により通過した件数（第2評価者を経ていない分）
 - 一致件数 / 要協議件数（不一致・Unsure の内訳）
 - 協議で解決した件数 / 解決せず Include に倒した件数
@@ -329,7 +329,9 @@ python -X utf8 scripts/make_screening_example.py
 
 ```
 screening/EXAMPLE_記入見本.xlsx   ← 全員に配る
-screening/sheet_kataoka.xlsx      ← Kataoka（164件）
-screening/sheet_watanabe.xlsx     ← WATANABE（164件）
+screening/sheet_kataoka.xlsx      ← Kataoka（164件・2026-08-19 配布）
+screening/sheet_watanabe.xlsx     ← WATANABE（164件・2026-08-19 配布）
+screening/supplement_sheet_kataoka.xlsx   ← Kataoka 追加59件（Rev.22・2026-08-20）
+screening/supplement_sheet_watanabe.xlsx  ← WATANABE 追加59件（Rev.22・2026-08-20）
 screening/sheet_author.xlsx       ← 著者（1,052件）
 ```

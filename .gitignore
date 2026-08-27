@@ -23,6 +23,13 @@ raw/IEEE2/
 # 割当表・協議リスト・最終判定は最初から追跡する。
 screening/sheet_*.csv
 screening/sheet_*.xlsx
+# 接頭辞つきの派生シートも同じ理由で追跡しない。
+# `screening/sheet_*` は "supplement_sheet_..." や "stage2_sheet_..." に一致しないため
+# 明示的に列挙する(2026-08-20 に補足シートを作った際に判明した穴)。
+screening/supplement_sheet_*.csv
+screening/supplement_sheet_*.xlsx
+screening/stage2_sheet_*.csv
+screening/stage2_sheet_*.xlsx
 
 # Excel の一時ロックファイル(シートを開いている間だけ生成される)。
 # 配布物に紛れると受け取り側が混乱するため、追跡もアーカイブもしない。
