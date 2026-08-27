@@ -49,6 +49,31 @@ from make_screening_xlsx import DECISIONS, EXCLUDE_REASONS, REASON_OTHER  # noqa
 ROOT = Path(__file__).resolve().parent.parent
 SCREENING = ROOT / "screening"
 
+# 複数該当時の優先順位 (Rev.24)。正は docs/reference/reviewer_briefing.md §3.3。
+#   上位ほど「下位の基準を評価する前提そのものが崩れている」順に並ぶ。
+#   キー 1-9 の並びは語彙の表示順(EXCLUDE_REASONS)で凍結されているため一致しない。
+#   凡例に順位を併記するのはこのズレで取り違えるのを防ぐため。
+EXCLUDE_PRIORITY = [
+    "重複(同一研究の別報告)",
+    "スコープ外(主題が無関係)",
+    "S: 原著論文でない",
+    "S: ユーザー実験が無い",
+    "P: 対象者が不適合",
+    "I: HMD-VR でない",
+    "I: スケール操作/多感覚刺激が無い",
+    "O: スケール知覚の測定が無い",
+    "その他",
+]
+
+# 語彙が変わったのに優先順位を直し忘れると、凡例が黙って嘘をつく。
+_vocab = {v for v, _ in EXCLUDE_REASONS}
+if set(EXCLUDE_PRIORITY) != _vocab:
+    raise SystemExit(
+        "EXCLUDE_PRIORITY が統制語彙と一致しません。\n"
+        f"  優先順位にのみ存在: {sorted(set(EXCLUDE_PRIORITY) - _vocab)}\n"
+        f"  語彙にのみ存在:     {sorted(_vocab - set(EXCLUDE_PRIORITY))}\n"
+        "docs/reference/reviewer_briefing.md §3.3 を確認して両方を揃えてください。")
+
 # ハイライト語。
 #   group1-3 は実行済み検索クエリの3概念群 (docs/protocol/search_strings.md Rev.6)。
 #   cue は PICOS の判断材料になりやすい語。**両方向(残す手がかり/落とす手がかり)を
@@ -155,6 +180,7 @@ def render(sheet_id: str, records: list[dict], rules: list[dict]) -> str:
     return TEMPLATE.replace("__SHEET_ID__", html.escape(sheet_id)) \
                    .replace("__RECORDS__", payload) \
                    .replace("__REASONS__", reasons) \
+                   .replace("__PRIORITY__", json.dumps(EXCLUDE_PRIORITY, ensure_ascii=False)) \
                    .replace("__DECISIONS__", json.dumps(DECISIONS, ensure_ascii=False)) \
                    .replace("__REASON_OTHER__", json.dumps(REASON_OTHER, ensure_ascii=False)) \
                    .replace("__HIGHLIGHT__", json.dumps(HIGHLIGHT, ensure_ascii=False)) \
@@ -211,6 +237,28 @@ mark.g3{background:var(--g3)} mark.cue{background:var(--cue)}
   display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--soft);
   border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-size:11px;color:var(--fg)}
+/* 常時表示のキー凡例。判定中に「どの数字がどの理由か」を毎回ヘルプで開かずに済ませる。 */
+#legend{position:fixed;right:0;top:0;bottom:0;width:270px;overflow:auto;z-index:9;
+  background:var(--soft);border-left:1px solid var(--line);
+  padding:14px 14px 76px;font-size:12.5px;display:none}
+body.legend-on #legend{display:block}
+body.legend-on{padding-right:270px}
+#legend h3{margin:0 0 6px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--muted);font-weight:700}
+#legend h3.sec{margin-top:16px}
+#legend .row{display:flex;gap:7px;align-items:baseline;padding:5px 0;
+  border-bottom:1px solid var(--line)}
+#legend .row:last-child{border-bottom:0}
+#legend .lb{flex:1;line-height:1.5}
+#legend .pr{color:var(--muted);font-size:10.5px;white-space:nowrap}
+#legend .foot{margin-top:14px;color:var(--muted);line-height:1.65;font-size:11.5px}
+/* 凡例を出しているときは下部バーの理由チップを畳む(同じ情報の二重表示を避ける)。 */
+body.legend-on .rchip{display:none}
+@media (max-width:1080px){
+  body.legend-on{padding-right:0}
+  body.legend-on #legend{display:none}
+  body.legend-on .rchip{display:inline}
+}
 #help{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:50;
   align-items:center;justify-content:center;padding:20px}
 #help.on{display:flex}
@@ -241,6 +289,7 @@ select{font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);
   </select>
   <button id="jamode" hidden>訳 対訳</button>
   <button id="exp">CSV書き出し (E)</button>
+  <button id="lgd">凡例 (R)</button>
   <button id="hlp">? ヘルプ</button>
 </div>
 
@@ -260,6 +309,7 @@ select{font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);
 </main>
 
 <div id="keys"></div>
+<aside id="legend"></aside>
 <div id="help"><div id="helpbox">
   <h2 style="margin-top:0">キー操作</h2>
   <table id="helptable"></table>
@@ -274,6 +324,7 @@ select{font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);
 
 <script>
 const RECORDS=__RECORDS__, REASONS=__REASONS__, DECISIONS=__DECISIONS__;
+const PRIORITY=__PRIORITY__;
 const REASON_OTHER=__REASON_OTHER__, HIGHLIGHT=__HIGHLIGHT__, RULES=__RULES__;
 const SHEET="__SHEET_ID__", KEY="phase3b:"+SHEET;
 
@@ -416,7 +467,7 @@ const KEYMAP=[
   ...REASONS.map((x,n)=>[String(n+1),"Exclude — "+x.value]),
   ["j / →","次へ"],["k / ←","前へ"],["m","メモ欄へ"],["z","直前を取り消し"],
   ["h","ハイライト切替"],["t","訳の表示切替（原文のみ → 対訳 → 訳のみ）"],
-  ["e","CSV書き出し"],["?","このヘルプ"],
+  ["r","キー凡例の表示切替"],["e","CSV書き出し"],["?","このヘルプ"],
 ];
 // 訳が1件でも載っていれば切替ボタンを出す。
 if(RECORDS.some(r=>r.ja)){
@@ -425,10 +476,41 @@ if(RECORDS.some(r=>r.ja)){
   b.onclick=()=>{jaMode=(jaMode+1)%3;b.textContent="訳 "+JA_MODE_LABEL[jaMode];draw()};
 }
 document.getElementById("keys").innerHTML=
-  ['<kbd>i</kbd> Include','<kbd>u</kbd> Unsure',
-   '<kbd>1</kbd>–<kbd>'+REASONS.length+'</kbd> Exclude+理由',
-   '<kbd>j</kbd>/<kbd>k</kbd> 移動','<kbd>m</kbd> メモ','<kbd>z</kbd> 取消',
-   '<kbd>t</kbd> 訳','<kbd>e</kbd> 書き出し','<kbd>?</kbd> ヘルプ'].join("　");
+  ['<kbd>i</kbd> Include','<kbd>u</kbd> Unsure']
+  .concat(REASONS.map((x,n)=>
+    '<span class="rchip"><kbd>'+(n+1)+'</kbd> '+esc(x.value)+'</span>'))
+  .concat(['<kbd>j</kbd>/<kbd>k</kbd> 移動','<kbd>m</kbd> メモ','<kbd>z</kbd> 取消',
+   '<kbd>t</kbd> 訳','<kbd>r</kbd> 凡例','<kbd>e</kbd> 書き出し','<kbd>?</kbd> ヘルプ'])
+  .join("　");
+
+// ---- 常時表示のキー凡例 ----
+// 1-9 の並びは語彙の表示順(凍結済み)であり、Rev.24 の優先順位とは一致しない。
+// 取り違えを防ぐため、各行に優先順位を併記する。
+function rank(v){const i=PRIORITY.indexOf(v);return i<0?"":"優先"+(i+1);}
+document.getElementById("legend").innerHTML=
+  '<h3>Exclude ＋除外理由</h3>'
+  +REASONS.map((x,n)=>
+    '<div class="row"><kbd>'+(n+1)+'</kbd><span class="lb">'+esc(x.value)
+    +'</span><span class="pr">'+rank(x.value)+'</span></div>').join("")
+  +'<h3 class="sec">判定・移動</h3>'
+  +[["i","Include"],["u","Unsure"],["j / →","次へ"],["k / ←","前へ"],
+    ["m","メモ欄へ"],["z","直前を取り消し"],
+    ["h","ハイライト切替"],["t","訳の切替"],
+    ["r","この凡例を閉じる"],["e","CSV書き出し"],
+    ["?","ヘルプ"]]
+   .map(([k,v])=>'<div class="row"><kbd>'+esc(k)+'</kbd><span class="lb">'+esc(v)+'</span></div>').join("")
+  +'<div class="foot"><b>優先</b> は理由が2つ以上当てはまるときに'
+  +'どれを選ぶかの順位（Rev.24）。'
+  +'<b>数字キーの並びとは一致しません</b>'
+  +'（キーは語彙の表示順）。</div>';
+
+let legendOn=localStorage.getItem("legend:"+SHEET)!=="0";
+function drawLegend(){document.body.classList.toggle("legend-on",legendOn);
+  document.getElementById("lgd").textContent=(legendOn?"凡例を閉じる":"凡例 (R)");}
+function toggleLegend(){legendOn=!legendOn;
+  localStorage.setItem("legend:"+SHEET,legendOn?"1":"0");drawLegend();}
+document.getElementById("lgd").onclick=toggleLegend;
+drawLegend();
 document.getElementById("helptable").innerHTML=
   KEYMAP.map(([k,v])=>"<tr><td><kbd>"+k+"</kbd></td><td>"+esc(v)+"</td></tr>").join("")
   +REASONS.map((x,n)=>"<tr><td><kbd>"+(n+1)+"</kbd></td><td><b>"+esc(x.value)+"</b><br><span style='color:var(--muted)'>"+esc(x.desc)+"</span></td></tr>").join("");
@@ -440,6 +522,7 @@ document.addEventListener("keydown",e=>{
   }
   if(e.ctrlKey||e.metaKey||e.altKey) return;
   const k=e.key;
+  if(k==="r"||k==="R"){toggleLegend();e.preventDefault();return}
   if(k==="?"){document.getElementById("help").classList.toggle("on");e.preventDefault();return}
   if(k==="Escape"){document.getElementById("help").classList.remove("on");return}
   if(k==="i"||k==="I"){set("Include");e.preventDefault();return}
