@@ -1,0 +1,534 @@
+%% reviewer_briefing.tex
+%% 評価者向け説明資料（Phase 3b Title/Abstract スクリーニング）
+%% 内容の正は docs/reference/reviewer_briefing.md。こちらは配布用の組版。
+%% ビルド: lualatex --interaction=nonstopmode reviewer_briefing.tex
+\documentclass[a4paper]{ltjsarticle}
+
+\usepackage{luatexja-fontspec}
+\usepackage[margin=20mm,top=18mm,bottom=20mm]{geometry}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+%% --- 配色 ---
+\definecolor{accent}{HTML}{1F4E79}
+\definecolor{soft}{HTML}{F0F4F8}
+\definecolor{warn}{HTML}{FDF1E7}
+\definecolor{newc}{HTML}{EAF3EC}
+\definecolor{rulec}{HTML}{C8D4E0}
+
+%% --- 見出し ---
+\usepackage{titlesec}
+\titleformat{\section}{\normalfont\Large\bfseries\color{accent}}{\thesection.}{0.6em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries\color{accent}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalfont\normalsize\bfseries\color{accent}}{\thesubsubsection}{0.5em}{}
+\titlespacing*{\section}{0pt}{1.6\baselineskip}{0.6\baselineskip}
+\titlespacing*{\subsection}{0pt}{1.1\baselineskip}{0.4\baselineskip}
+\titlespacing*{\subsubsection}{0pt}{0.9\baselineskip}{0.3\baselineskip}
+\setcounter{secnumdepth}{3}
+
+%% --- 強調ボックス ---
+\newcommand{\keybox}[1]{%
+  \par\medskip
+  \noindent\colorbox{soft}{%
+    \begin{minipage}{\dimexpr\linewidth-2\fboxsep\relax}
+      \vspace{2pt}\centering\bfseries\large #1\vspace{4pt}
+    \end{minipage}}%
+  \par\medskip}
+
+\newcommand{\notebox}[1]{%
+  \par\medskip
+  \noindent\colorbox{warn}{%
+    \begin{minipage}{\dimexpr\linewidth-2\fboxsep\relax}
+      \vspace{4pt}#1\vspace{4pt}
+    \end{minipage}}%
+  \par\medskip}
+
+\newcommand{\addbox}[1]{%
+  \par\medskip
+  \noindent\colorbox{newc}{%
+    \begin{minipage}{\dimexpr\linewidth-2\fboxsep\relax}
+      \vspace{4pt}#1\vspace{4pt}
+    \end{minipage}}%
+  \par\medskip}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+\setlist[itemize]{leftmargin=1.4em,itemsep=2pt,topsep=3pt}
+\setlist[enumerate]{leftmargin=1.8em,itemsep=2pt,topsep=3pt}
+\renewcommand{\arraystretch}{1.25}
+
+%% 統制語彙の選択肢を等幅で
+\newcommand{\rsn}[1]{\texttt{\small #1}}
+
+%% 小見出し（titlesec と \paragraph の相性問題を避けるため独自定義）
+\newcommand{\subhead}[1]{\par\medskip\noindent{\bfseries\color{accent}#1}\par\nopagebreak\smallskip}
+
+\begin{document}
+
+\begin{center}
+  {\LARGE\bfseries\color{accent} 評価者向け説明資料}\\[4pt]
+  {\large Phase 3b\quad Title/Abstract スクリーニング}\\[10pt]
+  {\small 対象: Yuta Kataoka さん / Ryoichi WATANABE さん}\\[3pt]
+  {\small 説明会: 2026年8月20日（第1回）／\textbf{2026年8月24日（補足説明）}}\\[3pt]
+  {\small 作成: 2026年8月19日\quad|\quad 改訂: 2026年8月24日（除外理由の優先順位を追加）}
+\end{center}
+
+\vspace{4pt}
+\noindent\textcolor{rulec}{\rule{\linewidth}{0.8pt}}
+\vspace{6pt}
+
+%% ============================================================
+\section*{2026年8月24日の補足について}
+
+\addbox{%
+\textbf{この回で新しく加わるのは §3.3「除外理由の優先順位」だけです。}\\[3pt]
+判定基準（Include / Exclude の線引き）は 2026年8月19日の凍結から\textbf{一切変えていません。}}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{L{9em} X}
+\toprule
+追加したもの & \textbf{除外理由が2つ以上当てはまるときに、どれを記録するかの順位}（§3.3） \\
+\addlinespace
+変えていないもの & 判定基準・9択の語彙・割当・シートの構成 \\
+\addlinespace
+\textbf{締切} & \textbf{2026年8月31日（月）へ延長しました}（従来は8月26日） \\
+\addlinespace
+影響 & Include / Exclude / Unsure の判定は\textbf{変わりません}。κ にも影響しません \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\keybox{締切: 2026年8月31日（月）}
+
+\noindent
+記入済みの \texttt{sheet\_\textless お名前\textgreater .xlsx} をご返送ください。
+集計と κ の算出はこちらで行います。
+
+\notebox{%
+\textbf{この資料は、既に配布した判定シートの基準を説明するものです。新しい基準は追加しません。}\\[4pt]
+Phase 3b は 2026年8月19日の配布をもって設計を凍結しています
+（\texttt{protocol\_changelog.md} Rev.19）。
+そのため\textbf{基準の解釈に関わる疑問は、この場で決めず持ち帰ります。}
+迷った文献は \rsn{Unsure} にしてください。それが協議に回る正しい経路です。}
+
+%% ============================================================
+\section{何を判定しているか}
+
+\textbf{VRの中で自分の体の大きさをどう感じるか（自己スケール知覚）}を扱った実証研究を、
+網羅的に集めるためのスクリーニングです。
+
+\medskip
+\noindent
+「視覚偏重」と「非視覚的手がかりの欠落」を定量的に示すのが狙いなので、
+\textbf{視覚だけを操作した研究こそが主要な調査対象}です。
+多感覚を扱っていないから物足りない、ということはありません。
+
+\begin{center}
+\begin{tabularx}{\linewidth}{L{8em} X}
+\toprule
+判定対象の全体 & \textbf{1,052件}（DB検索 795 + 引用探索 257） \\
+\addlinespace
+\textbf{今回の223件} & そのうちの\textbf{校正セット}。著者とお二人の\textbf{3名全員}が同じ223件を独立に判定する（κ の算出用） \\
+\addlinespace
+このあと & stage 2 として、著者が Exclude / Unsure にしたものの確認をお願いします（Kataoka 最大420件 / WATANABE 最大409件） \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\noindent
+\textbf{校正セットも判定基準は他と同じです。}「テストだから厳しく」などは不要です。
+
+\subsection{いちばん大事な原則}
+
+\keybox{除外できると確信できないものは残す（Include に倒す）}
+
+\noindent
+この段階のミスは\textbf{非対称}です。
+
+\begin{itemize}
+  \item \textbf{誤って Exclude} → その論文は二度と検討されない（\textbf{回復不能}）
+  \item \textbf{誤って Include} → 次の全文評価で落とせるだけ（手間が増えるだけ）
+\end{itemize}
+
+\noindent
+\textbf{全文を読めば分かることを、要旨だけの段階で切らないでください。}
+迷ったら \rsn{Unsure} で構いません。無理に二択にしないでください。
+
+%% ============================================================
+\section{判定基準（PICOS）}
+
+\texttt{rule.md} の Phase 4 基準を、Title/Abstract で判断できる水準に緩めたものです。
+
+\begin{center}
+\begin{tabularx}{\linewidth}{L{6em} X L{10em}}
+\toprule
+ & 基準 & 補足 \\
+\midrule
+\textbf{P} 対象者 & 健常成人 & 小児・高齢者（臨床対象）・患者は除外 \\
+\addlinespace
+\textbf{I} 介入 & \textbf{HMD を用いた VR 環境}での身体・空間スケール操作、および多感覚刺激の提示 & \\
+\addlinespace
+\textbf{C} 比較 & スケール操作の有無、異なる倍率間、視覚単独 vs 多感覚 & \textbf{この段では判定に使いません}（§3.4） \\
+\addlinespace
+\textbf{O} 評価指標 & 自己・環境のスケール変容を測る\textbf{定量的データ}（主観的サイズ推定、距離知覚、アフォーダンス判断、身体所有感、客観的運動出力） & \\
+\addlinespace
+\textbf{S} 研究デザイン & 客観的な\textbf{ユーザー実験}にもとづく実証研究 & \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+%% ============================================================
+\section{除外理由（9択・ドロップダウン）}
+
+\subsection{選択肢}
+
+Exclude のときは、以下から1つ選びます。
+
+\begin{center}
+\begin{tabularx}{\linewidth}{L{13.2em} L{10em} X}
+\toprule
+選択肢 & 定義 & 典型例 \\
+\midrule
+\rsn{P: 対象者が不適合} & 健常成人でない & 患者のリハビリ、外科医の訓練、小児発達研究 \\
+\rsn{I: HMD-VR でない} & HMD を用いた VR でない & デスクトップ画面、AR/MR、CAVE、実環境のみ \\
+\rsn{I: スケール操作/多感覚刺激が無い} & どちらも行っていない & 単なるVRコンテンツの評価 \\
+\rsn{O: スケール知覚の測定が無い} & 定量指標が無い & 「面白かった」等の感想のみ \\
+\rsn{S: ユーザー実験が無い} & 実証評価を伴わない & 技術提案、デモ、シミュレーションのみ \\
+\rsn{S: 原著論文でない} & 文献種別が対象外 & 総説・サーベイ・抄録のみ・基調講演・書籍 \\
+\rsn{スコープ外(主題が無関係)} & 基準を当てるまでもない & 主題がまったく別分野 \\
+\rsn{重複(同一研究の別報告)} & 別報告・拡張版 & \\
+\rsn{その他} & 上に当てはまらない & \textbf{メモに理由を必ず記入} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\noindent
+\textbf{当てはまるものが無ければ「その他」+ メモ。}無理に既存カテゴリへ押し込まないでください。
+
+\subsection{\rsn{S: 原著論文でない} の解釈（2026-08-20 補足）}
+
+\notebox{%
+\textbf{\rsn{S: 原著論文でない} は「実験を報告していない文献種別」を指します。}
+\begin{itemize}
+  \item \textbf{該当する:} 総説・サーベイ・基調講演・書籍、\textbf{実験の記述がない}抄録
+  \item \textbf{該当しない:} \textbf{実験を報告しているポスター/ショートペーパー → Include}
+  \item \textbf{ページ数は除外理由になりません。判断するのは内容です。}
+\end{itemize}
+配布済みシートのドロップダウン説明には「ポスター」という語が入っていますが、
+これは\textbf{実験を伴わない}ポスター発表を指します。2ページでも実験を報告していれば対象です
+（既知の適合論文17件のうち4件が2ページの会議論文で、\textbf{唯一の聴覚の例もその1つ}です）。\\[4pt]
+\textbf{シートの文言は記録としてそのまま残してあります}（Rev.19 の凍結を守るため）。
+解釈はこの補足が優先します。詳細は \texttt{protocol\_changelog.md} Rev.20。}
+
+%% ------------------------------------------------------------
+\subsection{除外理由の優先順位（2026年8月24日 追加）}
+
+\keybox{除外理由が2つ以上当てはまるときは、\\
+下の表で\textbf{最も上にあるもの}を1つ選びます。}
+
+\noindent
+これまでは「最も明白なものを1つ」とお伝えしていましたが、
+\textbf{何が「明白」かは人によってぶれます。}
+順位を固定して、\textbf{誰が判定しても同じ理由が記録される}ようにします。
+
+\begin{center}
+\begin{tabularx}{\linewidth}{C{3.2em} L{13.5em} X}
+\toprule
+順位 & 選択肢 & この順位である理由 \\
+\midrule
+\textbf{1} & \rsn{重複(同一研究の別報告)} & そもそも独立した1件の研究として数えない。PRISMA でも重複の除去は適格性評価より\textbf{前}の段 \\
+\addlinespace
+\textbf{2} & \rsn{スコープ外(主題が無関係)} & PICOS を当てる対象ですらない \\
+\addlinespace
+\textbf{3} & \rsn{S: 原著論文でない} & 総説・書籍などには\textbf{研究の実体が無く}、P/I/O を評価できない \\
+\addlinespace
+\textbf{4} & \rsn{S: ユーザー実験が無い} & 実証評価が無く、O（測定）を評価できない \\
+\addlinespace
+\textbf{5} & \rsn{P: 対象者が不適合} & ここから先は、実体のある研究に PICOS を順に当てる \\
+\addlinespace
+\textbf{6} & \rsn{I: HMD-VR でない} & \\
+\addlinespace
+\textbf{7} & \rsn{I: スケール操作/多感覚刺激が無い} & \\
+\addlinespace
+\textbf{8} & \rsn{O: スケール知覚の測定が無い} & \\
+\addlinespace
+\textbf{9} & \rsn{その他} & \textbf{上の8つのどれにも当てはまらないときだけ。}メモ必須 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsubsection*{理由は1つだけ。併記は不要です}
+
+\keybox{複数当てはまっても、優先順位で\\ 最も上のものを1つ選ぶだけで構いません。}
+
+\noindent
+\textbf{選ばなかった理由をメモに書き足す必要はありません。}
+メモが必須なのは \rsn{その他} を選んだときだけです。
+
+\subsubsection*{なぜこの並びなのか}
+
+\subhead{大原則}
+
+\keybox{上にあるものほど、下の基準を評価する\\ 前提そのものが崩れています。}
+
+\noindent
+除外理由は「\textbf{この論文はどこで脱落したか}」の記録です。
+そしてある基準を当てるには、\textbf{その基準を問える前提}が成り立っている必要があります。
+
+\medskip
+\noindent
+総説論文に「対象者が健常成人か」を問うても意味がありません。\textbf{被験者がいないからです。}
+だから、前提のほうを壊している理由を上位に置きます。
+
+\subhead{3つのブロックに分かれています}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{L{13em} L{4em} X}
+\toprule
+ブロック & 順位 & 問うていること \\
+\midrule
+\textbf{A. そもそも1件の研究か} & 1–2 & 独立した研究として数えるか（重複）／この分野の話か（スコープ外） \\
+\addlinespace
+\textbf{B. 研究の実体があるか} & 3–4 & 実験を報告した文献か（\rsn{S:} の2つ） \\
+\addlinespace
+\textbf{C. PICOS を満たすか} & 5–8 & 実体のある研究に P → I → O を順に当てる \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\noindent
+\textbf{A が崩れていれば B は問えず、B が崩れていれば C は問えません。}
+この一方向の依存関係が順位の実体です。
+\textbf{「重要な基準ほど上」という意味ではありません。}基準に軽重はありません。
+
+\subhead{★ なぜ \rsn{P: 対象者が不適合} が5番なのか}
+
+9択の表（§3.1）では \rsn{P:} が先頭に載っているので、5番は「格下げされた」ように
+見えるかもしれません。\textbf{表示の並びと優先順位は別物です。}
+ドロップダウンの並びは Rev.19 の凍結どおり一切変えていません。
+
+\medskip
+\noindent
+\rsn{P:} が \rsn{S:} の2つより下なのは、上の大原則をそのまま当てはめた結果です。
+
+\begin{center}
+\begin{tabularx}{\linewidth}{L{8em} X X}
+\toprule
+ & 患者を扱った\textbf{総説} & 患者を扱った\textbf{実験論文} \\
+\midrule
+被験者は & \textbf{いない}（総説に実験は無い） & いる（健常成人でない） \\
+\addlinespace
+記録する理由 & \rsn{S: 原著論文でない}（順位3） & \textbf{\rsn{P: 対象者が不適合}}（順位5） \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\noindent
+\textbf{「患者が対象だから落とした」と書けるのは、実際に患者を被験者にした研究だけ}です。
+総説にそう書くと、\textbf{存在しない被験者を判定したことになってしまいます。}
+
+\medskip
+\noindent
+なお \rsn{P:} は \rsn{I:} \rsn{O:} より上位です（5 \textless\ 6・7・8）。
+実体のある研究どうしを比べるときは、判定基準の表（§2）と同じ
+\textbf{P → I → O} の順で当てます。
+
+\subhead{検討したが採らなかった案}
+
+\textbf{\rsn{P:} を \rsn{S:} より上に置く案}（PICOS の文字順を優先し、§2 の判定基準の表と
+並びを揃える）も検討しました。評価者にとって覚えやすいという利点があります。
+
+\medskip
+\noindent
+採らなかったのは、\textbf{「総説の被験者適格性を判定した」という記録が残ってしまう}ためです。
+除外理由は第三者が監査する記録なので、\textbf{実際に評価できたことだけを書く}ほうが筋が通ります。
+
+\subhead{この順位の副作用（承知のうえで採用しています）}
+
+\notebox{%
+\textbf{患者対象かつ総説}のような文献は \rsn{S:} 側に計上されるため、
+PRISMA の理由別集計で \rsn{P:} の件数には乗りません。
+\textbf{「健常成人でないために落ちた文献の総数」は、あの表からは読めません。}\\[4pt]
+\textbf{併記を取らない運用なので、後から内訳を復元することもできません。}
+これは「1件につき1理由（primary reason）しか載せない」という PRISMA の形式そのものに
+由来する制約で、\textbf{順位をどう決めてもどこかに現れます。}
+この点は Threats to Validity に明記します。}
+
+\subsubsection*{具体例}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{X L{14em} L{12.5em}}
+\toprule
+論文 & 当てはまる理由 & \textbf{記録する理由} \\
+\midrule
+VRリハビリの\textbf{総説}（患者対象）
+& \rsn{S: 原著論文でない}\newline + \rsn{P: 対象者が不適合}
+& \textbf{\rsn{S: 原著論文でない}}\newline （3 \textless\ 5） \\
+\addlinespace
+デスクトップ画面で、患者にスケール操作
+& \rsn{I: HMD-VR でない}\newline + \rsn{P: 対象者が不適合}
+& \textbf{\rsn{P: 対象者が不適合}}\newline （5 \textless\ 6） \\
+\addlinespace
+実験の無い技術デモで、スケール操作も無い
+& \rsn{S: ユーザー実験が無い}\newline + \rsn{I: スケール操作が無い}
+& \textbf{\rsn{S: ユーザー実験が無い}}\newline （4 \textless\ 7） \\
+\addlinespace
+まったく別分野の総説
+& \rsn{スコープ外}\newline + \rsn{S: 原著論文でない}
+& \textbf{\rsn{スコープ外}}\newline （2 \textless\ 3） \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsubsection*{この追加は判定結果を変えません}
+
+\addbox{%
+\textbf{Include / Exclude / Unsure の判定は1件も変わりません。}
+変わるのは「Exclude と決めたあと、どの理由を記録するか」だけです。
+したがって\textbf{評価者間一致度（κ）の値には影響しません。}}
+
+\noindent
+むしろ κ が低かった場合の診断手順（\texttt{protocol\_changelog.md} Rev.21）では
+\textbf{「どの基準の解釈で割れたか」を除外理由の分布から突き止めます。}
+理由の付け方が人によってぶれていると、この診断が機能しません。この順位はそのための整備です。
+
+\medskip
+\noindent
+判定シート（xlsx）の語彙・ドロップダウンは\textbf{変更していません}（Rev.19 の凍結を維持）。
+\rsn{S: 原著論文でない} の解釈（§3.2）と同じく、\textbf{語彙は記録として固定し、
+運用の解釈を書面で足す}形をとっています。詳細は \texttt{protocol\_changelog.md} Rev.24。
+
+\subsubsection*{既に記入した分の扱い}
+
+\keybox{書き直しは不要です。そのままご返送ください。}
+
+\noindent
+理由の記録は判定そのものではないので、\textbf{Include / Exclude / Unsure が入っていれば
+κ は問題なく算出できます。}
+複数該当していたものに気づいた範囲で直していただければ十分で、
+遡って全件を見返す必要はありません。
+
+\subsection{補足}
+
+\noindent
+\textbf{なぜ選択式なのか。} PRISMA 2020 が除外理由の記録を要求しており、論文に
+\textbf{「理由別の除外件数」の表}を載せます。自由記述だと3人で表記が割れて
+（「患者対象」/「P: 患者が対象」/「対象者が健常成人でない」）、同じ理由が別物として
+集計されてしまうためです。
+
+\medskip
+\noindent
+\textbf{なぜ \texttt{C}（比較対象）が選択肢に無いのか。}
+比較条件は要旨に書かれないことが多いためです。ここで C を根拠に落とすと
+誤除外（回復不能）を招くので、C の判断は Phase 4（全文評価）に送ります。
+\textbf{「比較群が書かれていない」を理由に Exclude しないでください。}
+
+%% ============================================================
+\section{判断に迷いやすいケース}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{L{16em} X}
+\toprule
+ケース & 扱い \\
+\midrule
+視覚のスケール操作だけで、多感覚が無い & \textbf{Include。} これが本レビューの主要な調査対象 \\
+距離知覚だけを測っていて「自己サイズ」を測っていない & \textbf{Include。} O 基準に距離知覚が明記されている \\
+アイレベル（視点の高さ）だけを操作している & \textbf{Include。} 既知の適合論文にも3件ある \\
+2ページのポスター・アブストラクト & \textbf{実験があれば Include}（§3.2） \\
+心理系の雑誌で、VR が主題に見えない & HMD を使っていれば Include 側。\textbf{確信が持てなければ \rsn{Unsure}} \\
+要旨が無くタイトルだけ & 判断できなければ \textbf{\rsn{Unsure}。} 担当223件中\textbf{44件} \\
+手法は合うが被験者が患者 & \rsn{P: 対象者が不適合} で Exclude \\
+VR酔い・プレゼンス\textbf{だけ}が主題 & スケール知覚の測定が無ければ \rsn{O:} で Exclude。ただし\textbf{併せて測っていれば Include} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+%% ============================================================
+\section{実務の確認}
+
+\subsection{記入するもの}
+
+\texttt{sheet\_\textless お名前\textgreater .xlsx} の「判定」シート、★が付いた3列だけです。
+他はロックしてあります。
+
+\begin{enumerate}
+  \item \textbf{判定} … Include / Exclude / Unsure（ドロップダウン）
+  \item \textbf{除外理由} … Exclude のときのみ必須（ドロップダウン、9択）。
+        \textbf{複数該当するときは §3.3 の優先順位で1つに決める。併記は不要}
+  \item \textbf{メモ} … 任意。ただし除外理由が「その他」のときは必須
+\end{enumerate}
+
+\noindent
+記入が終わったらファイルをそのままご返送ください（\textbf{締切: 2026年8月31日（月）}）。
+
+\subsection{独立性のお願い}
+
+\begin{itemize}
+  \item \textbf{他の方のシートは開かないでください。} 互いの判定が見えると κ が意味を失います
+  \item \textbf{判定についての事前相談も無しでお願いします}（この説明会での基準の質疑は別です）
+  \item 迷ったものは相談せず \rsn{Unsure} に
+\end{itemize}
+
+\subsection{シートの使い方}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{L{9em} X}
+\toprule
+オートフィルタ & 「判定」を (空白) で絞ると\textbf{未記入だけ}表示できる \\
+淡い赤の行 & 要旨が無い文献（\texttt{要旨有無} 列が \texttt{N}）。フィルタでも絞れる \\
+赤字強調 & Exclude なのに理由が空 / 「その他」なのにメモが空 → \textbf{提出前の自己チェック用} \\
+要旨の読み方 & 中央値1,278字。行の高さの自動調整か数式バーの拡張で読む \\
+\texttt{要旨の出所} 列 & \texttt{enriched} は外部補完した要旨。\textbf{通常の要旨と同じように扱ってください} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\noindent
+\textbf{判定に使わない列:} \texttt{ランク}（Phase 2 で基準を満たし済み・二重に効かせない）、
+\texttt{概念群}（読む順序のトリアージ専用。\textbf{この数値で機械的に除外しない}）、
+\texttt{取得経路}（PRISMA の報告用）、\texttt{校正セット}（κ の算出対象かの記録）。
+\textbf{いずれも判定基準は同じです。}
+
+%% ============================================================
+\section{よくある質問}
+
+\subhead{Q. 除外理由が2つ以上当てはまるときは。}
+A. \textbf{§3.3 の優先順位で、最も上にあるものを1つ}選んでください。\textbf{併記は不要です。}
+Include / Exclude の判定そのものは変わりません。
+
+\subhead{Q. 自分の判定が著者と食い違ったらどうなりますか。}
+A. 不一致は κ に反映されたうえで協議リストに載ります。協議で決着しなければ
+\textbf{Include に倒して Phase 4 へ送ります}（再現率優先）。食い違うこと自体は想定内です。
+
+\subhead{Q. 途中で基準の解釈に迷ったら聞いてよいですか。}
+A. \textbf{質問は歓迎ですが、その場での回答は控えます。}
+配布後に基準が変わると、変更前後で適用基準が異なってしまうためです（Rev.19 の凍結）。
+持ち帰って記録し、必要なら協議段階で扱います。迷った個別文献は \rsn{Unsure} にしてください。
+
+\subhead{Q. 間に合わなさそうなときは。}
+A. 見込みが立った時点でご連絡ください。\textbf{未記入のまま提出されるより、期日を調整するほうが
+安全です}（未記入があると κ が算出できません）。
+
+%% ============================================================
+\section*{参照先}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{L{16em} X}
+\toprule
+文書 & 内容 \\
+\midrule
+\texttt{docs/protocol/rule.md} & プロトコル本体（目的・RQ・PICOS・Taxonomy・参考文献） \\
+\texttt{docs/protocol/screening\_protocol.md} & Phase 3b の運用手順 \\
+\texttt{screening/README.md} & \texttt{screening/} フォルダの読み方 \\
+\texttt{docs/log/protocol\_changelog.md} & 全改訂履歴（Rev.1〜24） \\
+\texttt{EXAMPLE\_記入見本.xlsx} & 記入例5件 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\end{document}

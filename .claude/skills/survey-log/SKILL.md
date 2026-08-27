@@ -5,7 +5,7 @@ description: サーベイ作業の終了時に PROGRESS_LOG.md へセッショ�
 
 # 進捗ログの追記
 
-`SurveyProtocol/docs/PROGRESS_LOG.md` の末尾「## セッションログ」セクションに、当日の日付見出しで追記する。
+`SurveyProtocol/docs/log/PROGRESS_LOG.md` の末尾「## セッションログ」セクションに、当日の日付見出しで追記する。
 （プロトコル文書は 2026-07-21 に `docs/` へ集約済み。README.md と known_items*.md はルート据え置き。）
 
 ## 書式

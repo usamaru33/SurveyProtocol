@@ -318,7 +318,7 @@ def main() -> None:
         for w_ in warnings:
             print(f"    - {w_}")
         print("\n打ち切りが疑われる場合は、検索UIの表示ヒット数と一致するまで")
-        print("出版年でスライスして再エクスポートすること(docs/search_replication.md §1)。")
+        print("出版年でスライスして再エクスポートすること(docs/protocol/search_replication.md §1)。")
         sys.exit(1)
 
     print("\n[OK] 打ち切り・欠損の疑いは検出されませんでした。")

@@ -40,6 +40,7 @@
 | 2026-08-17 | **Rev.16: 要旨を外部補完**（欠落 325→191件）。**Rev.17: Phase 3b を liberal accelerated へ変更**。配布可能な状態に到達 |
 | 2026-08-19 | **Rev.18: 除外理由を統制語彙（9択）に**。**Rev.19: 判定シートを配布し設計を凍結**。評価者向け説明資料を作成 |
 | 2026-08-20 | **Rev.20: 語彙と Rev.14 の S基準運用の矛盾を、語彙を変えず解釈の明示で解消**。事前配布資料を作成・PDF組版。説明会（評価者2名） |
+| 2026-08-24 | **Rev.24: 除外理由が複数該当する場合の優先順位を定める**（語彙・判定基準は不変更）。`reviewer_briefing.md` §3.3 を新設し `.tex`/`.pdf` を作成（判定に不要な節を削減し全6章に再構成）。**複数該当時の併記要求を取り下げ**（1つに絞るだけ）。**締切を 08-26 → 08-31 へ延長**（曜日の誤記も訂正: 08-26 は火ではなく水）。補足説明（評価者2名） |
 
 ---
 
@@ -54,10 +55,16 @@
   κ は3名全員が判定する校正セット164件で算出。Phase 4 は通常の二重評価（Rev.9 の体制）。
 - **Phase 3b は 2026-08-19 のシート配布をもって凍結**（Rev.19）。シート再生成・判定手法・
   除外理由の語彙・割当は変更しない。`make_screening_xlsx.py --force` と `pipeline.py` の再実行は禁止。
+- **除外理由の優先順位**（Rev.24）: 複数該当時は
+  重複 → スコープ外 → S:原著論文でない → S:ユーザー実験が無い → P → I:HMD-VR → I:スケール操作 → O → その他
+  の順で最上位を1つ記録する。**上位ほど下位の基準を評価する前提が崩れている**という原理。
+  **判定（Include/Exclude/Unsure）は変わらないため κ に影響しない。** 語彙・シートは不変更。
+  **併記は求めない**（Rev.18 の「残りは note へ」を取り下げ）。その帰結として理由別集計の
+  内訳は復元できず、Threats に明記する。既記入分の書き直しも求めない。
 - **`S: 原著論文でない` の解釈**（Rev.20）: 実験を報告していない文献種別を指す。
   **実験を報告しているポスター/ショートペーパーは Include**。ページ数は除外理由にしない。
   **語彙の文言は配布時のまま変更していない**（→ 既知の課題・Threats）。
-- 変更履歴は `docs/protocol_changelog.md`。**`rule.md` 本文は Rev.11 までを反映済み（2026-08-11）。**
+- 変更履歴は `docs/log/protocol_changelog.md`。**`rule.md` 本文は Rev.11 までを反映済み（2026-08-11）。**
 
 ### 2. 検索データ
 
@@ -71,7 +78,7 @@
 | **第2波** | **ACM DL** | **9,630** | `raw/acm_wave2_20260803.csv` |
 | **第2波** | **IEEE Xplore** | **361** | `raw/ieee_wave2_20260810.csv` |
 
-- 第2波は Rev.6 の G1拡張クエリ。ACM は **title検索 6,013 + abstract検索 8,331 の和集合**（`docs/search_strings.md` にスライス内訳）。
+- 第2波は Rev.6 の G1拡張クエリ。ACM は **title検索 6,013 + abstract検索 8,331 の和集合**（`docs/protocol/search_strings.md` にスライス内訳）。
 - Zotero 往復の無損失を3例で実測（Scopus 2,542 / ACM 9,630 / IEEE 361 とも一致）。
 - **統合生データ `ResearchVR4.csv` = 26,434件**（`scripts/merge_raw.py`、Source_DB 列つき、PubMed 除外）。
 
@@ -94,20 +101,20 @@
 - Phase 2 出力に `Match_Stage` / `Match_Guard_Note` を追加（誤照合を可視化する監査列）。
   unmatched 9,066件のうちガード起因は 865件（9.5%）。
 - **Phase 3b の判定対象は 1,052件**（DB検索795 + 引用探索257）。liberal accelerated により
-  著者1,052件 / 他2名は校正セット164件 + 著者の Exclude/Unsure 分担（割当上限 Kataoka 449 / WATANABE 439。
+  著者1,052件 / 他2名は校正セット164件 + 著者の Exclude/Unsure 分担（割当上限 Kataoka 420 / WATANABE 409。
   実数は著者の stage 1 完了時に確定）。
   引用探索分には venue フィルタとフィルタ層を適用していない（`snowballing_protocol.md` §4.3b）。
 
 ### 3b. Phase 3b の実施基盤（**配布可能な状態**）
 - 判定対象 **1,052件**（DB検索795 + 引用探索257）。**liberal accelerated 方式**（Rev.17）:
   1名の Include で通す / Exclude には2名。stage 1 は著者1,052件 + 他2名が校正セット164件、
-  stage 2 で著者の Exclude/Unsure 分を2名が分担（割当上限 Kataoka 449 / WATANABE 439）。
+  stage 2 で著者の Exclude/Unsure 分を2名が分担（割当上限 Kataoka 420 / WATANABE 409）。
 - `screening/` に判定シート一式（CSV + xlsx、`source` 列つき）。
   評価者ごとに独立したファイル（互いの判定が見えると κ が意味を失うため）。
   ブロック割当は決定論的（キーの MD5 mod 3）で、再生成しても既存の割当は動かない。
 - `scripts/make_screening_sheets.py`（生成）/ `make_screening_xlsx.py`（Excel版）/
   `score_screening.py`（ペア別 Cohen's κ・協議リスト・最終判定）。
-- 運用手順は `docs/screening_protocol.md`。
+- 運用手順は `docs/protocol/screening_protocol.md`。
 - **着手前の未決事項**: 要旨欠落 **325件（30.9%）** の扱い（補完するか、欠落のまま Threats に明記するか）。
 
 ### 4. 検証基盤
@@ -154,7 +161,7 @@
    （除外プールだけでは κ が常に 0 になるため）。
    - ~~判定シート様式が**未作成**~~ → **作成済み（2026-08-12）**。
      `scripts/make_screening_sheets.py`（生成）/ `scripts/score_screening.py`（κ算出・協議リスト）/
-     `docs/screening_protocol.md`（運用手順）。**評価者ごとに別ファイル**にして独立性を担保。
+     `docs/protocol/screening_protocol.md`（運用手順）。**評価者ごとに別ファイル**にして独立性を担保。
      ブロック割当は決定論的（キーの MD5 mod 3）。**Excel版（.xlsx）も生成済みで記入待ち**
      （ブロック1 325件 / 2 356件 / 3 371件）
    - キーワードスコアは読む順序のトリアージにのみ使用可。自動除外はしない
@@ -554,12 +561,12 @@
   RIS書き出しの整形確認、APIキー未設定時に**ネットワークに触れず**エラー終了することを確認、
   `known_item_test.py` 再実行で既存パイプラインへの影響が無いことを確認(recall 69.23% 不変)。
   **外部API通信を伴う本実行はしていない**(著者実行前提、方針どおり)。
-- `docs/search_replication.md` の Option B に自動化スクリプトへの導線を追記(ACMは手動継続と明記)。
+- `docs/protocol/search_replication.md` の Option B に自動化スクリプトへの導線を追記(ACMは手動継続と明記)。
 - **次回やること(著者、優先度順)**:
   1. IEEE_API_KEY(developer.ieee.org)・SCOPUS_API_KEY(dev.elsevier.com)を取得
   2. 各スクリプトを `--count-only`→少数件→本実行の順で試験(フィールド名のAPIドリフトを確認)
   3. 出力 .ris を Zotero に専用コレクション(ieee_wave2/scopus_wave2)で取り込み→CSVエクスポート
-  4. `docs/search_strings.md` に verbatim クエリ・実行日・ヒット数を転記(`outputs/api_search_log.csv`が下書き)
+  4. `docs/protocol/search_strings.md` に verbatim クエリ・実行日・ヒット数を転記(`outputs/api_search_log.csv`が下書き)
   5. ACM は手動エクスポートを実施し、3DB分が揃ってから統合・パイプライン再実行
 
 ### 2026-07-22 (3) / 2026-07-27 — APIキー投入・接続テスト・Scopus scope実測
@@ -620,7 +627,7 @@
   1. developer.ieee.org でアカウント設定を再確認(サブスクリプション/メール認証等)。
      解決しない場合はIEEEサポートへの問い合わせも検討
   2. `raw/scopus_wave2_20260730.ris` を Zotero に取り込み(専用コレクション)→CSVエクスポート
-     → `docs/search_strings.md` に実行記録を転記
+     → `docs/protocol/search_strings.md` に実行記録を転記
   3. ACM Abstract本実行の可否判断(7,655件、55%成功率想定、時間がかかる長時間ジョブ)
   4. `scripts/snowball_search.py` を実行し `outputs/snowballing_log.csv` を生成
      → picos_decision/reason列を著者が記入
@@ -663,7 +670,7 @@
 - ~~**保留**: `raw/additional.csv` の改名~~ → **2026-08-01 に著者承認、`raw/scopus_wave2_20260730.csv` へ改名済み**
   (`git mv` で履歴を保持。README §4 の参照も更新)。
 - **次回やること(優先度順)**:
-  1. **`docs/search_strings.md` の DB別記録表に「Scopus(第2波)」行を追記**(PRISMA Item #7 の穴埋め)。
+  1. **`docs/protocol/search_strings.md` の DB別記録表に「Scopus(第2波)」行を追記**(PRISMA Item #7 の穴埋め)。
      verbatim・実行日・2,542件は `outputs/api_search_log.csv` に下書きあり。**ネットワーク不要・即着手可**
   2. developer.ieee.org のアカウント有効化を確認(**全体の律速**)。解決しない場合は
      IEEEサポート問い合わせ、または**IEEEも手動エクスポートに切り替える**判断
@@ -705,7 +712,7 @@
   1. Phase 4 の一致度統計 (a)Fleiss' κ / (b)ペアワイズCohen's κ と、割当方式を著者が決定
      → `rule.md` 本文へ反映(Rev.8 の未反映分とまとめて)
   2. ACM/IEEE 第2波の結果をエクスポート → `raw/` へ配置 → Known-Item Test で TA/TAK を判定
-  3. `docs/search_strings.md` に第2波の記録を転記(Scopus 分は `outputs/api_search_log.csv` に下書きあり。
+  3. `docs/protocol/search_strings.md` に第2波の記録を転記(Scopus 分は `outputs/api_search_log.csv` に下書きあり。
      ACM/IEEE 分は verbatim クエリ・実行日・ヒット数を著者から受領)
   4. developer.ieee.org のアカウント有効化(手動検索が通っているため優先度は下がったが、
      API が使えれば再現性の記録が楽になる)
@@ -745,7 +752,7 @@
   1. ACM で入れ子の単一クエリを試す → 通ればそのヒット数を採用、駄目なら和集合＋逸脱記録
   2. ACM/IEEE 第2波をエクスポート → `raw/` へ配置 → Known-Item Test で recall 実測
      (ACM #7/#8/#13・IEEE #11 の捕捉を確認。#7/#11 はタイトルのみで通るため #8/#13 が判定の要)
-  3. `docs/search_strings.md` に第2波の記録を転記(Scopus は `outputs/api_search_log.csv` に下書きあり、
+  3. `docs/protocol/search_strings.md` に第2波の記録を転記(Scopus は `outputs/api_search_log.csv` に下書きあり、
      ACM/IEEE は verbatim クエリ・実行日・ヒット数を著者から受領)
   4. 判定シートの様式を作成(文献ID・担当ペア・両評価者の判定・除外理由・最終判定・協議メモ)
   5. 3DB分が揃ったら統合 → 正規化改修 → 公式再実行 → PRISMA 数値確定 → rule.md へ Rev.8 分を反映
@@ -818,7 +825,7 @@
   3. IEEE(379件、上限内なので分割不要)をエクスポート → `raw/ieee_wave2_YYYYMMDD.csv`
   4. `merge_raw.py` で `ResearchVR4.csv` 生成 → `known_item_test.py` で step0 recall 実測
      → **TA 維持か TAK 移行かを判断**
-  5. `docs/search_strings.md` に第2波の verbatim・実行日・ヒット数・スライス内訳を転記
+  5. `docs/protocol/search_strings.md` に第2波の verbatim・実行日・ヒット数・スライス内訳を転記
   6. 和集合方式の逸脱を `protocol_changelog.md` に記録(Rev.10 候補)
 
 ### 2026-08-03 (2) — ACM第2波(raw/acm2)のスライス検査 / gold set 2件を修正
@@ -907,7 +914,7 @@
   `merge_raw.py` の `Source_DB` 判定が第1波 `acm.csv` と同じ "ACM" に落ちるのを防ぐため
   (リネーム後は "ACM(wave2)" として正しく分離されることを dry-run で確認)。
 - **著者判断: スライス .bib はコミットせず ignore**。`.gitignore` に `raw/*.bib` と `raw/acm2/` を追加。
-  **その代わり、スライス別の年範囲・件数を `docs/search_strings.md` に表として記録**した
+  **その代わり、スライス別の年範囲・件数を `docs/protocol/search_strings.md` に表として記録**した
   (PRISMA Item #7 の根拠は今後この表が正)。あわせて第2波の verbatim・実行日・ヒット数、
   和集合方式の代償(フィールド横断の取りこぼし)も同ファイルに記載。
 - 統合見込み(`merge_raw.py --dry-run`): ACM 7,997 / ACM(wave2) 9,630 / IEEE 1,276 /
@@ -946,7 +953,7 @@
 
 2026-07-17 以来凍結していた step ファイルを解除し、**人手スクリーニングを始められる状態**
 （判定対象1,052件・シート配布可能）まで到達した。プロトコル改訂6本を含む。各改訂の詳細は
-`docs/protocol_changelog.md` にあるので、ここでは**なぜそうしたか**を中心に記録する。
+`docs/log/protocol_changelog.md` にあるので、ここでは**なぜそうしたか**を中心に記録する。
 
 #### 確定した数値
 
@@ -1037,7 +1044,7 @@ PRISMA 2020 公式フロー図・Wohlin 2014・DB検索とスノーボーリン�
 
 - `screening/` に判定シート一式（CSV + xlsx、`source` 列つき）。著者681 / Kataoka 696 / WATANABE 727
 - `scripts/`: `make_screening_sheets.py` / `make_screening_xlsx.py` / `score_screening.py` を新設
-- `docs/screening_protocol.md` を新設（Phase 3b の運用手順）
+- `docs/protocol/screening_protocol.md` を新設（Phase 3b の運用手順）
 
 #### 次回やること（優先度順）
 
@@ -1128,7 +1135,7 @@ DOI しか持たないことが多く S2 側にも要旨が無いため。**Thre
 
 リポジトリ直下に **`PROGRESS_LOG.md`（未追跡）** が存在する。2026-07-21 のコミット `7a27187`
 で `docs/` へ移動したはずのファイルで、**内容も同時期（7月中旬）の古いもの**。
-誰がいつ復活させたか不明なため**削除せず残してある**。`docs/PROGRESS_LOG.md` が正であり、
+誰がいつ復活させたか不明なため**削除せず残してある**。`docs/log/PROGRESS_LOG.md` が正であり、
 ルート側は不要と判断できれば削除してよい。
 
 ### 2026-08-17 (2) — Rev.17: Phase 3b を liberal accelerated 方式へ変更
@@ -1276,7 +1283,7 @@ Include の典型例1件、Exclude 3件（P / I / S 基準それぞれ）、Unsu
 
 変更が必要になった場合はシートを作り直さず、`protocol_changelog.md` に逸脱として記録し
 Threats to Validity で報告する。凍結解除は著者の明示的な指示があるときだけ。
-告知は `rule.md` §Phase 3b・`docs/screening_protocol.md`・`screening/README.md`・
+告知は `rule.md` §Phase 3b・`docs/protocol/screening_protocol.md`・`screening/README.md`・
 `.claude/skills/survey-pipeline/SKILL.md` の4箇所に置いた。
 
 読み取りは自由。`score_screening.py` による記入状況の確認と、
@@ -1371,7 +1378,7 @@ PR を「コードが動くか」ではなく**「文書がコードと現実に
 
 ### 2026-08-19 (2) — 評価者向け説明資料 / Known-Item の判定対象への残存を照合
 
-#### 説明資料（`docs/reviewer_briefing.md`）
+#### 説明資料（`docs/reference/reviewer_briefing.md`）
 
 評価者2名から「経緯を把握できていない、**特にどういった論文を対象にしているか理解したい**」
 という依頼があり、8/20 に30分の説明会を設けることになった。前回説明が Rev.9 時点だったため
@@ -1413,7 +1420,7 @@ Rev.10〜19 を差分として扱い、Rev.15 / Rev.17 / Rev.18 に印を付け�
 
 `known_item_test.py` は step ファイル（DB検索側）だけを対象にしており、
 引用探索分を勘定に入れていないため、この数値はこれまで未計測だった。
-Threats to Validity 転用可の形で `docs/snowballing_protocol.md` §4.7 に記録した。
+Threats to Validity 転用可の形で `docs/protocol/snowballing_protocol.md` §4.7 に記録した。
 
 > **報告時の注意:** 47.1% は依然として低い。「引用探索で解決した」ではなく
 > **「29.4% → 47.1% に改善したが限界が残る」**が正確な記述。残る9件の脱落理由
@@ -1478,7 +1485,7 @@ Rev.18 で自由記述を統制語彙に置き換えた際、Rev.14 の運用判
 
 - 組版は MiKTeX の **lualatex + ltjsarticle**。A4・5ページ、日本語フォント（原ノ味）埋め込み、
   Overfull 0・警告なし。中間ファイルは削除し `.gitignore` に追加した
-- ビルド: `lualatex --interaction=nonstopmode docs/reviewer_briefing_preread.tex`
+- ビルド: `lualatex --interaction=nonstopmode docs/reference/reviewer_briefing_preread.tex`
 
 **最大の内容上の修正は「164件と1,052件の関係」。** 評価者は
 「164件の後に著者が1,052件を判定する」と理解していたが、**これは前後関係ではなく包含関係**。
@@ -1594,3 +1601,54 @@ Rev.18 以来「未確認」としていた穴が塞がった。
 3. 締切後: `score_screening.py` → κ 算出 → **Rev.21 の閾値方針に従って対応**
 4. 未決: `rule.md` Rev.2 の「AI/LLM」が古典的機械学習を含むか（候補F の可否）
 5. 未決: [R7][R8] の書誌情報の特定
+
+
+### 2026-08-20 (3) — Rev.22: 校正セットを 20% へ引き上げ（凍結の部分解除）
+
+Rev.21 の調査で「Cochrane のガイダンス [R4] は二重判定の割合として20%を例示しており、
+本研究の15%はこれを下回る」ことが判明していた。当初は Threats に記載する方針だったが、
+**先行研究に合わせられるなら合わせるほうが弁明が不要**との著者判断で引き上げた。
+
+| | 15% | 20% |
+|---|---|---|
+| 校正セット | 164 | **223（21.20%）** |
+| stage 2 上限 | Kataoka 449 / WATANABE 439 | **Kataoka 420 / WATANABE 409** |
+| 要旨なし（校正セット内） | 35 | **44** |
+
+#### ★ 配布済みの判定を捨てずに済んだ理由
+
+抽出が `md5("cal:"+key) % 100 < pct` で**閾値について単調**なため、
+`<15` の集合は `<20` の集合に完全に含まれる。実測で
+**既存164件から外れる文献は0件、追加は59件**だった。
+
+そのため既存シートを作り直さず、**差分59件だけを補足シートとして追加**した。
+`scripts/make_calibration_supplement.py` を新規作成。
+`make_screening_xlsx.py --force` は**使っていない**（配布済み・記入進行中のため）。
+
+`score_screening.py` は `supplement_sheet_<id>` を自動統合する（重複時は本体優先）。
+
+> **割合を下げる場合はこの性質が働かない。** 引き下げは配布後には実施できない。
+
+#### 凍結（Rev.19）との関係
+
+凍結の趣旨は「記入済み判定を壊さない」「判定基準を変えない」であり、
+本変更はどちらにも抵触しない。判定基準は一切変えておらず、変わるのは
+**κ の算出に使う集合の広さだけ**である。
+
+#### 検証
+
+- 223 = 164 + 59（重複なし・過不足なし）
+- 補足シートの判定列は空、統制語彙のドロップダウンを継承
+- **gold set 17件のうち校正セットに含まれるものは 0件**（20%でも変わらず。κ への影響なし）
+
+#### 未了
+
+- **評価者2名への連絡**（追加59件の送付と、締切の調整）。作業量が +36% になる
+- `docs/log/consistency_audit_log.md` の 449/439 は**遡及修正せず注記を追加**した
+
+#### 次回やること
+
+1. **著者の stage 1 判定 1,052件**（最優先・クリティカルパス）
+2. 評価者2名: 既存164件 + 補足59件 = 223件
+3. 締切後: `score_screening.py` → κ 算出 → **Rev.21 の閾値方針に従って対応**
+

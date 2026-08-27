@@ -12,7 +12,7 @@ gold set の in-scope 文献が何件残ったかを照合し、取得経路の�
 
 【なぜ要るか】
 スノーボーリングの目的(A)は「Venue フィルタで脱落した Known-Item の回収」だった
-(`docs/snowballing_protocol.md` §0)。その**実測値**が無いと、Threats to Validity で
+(`docs/protocol/snowballing_protocol.md` §0)。その**実測値**が無いと、Threats to Validity で
 「検索式のギャップを引用探索で補完した」と書けない。
 
 【読み取り専用】

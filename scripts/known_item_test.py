@@ -301,11 +301,14 @@ def parse_known_items(root: Path, items_path: Path | None = None) -> list[dict]:
     """既知文献リストを読む。--items 指定 > known_items.csv > known_items.md >
     self_scale_references.csv の順。列名はエイリアス解決する。"""
     if items_path is None:
-        for cand in ("known_items.csv", "known_items.md",
+        # 2026-08-20: 文書を docs/ 配下へ整理したため docs/reference/ も探す。
+        # ルート直下の旧パスは、手元に残っている場合のために候補として残す。
+        for cand in ("known_items.csv",
+                     "docs/reference/known_items.md", "known_items.md",
                      "self_scale_references.csv"):
             p = root / cand
             if p.exists():
-                if cand == "known_items.md":
+                if cand.endswith("known_items.md"):
                     # md はテンプレートのみ(有効行なし)の場合があるため中身で判断
                     md_items = _parse_md_table(p)
                     if md_items:
@@ -405,7 +408,7 @@ def main() -> None:
     outdir = ROOT / "outputs"
     outdir.mkdir(exist_ok=True)
     out_csv = outdir / "known_item_test.csv"
-    out_md = ROOT / "known_item_analysis.md"
+    out_md = ROOT / "docs" / "reference" / "known_item_analysis.md"
 
     if not items:
         msg = ("known_items.md がまだ記入されていません(有効行 0 件)。"
