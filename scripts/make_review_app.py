@@ -25,6 +25,15 @@
 生成した HTML をブラウザで開き、キーボードで判定する。判定は逐次 localStorage に
 保存され、`E` キーで decisions CSV を書き出す。CSV を xlsx へ反映するのは
 `scripts/apply_review_decisions.py`。
+
+**localStorage はブラウザごと・端末ごとに別物で、履歴消去で消える。** そのため
+`s` で途中保存 JSON (`progress_<id>_YYYYMMDD_HHMM.json`) を書き出し、`l` で読み込む
+経路を持たせてある。読み込みは apply_review_decisions.py と同じ考え方で
+**検証してから取り込む**(別評価者のファイルは独立性のため拒否、判定値と統制語彙の検査、
+このシートに無い ID はスキップ)。途中保存ファイルは判定そのものなので git 追跡しない。
+
+幅700px以下ではキー凡例に代えてタップ操作バーを出す(スマホでの判定用)。Exclude は
+ボトムシートで9つの理由から選ぶ。**スワイプは前後移動だけで、判定は変えない。**
 """
 from __future__ import annotations
 
@@ -271,15 +280,70 @@ button{font:inherit;font-size:13px;padding:5px 11px;border:1px solid var(--line)
 select{font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);
   border-radius:6px;background:var(--bg);color:var(--fg)}
 .warn{background:var(--cal);border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px}
+#saved{color:var(--muted);font-size:11.5px;white-space:nowrap;font-variant-numeric:tabular-nums}
+#flash{position:fixed;left:50%;bottom:74px;transform:translateX(-50%);z-index:80;
+  background:var(--fg);color:var(--bg);padding:8px 16px;border-radius:99px;font-size:13px;
+  opacity:0;pointer-events:none;transition:opacity .18s}
+#flash.on{opacity:.94}
+
+/* ---- 途中保存の取り込みダイアログ ---- */
+#imp{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:60;
+  align-items:center;justify-content:center;padding:20px}
+#imp.on{display:flex}
+#impbox{background:var(--bg);border:1px solid var(--line);border-radius:10px;
+  padding:20px 22px;max-width:580px;width:100%;max-height:82vh;overflow:auto}
+#impbox h2{margin:0 0 10px;font-size:17px}
+#impbox dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:10px 0 4px;font-size:13.5px}
+#impbox dt{color:var(--muted)} #impbox dd{margin:0;font-variant-numeric:tabular-nums}
+#impbox .err{color:var(--exc)} #impbox .warnline{color:var(--uns)}
+#impbox ul{margin:6px 0 12px;padding-left:20px;font-size:13px;line-height:1.75}
+#impbox .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+#impbox .btns button{padding:9px 14px}
+
+/* ---- スマホ表示 ---- */
+#touch{display:none;position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--bg);
+  border-top:1px solid var(--line);flex-direction:column;gap:6px;
+  padding:6px 8px calc(6px + env(safe-area-inset-bottom))}
+#touch .row1{display:flex;gap:6px}
+#touch .row2{display:flex;gap:6px;justify-content:center}
+#touch button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+#touch .tb{flex:1;min-height:54px;font-size:15px;font-weight:700}
+#touch .tb.nav{flex:0 0 54px;font-size:19px;font-weight:400}
+#touch .tb.inc{color:var(--inc)} #touch .tb.uns{color:var(--uns)} #touch .tb.exc{color:var(--exc)}
+#touch .sm{flex:1;font-size:12.5px;padding:7px 4px;color:var(--muted)}
+#sheet{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:70;align-items:flex-end}
+#sheet.on{display:flex}
+#sheetbox{background:var(--bg);width:100%;border-radius:14px 14px 0 0;max-height:88vh;overflow:auto;
+  padding:14px 12px calc(14px + env(safe-area-inset-bottom))}
+#sheetbox h3{margin:0 0 4px;font-size:14px}
+#sheetbox p.hint{margin:0 0 10px;font-size:12px;color:var(--muted);line-height:1.6}
+#sheetbox .r{display:flex;gap:10px;align-items:center;width:100%;text-align:left;
+  min-height:52px;margin-bottom:6px;padding:8px 10px;touch-action:manipulation}
+#sheetbox .r .lb{flex:1;line-height:1.45;font-size:14px}
+#sheetbox .r .pr{color:var(--muted);font-size:11px;white-space:nowrap}
+@media (max-width:700px){
+  #bar{padding:6px 10px;gap:7px;font-size:12px}
+  #bar .pill.opt{display:none}
+  #bar button,#bar select{padding:8px 10px;font-size:13px;touch-action:manipulation}
+  main{max-width:none;padding:14px 14px 172px}
+  h1{font-size:19px}
+  .abs{font-size:15.5px;line-height:1.9;max-width:none;padding-left:12px}
+  .abs.ja{padding:10px 12px}
+  #note{max-width:none;font-size:16px}
+  #keys{display:none}
+  #touch{display:flex}
+  #flash{bottom:130px}
+  #helpbox,#impbox{padding:16px 14px;max-height:86vh}
+}
 </style></head><body>
 
 <div id="bar">
   <span class="pill">#<b id="pos">0</b>/<b id="total">0</b></span>
   <div id="prog"><div id="progfill"></div></div>
   <span class="pill">判定済 <b id="done">0</b></span>
-  <span class="pill" style="color:var(--inc)">Inc <b id="ninc">0</b></span>
-  <span class="pill" style="color:var(--exc)">Exc <b id="nexc">0</b></span>
-  <span class="pill" style="color:var(--uns)">Uns <b id="nuns">0</b></span>
+  <span class="pill opt" style="color:var(--inc)">Inc <b id="ninc">0</b></span>
+  <span class="pill opt" style="color:var(--exc)">Exc <b id="nexc">0</b></span>
+  <span class="pill opt" style="color:var(--uns)">Uns <b id="nuns">0</b></span>
   <select id="filter">
     <option value="all">すべて</option>
     <option value="todo">未判定のみ</option>
@@ -288,10 +352,14 @@ select{font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);
     <option value="flag">ルール該当のみ</option>
   </select>
   <button id="jamode" hidden>訳 対訳</button>
+  <button id="sav">途中保存 (S)</button>
+  <button id="ld">読み込み (L)</button>
   <button id="exp">CSV書き出し (E)</button>
   <button id="lgd">凡例 (R)</button>
   <button id="hlp">? ヘルプ</button>
+  <span id="saved"></span>
 </div>
+<input type="file" id="fin" accept="application/json,.json" hidden>
 
 <main>
   <div id="calwarn" class="warn" hidden>
@@ -310,6 +378,34 @@ select{font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);
 
 <div id="keys"></div>
 <aside id="legend"></aside>
+<nav id="touch">
+  <div class="row1">
+    <button class="tb nav" id="t-prev" aria-label="前へ">&#9664;</button>
+    <button class="tb inc" id="t-inc">Include</button>
+    <button class="tb uns" id="t-uns">Unsure</button>
+    <button class="tb exc" id="t-exc">Exclude &#9662;</button>
+    <button class="tb nav" id="t-next" aria-label="次へ">&#9654;</button>
+  </div>
+  <div class="row2">
+    <button class="sm" id="t-undo">取消</button>
+    <button class="sm" id="t-note">メモ</button>
+    <button class="sm" id="t-ja">訳</button>
+    <button class="sm" id="t-hl">ハイライト</button>
+    <button class="sm" id="t-help">?</button>
+  </div>
+</nav>
+
+<div id="sheet"><div id="sheetbox">
+  <h3>Exclude の理由を1つ選ぶ</h3>
+  <p class="hint">複数当てはまるときは <b>優先</b> の数字が小さいものを選ぶ（Rev.24）。
+    先頭の数字はキーボードのキー番号で、優先順位とは一致しません。</p>
+  <div id="sheetrows"></div>
+  <button class="r" id="sheet-cancel" style="justify-content:center">キャンセル</button>
+</div></div>
+
+<div id="imp"><div id="impbox"></div></div>
+<div id="flash"></div>
+
 <div id="help"><div id="helpbox">
   <h2 style="margin-top:0">キー操作</h2>
   <table id="helptable"></table>
@@ -317,6 +413,12 @@ select{font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);
     判定は入力のたびにブラウザに保存されます（localStorage）。作業を終えたら
     <kbd>E</kbd> で CSV を書き出し、<code>scripts/apply_review_decisions.py</code> で
     xlsx に反映してください。<br><br>
+    <b>localStorage はブラウザごと・端末ごとに別です。</b> PC とスマホで続きをやる場合や、
+    履歴の消去・別ブラウザへの移行に備える場合は <kbd>S</kbd> で途中保存ファイル
+    （<code>progress_&lt;id&gt;_YYYYMMDD_HHMM.json</code>）を書き出し、移動先で
+    <kbd>L</kbd> から読み込んでください。読み込みは検証してから取り込み、
+    <b>別の評価者のファイルは受け付けません</b>（独立性のため）。
+    取り込みは <kbd>z</kbd> で一括取り消しできます。<br><br>
     <b>このツールは判定を自動化しません。</b> キーワードルールはハイライトと並べ替えだけに
     使われ、Include / Exclude を書き込むことはありません。
   </p>
@@ -333,6 +435,40 @@ try{store=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){store={}}
 // 生成時に xlsx から取り込んだ判定は、localStorage が空のときだけ初期値にする。
 RECORDS.forEach(r=>{ if(!store[r.record_id] && r.decision)
   store[r.record_id]={decision:r.decision,reason:r.reason||"",note:r.note||""}; });
+
+const ID_SET=new Set(RECORDS.map(r=>r.record_id));
+const VALID_DEC=new Set(DECISIONS), VALID_REASON=new Set(REASONS.map(x=>x.value));
+
+// ---- 途中保存ファイル ----
+// localStorage はブラウザごと・端末ごとに別物で、履歴消去でも消える。PC とスマホを
+// 行き来する使い方が入ったので、判定をファイルに落として持ち運べる形を用意する。
+const PROG_FORMAT="phase3b-progress", PROG_VERSION=1;
+function fingerprint(){
+  const s=RECORDS.map(r=>r.record_id).slice().sort().join("|");
+  let h=2166136261;
+  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0}
+  return RECORDS.length+":"+h.toString(16);
+}
+function stamp(d){const p=n=>String(n).padStart(2,"0");
+  return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+"_"+p(d.getHours())+p(d.getMinutes());}
+function hhmm(d){const p=n=>String(n).padStart(2,"0");return p(d.getHours())+":"+p(d.getMinutes());}
+function download(text,name,type){
+  const blob=new Blob([text],{type:type+";charset=utf-8"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download=name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+let flashT=null;
+function flash(msg){
+  const el=document.getElementById("flash");
+  el.textContent=msg; el.classList.add("on");
+  clearTimeout(flashT); flashT=setTimeout(()=>el.classList.remove("on"),2200);
+}
+let lastAuto=null,lastFile=null;
+function drawSaved(){
+  document.getElementById("saved").textContent=
+    (lastAuto?("自動保存 "+hhmm(lastAuto)):"")+(lastFile?("／保存ファイル "+hhmm(lastFile)):"");
+}
 
 function matchRules(r){
   const hay=((r.title||"")+" "+(r.abstract||"")+" "+(r.venue||"")).toLowerCase();
@@ -437,7 +573,10 @@ function set(dec,reason){
   if(!(dec==="Exclude"&&reason===REASON_OTHER)) next();
   else document.getElementById("note").focus();
 }
-function save(){localStorage.setItem(KEY,JSON.stringify(store))}
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(store)); lastAuto=new Date(); drawSaved();}
+  catch(err){flash("⚠ ブラウザへの保存に失敗。S で途中保存ファイルを書き出してください");}
+}
 function next(){if(cur<view.length-1){cur++;draw()}else{draw()}}
 function prev(){if(cur>0){cur--;draw()}}
 
@@ -455,11 +594,128 @@ function exportCSV(){
     lines.push([r.record_id,s.decision,s.reason||"",s.note||""]
       .map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(","));
   }
-  const blob=new Blob(["\ufeff"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="decisions_"+SHEET+".csv"; a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  download("\ufeff"+lines.join("\r\n"),"decisions_"+SHEET+".csv","text/csv");
+}
+
+// ---- 途中保存（書き出し） ----
+function counts(){
+  let d=0,i=0,e=0,u=0;
+  for(const r of RECORDS){const s=store[r.record_id];if(!s||!s.decision)continue;
+    d++; if(s.decision==="Include")i++; else if(s.decision==="Exclude")e++; else u++;}
+  return {done:d,include:i,exclude:e,unsure:u,total:RECORDS.length};
+}
+function saveFile(){
+  const now=new Date();
+  const payload={format:PROG_FORMAT,version:PROG_VERSION,sheet:SHEET,
+    saved_at:now.toISOString(),fingerprint:fingerprint(),counts:counts(),decisions:store};
+  download(JSON.stringify(payload,null,1),
+           "progress_"+SHEET+"_"+stamp(now)+".json","application/json");
+  lastFile=now; drawSaved();
+  flash("途中保存を書き出しました（"+counts().done+" 件）");
+}
+
+// ---- 途中保存（読み込み） ----
+// 検証してから取り込む(apply_review_decisions.py と同じ考え方)。壊れた値は飲み込まない。
+// **別の評価者のファイルは独立性のため拒否する。**
+function impClose(){document.getElementById("imp").classList.remove("on")}
+function impShow(h){document.getElementById("impbox").innerHTML=h;
+  document.getElementById("imp").classList.add("on");}
+function impError(title,lines){
+  impShow('<h2 class="err">'+esc(title)+'</h2><ul>'
+    +lines.map(l=>"<li>"+esc(l)+"</li>").join("")
+    +'</ul><div class="btns"><button id="imp-x">閉じる</button></div>');
+  document.getElementById("imp-x").onclick=impClose;
+}
+function readProgress(file){
+  const fr=new FileReader();
+  fr.onerror=()=>impError("ファイルを読めませんでした",[String(fr.error||"")]);
+  fr.onload=()=>{
+    let d;
+    try{d=JSON.parse(fr.result)}
+    catch(err){return impError("JSON として読めません",[String(err.message||err)])}
+    const fatal=[];
+    if(!d||d.format!==PROG_FORMAT)
+      fatal.push("このアプリの途中保存ファイルではありません（format="+((d&&d.format)||"なし")+"）。");
+    if(d&&d.version>PROG_VERSION)
+      fatal.push("より新しい版のファイルです（version="+d.version+"）。アプリを再生成してください。");
+    if(d&&d.sheet&&d.sheet!==SHEET)
+      fatal.push("別の評価者のファイルです（"+d.sheet+" ／ このアプリは "+SHEET
+                +"）。独立性のため取り込めません。");
+    if(fatal.length) return impError("取り込めません",fatal);
+
+    const dec=(d&&d.decisions)||{};
+    const unknown=[],badDec=[],badReason=[],noReason=[];
+    for(const id of Object.keys(dec)){
+      const s=dec[id];
+      if(!ID_SET.has(id)){unknown.push(id);continue}
+      if(!s||!s.decision) continue;
+      if(!VALID_DEC.has(s.decision)){badDec.push(id);continue}
+      if(s.decision==="Exclude"){
+        if(!s.reason) noReason.push(id);
+        else if(!VALID_REASON.has(s.reason)) badReason.push(id);
+      }
+    }
+    if(badDec.length||badReason.length){
+      const ls=[];
+      if(badDec.length) ls.push("判定が Include/Exclude/Unsure 以外: "+badDec.length
+                               +" 件（例 "+badDec[0]+"）");
+      if(badReason.length) ls.push("統制語彙にない除外理由: "+badReason.length
+                                  +" 件（例 "+badReason[0]+"）");
+      ls.push("ファイルが壊れている可能性があります。取り込みは行いませんでした。");
+      return impError("取り込めません",ls);
+    }
+
+    let add=0,same=0,conflict=0;
+    for(const id of Object.keys(dec)){
+      const s=dec[id]; if(!ID_SET.has(id)||!s||!s.decision) continue;
+      const cur=store[id];
+      if(!cur||!cur.decision) add++;
+      else if(cur.decision===s.decision&&(cur.reason||"")===(s.reason||"")) same++;
+      else conflict++;
+    }
+    const warns=[];
+    if(d.fingerprint&&d.fingerprint!==fingerprint())
+      warns.push("判定対象の集合がこのアプリと一致しません（シートを作り直した可能性）。"
+                +"見つからない ID は取り込みません。");
+    if(unknown.length) warns.push("このシートに無い ID: "+unknown.length+" 件（スキップします）");
+    if(noReason.length) warns.push("Exclude なのに理由が空: "+noReason.length
+                +" 件（取り込みますが、CSV 反映前に埋めてください）");
+
+    impShow('<h2>途中保存を読み込む</h2>'
+      +'<dl><dt>保存日時</dt><dd>'+esc(String(d.saved_at||"不明"))+'</dd>'
+      +'<dt>ファイル内の判定</dt><dd>'+(d.counts?d.counts.done:Object.keys(dec).length)+' 件</dd>'
+      +'<dt>いま未判定 → 埋まる</dt><dd>'+add+' 件</dd>'
+      +'<dt>同じ内容</dt><dd>'+same+' 件</dd>'
+      +'<dt>食い違い</dt><dd>'+conflict+' 件</dd></dl>'
+      +(warns.length?'<ul class="warnline">'+warns.map(w=>"<li>"+esc(w)+"</li>").join("")+'</ul>':'')
+      +'<div class="btns">'
+      +'<button id="imp-keep">取り込む（食い違いは<b>いまの判定</b>を残す）</button>'
+      +'<button id="imp-over">置き換える（<b>ファイル</b>を正とする）</button>'
+      +'<button id="imp-cancel">キャンセル</button></div>'
+      +'<p style="font-size:12px;color:var(--muted);margin:12px 0 0">'
+      +'取り込みは <kbd>z</kbd> で一括で取り消せます。</p>');
+    document.getElementById("imp-keep").onclick=()=>applyImport(dec,"keep");
+    document.getElementById("imp-over").onclick=()=>applyImport(dec,"over");
+    document.getElementById("imp-cancel").onclick=impClose;
+  };
+  fr.readAsText(file,"utf-8");
+}
+function applyImport(dec,mode){
+  const curId=RECORDS[view[cur]].record_id, bulk=[];
+  for(const id of Object.keys(dec)){
+    const s=dec[id]; if(!ID_SET.has(id)||!s||!s.decision) continue;
+    const now=store[id];
+    if(now&&now.decision&&mode==="keep") continue;
+    if(now&&now.decision===s.decision&&(now.reason||"")===(s.reason||"")
+       &&(now.note||"")===(s.note||"")) continue;
+    bulk.push({id:id,prev:now?JSON.parse(JSON.stringify(now)):null});
+    store[id]={decision:s.decision,
+               reason:s.decision==="Exclude"?(s.reason||""):"",
+               note:s.note||""};
+  }
+  if(bulk.length){undo.push({bulk:bulk}); if(undo.length>200)undo.shift(); save();}
+  impClose(); rebuild(curId);
+  flash(bulk.length?("取り込みました（"+bulk.length+" 件を更新）"):"更新はありませんでした");
 }
 
 const KEYMAP=[
@@ -467,7 +723,9 @@ const KEYMAP=[
   ...REASONS.map((x,n)=>[String(n+1),"Exclude — "+x.value]),
   ["j / →","次へ"],["k / ←","前へ"],["m","メモ欄へ"],["z","直前を取り消し"],
   ["h","ハイライト切替"],["t","訳の表示切替（原文のみ → 対訳 → 訳のみ）"],
-  ["r","キー凡例の表示切替"],["e","CSV書き出し"],["?","このヘルプ"],
+  ["r","キー凡例の表示切替"],
+  ["s","途中保存をファイルに書き出す"],["l","途中保存ファイルを読み込む"],
+  ["e","CSV書き出し"],["?","このヘルプ"],
 ];
 // 訳が1件でも載っていれば切替ボタンを出す。
 if(RECORDS.some(r=>r.ja)){
@@ -480,7 +738,8 @@ document.getElementById("keys").innerHTML=
   .concat(REASONS.map((x,n)=>
     '<span class="rchip"><kbd>'+(n+1)+'</kbd> '+esc(x.value)+'</span>'))
   .concat(['<kbd>j</kbd>/<kbd>k</kbd> 移動','<kbd>m</kbd> メモ','<kbd>z</kbd> 取消',
-   '<kbd>t</kbd> 訳','<kbd>r</kbd> 凡例','<kbd>e</kbd> 書き出し','<kbd>?</kbd> ヘルプ'])
+   '<kbd>t</kbd> 訳','<kbd>r</kbd> 凡例','<kbd>s</kbd> 途中保存','<kbd>l</kbd> 読込',
+   '<kbd>e</kbd> 書き出し','<kbd>?</kbd> ヘルプ'])
   .join("　");
 
 // ---- 常時表示のキー凡例 ----
@@ -496,8 +755,9 @@ document.getElementById("legend").innerHTML=
   +[["i","Include"],["u","Unsure"],["j / →","次へ"],["k / ←","前へ"],
     ["m","メモ欄へ"],["z","直前を取り消し"],
     ["h","ハイライト切替"],["t","訳の切替"],
-    ["r","この凡例を閉じる"],["e","CSV書き出し"],
-    ["?","ヘルプ"]]
+    ["r","この凡例を閉じる"],
+    ["s","途中保存（ファイル）"],["l","途中保存の読み込み"],
+    ["e","CSV書き出し"],["?","ヘルプ"]]
    .map(([k,v])=>'<div class="row"><kbd>'+esc(k)+'</kbd><span class="lb">'+esc(v)+'</span></div>').join("")
   +'<div class="foot"><b>優先</b> は理由が2つ以上当てはまるときに'
   +'どれを選ぶかの順位（Rev.24）。'
@@ -536,15 +796,79 @@ document.addEventListener("keydown",e=>{
     const b=document.getElementById("jamode"); if(b)b.textContent="訳 "+JA_MODE_LABEL[jaMode];
     return}
   if(k==="e"||k==="E"){exportCSV();return}
-  if(k==="z"||k==="Z"){const u=undo.pop(); if(u){ if(u.prev&&u.prev.decision)store[u.id]=u.prev; else delete store[u.id];
-    save(); rebuild(u.id);} return}
+  if(k==="z"||k==="Z"){undoOne();return}
+  if(k==="s"||k==="S"){saveFile();e.preventDefault();return}
+  if(k==="l"||k==="L"){document.getElementById("fin").click();e.preventDefault();return}
 });
+function undoOne(){
+  const u=undo.pop(); if(!u) return;
+  if(u.bulk){
+    const curId=RECORDS[view[cur]].record_id;
+    for(const b of u.bulk){ if(b.prev&&b.prev.decision) store[b.id]=b.prev; else delete store[b.id]; }
+    save(); rebuild(curId); flash("取り込みを取り消しました（"+u.bulk.length+" 件）"); return;
+  }
+  if(u.prev&&u.prev.decision) store[u.id]=u.prev; else delete store[u.id];
+  save(); rebuild(u.id);
+}
+
+// ---- スマホのタップ操作 ----
+// キーボードが無い端末では 1-9 が押せない。Exclude はボトムシートで理由を選ぶ。
+// 並びと番号は凡例と同じ(語彙の表示順)にし、各行に優先順位(Rev.24)を併記する。
+function sheetOpen(){document.getElementById("sheet").classList.add("on")}
+function sheetClose(){document.getElementById("sheet").classList.remove("on")}
+document.getElementById("sheetrows").innerHTML=REASONS.map((x,n)=>
+  '<button class="r" data-v="'+esc(x.value)+'"><kbd>'+(n+1)+'</kbd>'
+  +'<span class="lb">'+esc(x.value)+'</span>'
+  +'<span class="pr">'+rank(x.value)+'</span></button>').join("");
+document.querySelectorAll("#sheetrows .r").forEach(b=>{
+  b.onclick=()=>{sheetClose(); set("Exclude",b.dataset.v);};
+});
+document.getElementById("sheet-cancel").onclick=sheetClose;
+document.getElementById("sheet").onclick=e=>{if(e.target.id==="sheet")sheetClose()};
+document.getElementById("t-prev").onclick=prev;
+document.getElementById("t-next").onclick=next;
+document.getElementById("t-inc").onclick=()=>set("Include");
+document.getElementById("t-uns").onclick=()=>set("Unsure");
+document.getElementById("t-exc").onclick=sheetOpen;
+document.getElementById("t-undo").onclick=undoOne;
+document.getElementById("t-note").onclick=()=>{
+  const n=document.getElementById("note"); n.scrollIntoView({block:"center"}); n.focus();};
+document.getElementById("t-ja").onclick=()=>{jaMode=(jaMode+1)%3;draw();
+  const b=document.getElementById("jamode"); if(b)b.textContent="訳 "+JA_MODE_LABEL[jaMode];
+  flash("要旨の表示: "+JA_MODE_LABEL[jaMode]);};
+document.getElementById("t-hl").onclick=()=>{hlOn=!hlOn;draw();
+  flash("ハイライト "+(hlOn?"ON":"OFF"));};
+document.getElementById("t-help").onclick=()=>document.getElementById("help").classList.toggle("on");
+
+// 左右スワイプで移動。判定は動かさない(誤操作の被害を移動だけに限る)。
+let sx=0,sy=0,stt=0;
+document.addEventListener("touchstart",e=>{
+  if(e.touches.length!==1)return;
+  sx=e.touches[0].clientX; sy=e.touches[0].clientY; stt=Date.now();
+},{passive:true});
+document.addEventListener("touchend",e=>{
+  if(document.querySelector("#help.on,#imp.on,#sheet.on")) return;
+  if(document.activeElement&&document.activeElement.tagName==="INPUT") return;
+  if(Date.now()-stt>700) return;
+  const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy;
+  if(Math.abs(dx)<70||Math.abs(dy)>60) return;
+  if(dx<0) next(); else prev();
+},{passive:true});
+
+document.getElementById("sav").onclick=saveFile;
+document.getElementById("ld").onclick=()=>document.getElementById("fin").click();
+document.getElementById("fin").onchange=e=>{
+  const f=e.target.files&&e.target.files[0];
+  if(f) readProgress(f);
+  e.target.value="";
+};
 document.getElementById("exp").onclick=exportCSV;
 document.getElementById("hlp").onclick=()=>document.getElementById("help").classList.toggle("on");
 document.getElementById("filter").onchange=()=>{cur=0;rebuild()};
 window.addEventListener("beforeunload",e=>{
   const any=Object.keys(store).length; if(any){e.preventDefault();e.returnValue=""}
 });
+drawSaved();
 rebuild();
 </script></body></html>
 """

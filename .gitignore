@@ -50,4 +50,7 @@ screening/~$*
 screening/review_*.html
 decisions_*.csv
 screening/decisions_*.csv
+# 閲覧アプリの途中保存。判定そのものなので decisions_*.csv と同じ扱いにする。
+progress_*.json
+screening/progress_*.json
 screening/*.bak.xlsx
