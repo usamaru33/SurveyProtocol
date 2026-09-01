@@ -445,3 +445,20 @@ Teijema JJ, et al.（ASReview 関連の評価研究群）
 
 > **書誌情報は未確定。引用する場合は一次資料を特定すること。**
 
+### [R9] レビュー論文の貢献類型を明示せよという勧告
+
+Stefanidi E, Bentvelzen M, Woźniak PW, et al.
+**Literature Reviews in HCI: A Review of Reviews.** CHI '23.
+<https://doi.org/10.1145/3544548.3581332>
+
+SIGCHI 会議 + TOCHI のレビュー論文 189本を分析し、貢献を5類型
+（Empirical / Artefact / Methodological / Theoretical / Opinion）に分けたうえで、
+**自分のレビューがどの型でどこに位置するかを本文で明示すること**を勧告している。
+同時に「構造のための構造」を戒めている。
+
+> **Rev.25 の根拠。** 本サーベイは Empirical + Theoretical の multi-part であり、
+> Theoretical の部分（多感覚統合モデル）は**貢献として主張するもの**であって RQ ではない。
+> RQ を「コーパスの集計で答えが出る問い」にそろえた判断はこの勧告に依る。
+> 同論文が報告する実施率（IRR 算出 13%、PRISMA 等のフロー図 23%、DB 明記 69%）は
+> 本サーベイの方法論的厳密さを位置づける材料としても使える。
+
