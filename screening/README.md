@@ -192,12 +192,18 @@ Unsure は協議対象になるので、無理に二択にする必要はあり�
 
 ```bash
 python -X utf8 scripts/make_review_app.py            # → screening/review_author.html
-# ブラウザで開き、キーボードで判定 → E キーで decisions_author.csv を書き出す
+# ブラウザで開き、キーボードで判定
+#   s = 途中保存（screening/json/progress_author.json）   l = 途中経過の読み込み
+#   e = decisions_author.csv を書き出す
 python -X utf8 scripts/apply_review_decisions.py --id author --input decisions_author.csv
+# 進捗JSON をそのまま渡してもよい（検証は CSV と同じ）
+python -X utf8 scripts/apply_review_decisions.py --id author \
+    --input screening/json/progress_author.json
 ```
 
 - 1件ずつ全画面表示。**`i`=Include / `u`=Unsure / `1`〜`9`=Exclude+除外理由**（1打で判定+理由）。
-  `j`/`k` 移動、`m` メモ、`z` 取り消し、`h` ハイライト切替、`t` 訳切替、`r` 凡例、`?` ヘルプ
+  `j`/`k` 移動、`m` メモ、`z` 取り消し、`h` ハイライト切替、`t` 訳切替、`r` 凡例、
+  `s` 途中保存、`l` 途中経過の読み込み、`?` ヘルプ
 - **キー凡例を画面右に常時表示する**（`r` またはバーの「凡例」で開閉。既定は表示、
   localStorage に記憶）。数字キー1〜9とその除外理由を一覧でき、判定中にヘルプを開き直す必要がない。
   幅1080px以下では自動的に下部バーへ畳む
@@ -205,7 +211,25 @@ python -X utf8 scripts/apply_review_decisions.py --id author --input decisions_a
   **優先順位とは一致しない**（例: `1`=`P: 対象者が不適合` は優先5、`8`=`重複` が優先1）。
   取り違えを防ぐため各行に「優先n」を出す。優先順位の定義は `make_review_app.py` の
   `EXCLUDE_PRIORITY` にあり、統制語彙と集合が一致しなければ生成時にエラーで止まる
-- 判定は入力のたびにブラウザに保存される（localStorage）。中断・再開できる
+- 判定は入力のたびにブラウザに保存される（localStorage）。中断・再開できる。
+  ただし localStorage は**ブラウザの閲覧データを消すと一緒に消える**（別PC・別ブラウザにも
+  引き継がれない）。区切りごとに **`s`** で JSON へ退避すること（次項）
+- **途中保存 `s` / 途中経過の読み込み `l`。** 判定を
+  `screening/json/progress_<id>.json` へ書き出す。保存先フォルダは初回に一度だけ選び
+  （`screening/json` を選ぶ）、2回目以降は同じフォルダへ上書きする。上部バーに
+  最後に保存した時刻と、それ以降に増えた判定の件数（`+n`）を出す
+  - `l` はそのフォルダの `progress_<id>.json` を、`Shift`+`L` は選んだファイルを読む。
+    読み込みは**置き換え**（統合はしない）。実行前に 新規／上書き／変わらない／
+    **消える** の内訳を必ず表示し、直前の状態は localStorage の
+    `phase3b:<id>:backup` へ退避する
+  - 読み込み時に検証する: `format`・`version`・**シートID**（他人の進捗を自分のシートへ
+    入れると独立性が壊れる）・統制語彙の外の除外理由・Exclude なのに理由が空・
+    担当外の record_id（読み飛ばして件数を報告）・**指紋**
+    （`件数:record_id列のSHA-1先頭7桁`。判定対象の集合が違えば警告する）
+  - フォルダ書き込みは File System Access API（Chrome / Edge）。使えないブラウザでは
+    通常のダウンロードに落ちるので、`screening/json/` へ自分で移す
+  - JSON はそのまま反映できる:
+    `apply_review_decisions.py --id author --input screening/json/progress_author.json`
 - 校正セット（`calibration=Y`）は **★ バッジと警告帯**を出す。**表示の正は `assignment.csv`**
   （`sheet_*.csv` は生成時点のスナップショットで、Rev.22 の 15%→20% 引き上げに追随していない）
 - 反映スクリプトは書き込む前に検証する: 担当外ID・不正な判定値・統制語彙の外の理由・
