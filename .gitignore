@@ -50,4 +50,8 @@ screening/~$*
 screening/review_*.html
 decisions_*.csv
 screening/decisions_*.csv
+# 閲覧アプリの途中保存(進捗JSON)。中身は判定そのものなので CSV と同じ理由で
+# 追跡しない。フォルダは追跡したい(クローン直後に保存先として選べるように)ので、
+# 中の JSON だけを除外する。
+screening/json/*.json
 screening/*.bak.xlsx

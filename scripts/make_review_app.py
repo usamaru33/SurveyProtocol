@@ -25,6 +25,11 @@
 生成した HTML をブラウザで開き、キーボードで判定する。判定は逐次 localStorage に
 保存され、`E` キーで decisions CSV を書き出す。CSV を xlsx へ反映するのは
 `scripts/apply_review_decisions.py`。
+
+途中経過は `S` キーで JSON へ書き出し、`L` キーで読み戻せる(既定の保存先は
+`screening/json/progress_<id>.json`)。localStorage はブラウザの閲覧データ削除で
+消えるため、JSON がその唯一のバックアップになる。JSON は
+`apply_review_decisions.py --input ...json` でそのまま xlsx へ反映できる。
 """
 from __future__ import annotations
 
@@ -90,6 +95,17 @@ HIGHLIGHT = {
             "we present", "we propose", "prototype", "demonstration",
             "survey", "review", "state of the art"],
 }
+
+
+def fingerprint(records: list[dict]) -> str:
+    """レコード集合の指紋。「件数:ID列のSHA-1先頭7桁」。
+
+    進捗JSON がこの HTML と同じ判定対象に対するものかを読み込み時に照合する。
+    件数だけだと入れ替え(同数で別集合)を見逃し、ハッシュだけだと人が見て何が
+    違うのか分からないので両方を出す。
+    """
+    ids = [str(r.get("record_id") or "") for r in records]
+    return "{}:{}".format(len(ids), _sha1("\n".join(ids))[:7])
 
 
 def load_records(sheet_id: str) -> list[dict]:
@@ -184,7 +200,8 @@ def render(sheet_id: str, records: list[dict], rules: list[dict]) -> str:
                    .replace("__DECISIONS__", json.dumps(DECISIONS, ensure_ascii=False)) \
                    .replace("__REASON_OTHER__", json.dumps(REASON_OTHER, ensure_ascii=False)) \
                    .replace("__HIGHLIGHT__", json.dumps(HIGHLIGHT, ensure_ascii=False)) \
-                   .replace("__RULES__", json.dumps(rules, ensure_ascii=False))
+                   .replace("__RULES__", json.dumps(rules, ensure_ascii=False)) \
+                   .replace("__FINGERPRINT__", fingerprint(records))
 
 
 TEMPLATE = r"""<!doctype html>
@@ -271,6 +288,27 @@ button{font:inherit;font-size:13px;padding:5px 11px;border:1px solid var(--line)
 select{font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);
   border-radius:6px;background:var(--bg);color:var(--fg)}
 .warn{background:var(--cal);border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px}
+/* 進捗JSON の読み込みは判定を丸ごと置き換える。実行前に必ず内訳を見せる。 */
+#dlg{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:60;
+  align-items:center;justify-content:center;padding:20px}
+#dlg.on{display:flex}
+#dlgbox{background:var(--bg);border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;max-width:600px;max-height:82vh;overflow:auto;
+  font-size:13.5px;line-height:1.75}
+#dlgbox h2{margin:0 0 10px;font-size:16px}
+#dlgbox .dmsg{color:var(--muted);margin:8px 0;word-break:break-all}
+#dlgbox .dtab{border-collapse:collapse;margin:12px 0;font-variant-numeric:tabular-nums}
+#dlgbox .dtab td{padding:4px 26px 4px 0;border-bottom:1px solid var(--line)}
+#dlgbox .dtab td:last-child{text-align:right;font-weight:700;padding-right:0}
+#dlgbox .dwarn{background:var(--cal);border-radius:8px;padding:10px 13px;margin:12px 0}
+#dlgbox .btns{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+#dlgbox button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+#toast{position:fixed;left:50%;bottom:52px;transform:translateX(-50%);z-index:70;
+  max-width:80vw;background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:8px;
+  font-size:13px;line-height:1.6;box-shadow:0 4px 16px rgba(0,0,0,.25);display:none}
+#toast.on{display:block}
+#toast.bad{background:var(--exc);color:#fff}
+#jsonstat{cursor:default}
 </style></head><body>
 
 <div id="bar">
@@ -288,7 +326,10 @@ select{font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);
     <option value="flag">ルール該当のみ</option>
   </select>
   <button id="jamode" hidden>訳 対訳</button>
+  <span class="pill" id="jsonstat">JSON 未保存</span>
   <button id="exp">CSV書き出し (E)</button>
+  <button id="sav">JSON保存 (S)</button>
+  <button id="ld">JSON読込 (L)</button>
   <button id="lgd">凡例 (R)</button>
   <button id="hlp">? ヘルプ</button>
 </div>
@@ -317,16 +358,32 @@ select{font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);
     判定は入力のたびにブラウザに保存されます（localStorage）。作業を終えたら
     <kbd>E</kbd> で CSV を書き出し、<code>scripts/apply_review_decisions.py</code> で
     xlsx に反映してください。<br><br>
+    <b>途中保存は <kbd>S</kbd>。</b> 判定を JSON ファイル
+    （<code>progress___SHEET_ID__.json</code>）へ書き出します。保存先フォルダは
+    初回に一度だけ選びます（<code>screening/json</code> を選んでください）。2回目以降は
+    同じフォルダへ上書きします。<kbd>L</kbd> でそのファイルを読み戻し、
+    <kbd>Shift</kbd>+<kbd>L</kbd> でファイルを選んで読み込みます。<br>
+    localStorage は<b>ブラウザの閲覧データを消すと一緒に消えます</b>。JSON がその唯一の
+    バックアップなので、区切りごとに <kbd>S</kbd> を押してください。<br><br>
     <b>このツールは判定を自動化しません。</b> キーワードルールはハイライトと並べ替えだけに
     使われ、Include / Exclude を書き込むことはありません。
   </p>
 </div></div>
+
+<div id="dlg"><div id="dlgbox"></div></div>
+<div id="toast"></div>
+<!-- File System Access API が無いブラウザ用の読み込み口 -->
+<input type="file" id="fileinput" accept=".json,application/json" hidden>
 
 <script>
 const RECORDS=__RECORDS__, REASONS=__REASONS__, DECISIONS=__DECISIONS__;
 const PRIORITY=__PRIORITY__;
 const REASON_OTHER=__REASON_OTHER__, HIGHLIGHT=__HIGHLIGHT__, RULES=__RULES__;
 const SHEET="__SHEET_ID__", KEY="phase3b:"+SHEET;
+// 進捗JSON。FINGERPRINT は判定対象の集合が同じかを読み込み時に照合するためのもの。
+const FINGERPRINT="__FINGERPRINT__";
+const PROGRESS_FORMAT="phase3b-progress", PROGRESS_VERSION=1;
+const PROGRESS_FILE="progress_"+SHEET+".json";
 
 let store={};
 try{store=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){store={}}
@@ -415,15 +472,22 @@ function draw(){
   stats(); window.scrollTo(0,0);
 }
 
+// 上部バーと進捗JSON の counts は同じ数え方でなければならない(ズレると
+// 「ファイルには 201 件と書いてあるのに画面は 200 件」で原因追跡が始まる)。
+function tally(src){
+  const st=src||store; let done=0,inc=0,exc=0,uns=0;
+  for(const r of RECORDS){const s=st[r.record_id]; if(!s||!s.decision)continue;
+    done++; if(s.decision==="Include")inc++; else if(s.decision==="Exclude")exc++; else uns++;}
+  return {done:done,include:inc,exclude:exc,unsure:uns,total:RECORDS.length};
+}
 function stats(){
-  let d=0,i=0,e=0,u=0;
-  for(const r of RECORDS){const s=store[r.record_id];if(!s||!s.decision)continue;
-    d++; if(s.decision==="Include")i++; else if(s.decision==="Exclude")e++; else u++;}
-  document.getElementById("done").textContent=d;
-  document.getElementById("ninc").textContent=i;
-  document.getElementById("nexc").textContent=e;
-  document.getElementById("nuns").textContent=u;
-  document.getElementById("progfill").style.width=(d/RECORDS.length*100).toFixed(1)+"%";
+  const t=tally();
+  document.getElementById("done").textContent=t.done;
+  document.getElementById("ninc").textContent=t.include;
+  document.getElementById("nexc").textContent=t.exclude;
+  document.getElementById("nuns").textContent=t.unsure;
+  document.getElementById("progfill").style.width=(t.done/RECORDS.length*100).toFixed(1)+"%";
+  drawSaved(t);
 }
 
 let undo=[];
@@ -455,11 +519,272 @@ function exportCSV(){
     lines.push([r.record_id,s.decision,s.reason||"",s.note||""]
       .map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(","));
   }
-  const blob=new Blob(["\ufeff"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"});
+  download("\ufeff"+lines.join("\r\n"),"decisions_"+SHEET+".csv","text/csv;charset=utf-8");
+}
+function download(text,name,type){
   const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="decisions_"+SHEET+".csv"; a.click();
+  a.href=URL.createObjectURL(new Blob([text],{type:type}));
+  a.download=name; a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+
+// ---- 途中経過の JSON 書き出し / 読み込み -------------------------------------
+// localStorage はブラウザの閲覧データ削除・別PC・別ブラウザで失われる。1,052件を
+// 読み直す羽目になるので、同じ内容をファイルへ退避できるようにする。
+// 保存先フォルダ(screening/json/)は初回に一度だけ選ぶ。File System Access API の
+// ハンドルを IndexedDB に覚えるので、2回目以降はダイアログなしで上書きできる。
+// IndexedDB が使えない環境ではセッション中だけ覚え、API 自体が無ければ通常の
+// ダウンロードへ落とす。どの経路でも保存自体は必ずできるようにしてある。
+const FS_OK=(typeof window.showDirectoryPicker==="function");
+let dirHandle=null;
+
+function idbOpen(){return new Promise((res,rej)=>{
+  let rq; try{rq=indexedDB.open("phase3b",1)}catch(e){return rej(e)}
+  rq.onupgradeneeded=()=>rq.result.createObjectStore("kv");
+  rq.onsuccess=()=>res(rq.result); rq.onerror=()=>rej(rq.error);});}
+async function idbGet(k){try{const db=await idbOpen();
+  return await new Promise((res,rej)=>{
+    const rq=db.transaction("kv","readonly").objectStore("kv").get(k);
+    rq.onsuccess=()=>res(rq.result||null); rq.onerror=()=>rej(rq.error);});
+  }catch(e){return null}}
+async function idbPut(k,v){try{const db=await idbOpen();
+  await new Promise((res,rej)=>{const tx=db.transaction("kv","readwrite");
+    tx.objectStore("kv").put(v,k); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error);});
+  }catch(e){}}
+
+async function perm(h){
+  if(!h) return false;
+  if(!h.queryPermission) return true;
+  const o={mode:"readwrite"};
+  try{ if(await h.queryPermission(o)==="granted") return true;
+       return (await h.requestPermission(o))==="granted"; }catch(e){return false}
+}
+// ask=false なら「既に許可済みのフォルダ」だけを返す(勝手にダイアログを出さない)。
+async function getDir(ask){
+  if(!FS_OK) return null;
+  if(!dirHandle) dirHandle=await idbGet("dir:"+SHEET);
+  if(dirHandle && await perm(dirHandle)) return dirHandle;
+  dirHandle=null;
+  if(!ask) return null;
+  const h=await window.showDirectoryPicker({id:"phase3b-json",mode:"readwrite"});
+  dirHandle=h; await idbPut("dir:"+SHEET,h); return h;
+}
+
+function buildProgress(){
+  // 判定した順ではなくシートの並びで書く。同じ状態なら同じファイルになり、
+  // 2つの進捗JSON を diff で比べられる。
+  const decisions={};
+  for(const r of RECORDS){const s=store[r.record_id];
+    if(!s||!s.decision) continue;
+    decisions[r.record_id]={decision:s.decision,reason:s.reason||"",note:s.note||""};}
+  return {format:PROGRESS_FORMAT,version:PROGRESS_VERSION,sheet:SHEET,
+          saved_at:new Date().toISOString(),fingerprint:FINGERPRINT,
+          counts:tally(),decisions:decisions};
+}
+
+function noteSaved(p,where){
+  localStorage.setItem("json:"+SHEET,p.saved_at);
+  localStorage.setItem("json:"+SHEET+":n",String(p.counts.done));
+  localStorage.setItem("json:"+SHEET+":where",where);
+  drawSaved();
+}
+// 「最後に JSON へ退避したのはいつか」を常に見せる。前回保存より判定が増えて
+// いれば色を変える(その差分はブラウザの中にしか無い)。
+function drawSaved(t){
+  const el=document.getElementById("jsonstat"); if(!el) return;
+  const iso=localStorage.getItem("json:"+SHEET), done=(t||tally()).done;
+  if(!iso){
+    el.textContent="JSON 未保存";
+    el.style.color=done?"var(--exc)":"var(--muted)";
+    el.title="S キーで進捗を JSON に書き出す（localStorage が消えたときの唯一の復帰手段）";
+    return;
+  }
+  const n=+(localStorage.getItem("json:"+SHEET+":n")||0);
+  const d=new Date(iso);
+  el.textContent="JSON "+d.toLocaleString("ja-JP",{month:"2-digit",day:"2-digit",
+    hour:"2-digit",minute:"2-digit"})+(done>n?"（+"+(done-n)+"）":"");
+  el.style.color=done>n?"var(--uns)":"var(--muted)";
+  el.title=(localStorage.getItem("json:"+SHEET+":where")||"")
+    +" / 保存時 "+n+"件"+(done>n?" → 未保存 "+(done-n)+"件":"");
+}
+
+let toastT=null;
+function toast(msg,bad){
+  const el=document.getElementById("toast");
+  el.textContent=msg; el.className=bad?"on bad":"on";
+  clearTimeout(toastT); toastT=setTimeout(()=>{el.className=""},6000);
+}
+
+// 判定を置き換える操作は取り返しがつきにくい。必ず内訳を見せてから実行する。
+function dialog(html,buttons){
+  return new Promise(res=>{
+    const wrap=document.getElementById("dlg"), box=document.getElementById("dlgbox");
+    box.innerHTML=html+'<div class="btns"></div>';
+    const bar=box.querySelector(".btns");
+    const close=v=>{wrap.classList.remove("on");
+      document.removeEventListener("keydown",onk,true); res(v)};
+    buttons.forEach(b=>{const el=document.createElement("button");
+      el.textContent=b.label; if(b.primary)el.className="primary";
+      el.onclick=()=>close(b.value); bar.appendChild(el);});
+    const onk=e=>{if(e.key==="Escape"){e.stopPropagation();e.preventDefault();close(null)}};
+    document.addEventListener("keydown",onk,true);
+    wrap.classList.add("on");
+    const first=bar.querySelector("button.primary")||bar.firstChild;
+    if(first)first.focus();
+  });
+}
+function modalOn(){return document.getElementById("dlg").classList.contains("on")}
+
+async function saveJSON(){
+  const p=buildProgress(), text=JSON.stringify(p,null,1);
+  let dir=null;
+  if(FS_OK){
+    try{dir=await getDir(true)}
+    catch(e){ dir=null;
+      if(e&&e.name==="AbortError") toast("フォルダを選ばなかったので、いつものダウンロードに切り替える",true);
+      else toast("フォルダを開けない("+(e.message||e.name)+")のでダウンロードにする",true); }
+  }
+  if(dir){
+    try{
+      const fh=await dir.getFileHandle(PROGRESS_FILE,{create:true});
+      const w=await fh.createWritable(); await w.write(text); await w.close();
+      noteSaved(p,dir.name+"/"+PROGRESS_FILE);
+      toast("保存した: "+dir.name+"/"+PROGRESS_FILE+"（判定済 "+p.counts.done+" 件）");
+      return;
+    }catch(e){ toast("フォルダへ書けない("+(e.message||e.name)+")のでダウンロードにする",true) }
+  }
+  download(text,PROGRESS_FILE,"application/json");
+  noteSaved(p,"（ダウンロード）"+PROGRESS_FILE);
+  toast("書き出した: "+PROGRESS_FILE+"（判定済 "+p.counts.done
+       +" 件）ダウンロードフォルダから screening/json/ へ移すこと");
+}
+
+// 受け取った JSON は「他人が書いたかもしれないファイル」として扱う。
+// 統制語彙の外・担当外ID・別シートを黙って取り込むと、xlsx へ反映する時ではなく
+// κ を集計する時に初めて壊れていると分かる、という最悪の順番になる。
+function parseProgress(text){
+  let p; try{p=JSON.parse(text)}catch(e){return{err:"JSON として読めない: "+esc(e.message)}}
+  if(!p||typeof p!=="object") return{err:"JSON の中身がオブジェクトでない"};
+  if(p.format!==PROGRESS_FORMAT)
+    return{err:'format が "'+PROGRESS_FORMAT+'" でない（この閲覧アプリの進捗ファイルではない）'};
+  if(+p.version>PROGRESS_VERSION)
+    return{err:"version "+esc(String(p.version))+" はこの閲覧アプリ(v"+PROGRESS_VERSION
+              +")より新しい。make_review_app.py で HTML を作り直すこと"};
+  if(p.sheet!==SHEET)
+    return{err:"担当シートが違う（ファイル: "+esc(String(p.sheet))+" / このアプリ: "+SHEET
+              +"）。他人の判定を自分のシートへ入れると二重スクリーニングの独立性が壊れる"};
+  const dec=p.decisions;
+  if(!dec||typeof dec!=="object") return{err:"decisions が無い"};
+  const known={}; RECORDS.forEach(r=>known[r.record_id]=1);
+  const ok={}, bad=[], unknown=[], noteless=[];
+  for(const id of Object.keys(dec)){
+    const s=dec[id]||{}, d=String(s.decision||""), rs=String(s.reason||""), nt=String(s.note||"");
+    if(!known[id]){unknown.push(id);continue}
+    if(DECISIONS.indexOf(d)<0){bad.push(id+": 判定が不正 "+JSON.stringify(s.decision));continue}
+    if(d==="Exclude"){
+      if(!rs){bad.push(id+": Exclude なのに除外理由が空");continue}
+      if(!REASONS.some(x=>x.value===rs)){
+        bad.push(id+": 統制語彙の外の除外理由 "+JSON.stringify(rs));continue}
+      if(rs===REASON_OTHER&&!nt) noteless.push(id);
+    }
+    ok[id]={decision:d,reason:(d==="Exclude"?rs:""),note:nt};
+  }
+  if(bad.length) return{err:"不正な判定が "+bad.length+" 件あるので読み込まない:<br>"
+    +bad.slice(0,8).map(esc).join("<br>")+(bad.length>8?"<br>… 他 "+(bad.length-8)+" 件":"")};
+  if(!Object.keys(ok).length)
+    return{err:"このシートの record_id が1件も入っていない（不明なID "+unknown.length+" 件）"};
+  return{p:p,ok:ok,unknown:unknown,noteless:noteless};
+}
+
+function diffProgress(ok){
+  let add=0,chg=0,same=0,lost=0;
+  for(const id of Object.keys(ok)){
+    const c=store[id];
+    if(!c||!c.decision){add++;continue}
+    if(c.decision===ok[id].decision&&(c.reason||"")===ok[id].reason
+       &&(c.note||"")===ok[id].note) same++; else chg++;
+  }
+  for(const r of RECORDS){const c=store[r.record_id];
+    if(c&&c.decision&&!ok[r.record_id]) lost++;}
+  return {add:add,chg:chg,same:same,lost:lost};
+}
+
+function pickFileFallback(){
+  return new Promise(res=>{
+    const el=document.getElementById("fileinput");
+    let done=false; const fin=v=>{if(!done){done=true;res(v)}};
+    el.value=""; el.onchange=()=>fin(el.files[0]||null);
+    // キャンセルでは change が来ない。ダイアログが閉じてフォーカスが戻ったら諦める。
+    window.addEventListener("focus",()=>setTimeout(()=>fin(el.files[0]||null),500),{once:true});
+    el.click();
+  });
+}
+
+async function loadJSON(pick){
+  let text=null,name="";
+  if(!pick){  // 許可済みのフォルダに定位置のファイルがあれば、それを既定にする
+    try{
+      const dir=await getDir(false);
+      if(dir){const fh=await dir.getFileHandle(PROGRESS_FILE);
+        const f=await fh.getFile(); text=await f.text(); name=dir.name+"/"+f.name;}
+    }catch(e){}
+  }
+  if(text===null){
+    let f=null;
+    if(FS_OK){
+      try{
+        const h=await window.showOpenFilePicker({id:"phase3b-json",multiple:false,
+          types:[{description:"進捗JSON",accept:{"application/json":[".json"]}}]});
+        f=await h[0].getFile();
+      }catch(e){ if(e&&e.name==="AbortError") return; }
+    }
+    if(!f) f=await pickFileFallback();
+    if(!f) return;
+    text=await f.text(); name=f.name;
+  }
+  const r=parseProgress(text);
+  if(r.err){
+    const v=await dialog('<h2>読み込めない</h2><div class="dwarn">'+r.err+'</div>'
+      +'<p class="dmsg">'+esc(name)+'</p>',
+      [{label:"別のファイルを選ぶ",value:"other"},{label:"閉じる",value:null,primary:true}]);
+    if(v==="other") return loadJSON(true);
+    return;
+  }
+  const p=r.p, d=diffProgress(r.ok), warn=[];
+  if(p.fingerprint!==FINGERPRINT)
+    warn.push("指紋が違う（ファイル: "+esc(String(p.fingerprint))+" / このアプリ: "+FINGERPRINT
+             +"）。判定対象の集合が違う可能性がある");
+  if(r.unknown.length)
+    warn.push("このシートに無い record_id を "+r.unknown.length+" 件、読み飛ばす");
+  if(r.noteless.length)
+    warn.push("除外理由が「"+esc(REASON_OTHER)+"」なのにメモが空: "+r.noteless.length
+             +" 件（xlsx へ反映する前にメモを入れること）");
+  if(d.lost)
+    warn.push("<b>いま手元にある判定 "+d.lost+" 件が消える</b>（ファイルに入っていないため）");
+  const saved=p.saved_at?new Date(p.saved_at).toLocaleString("ja-JP"):"不明";
+  const html='<h2>進捗を読み込む</h2>'
+    +'<p class="dmsg">'+esc(name)+'<br>保存 '+esc(saved)+' ／ ファイルの判定済 '
+    +Object.keys(r.ok).length+' 件</p>'
+    +'<table class="dtab">'
+    +'<tr><td>新しく入る</td><td>'+d.add+'</td></tr>'
+    +'<tr><td>上書きされる</td><td>'+d.chg+'</td></tr>'
+    +'<tr><td>変わらない</td><td>'+d.same+'</td></tr>'
+    +'<tr><td>消える（手元にのみある判定）</td><td>'+d.lost+'</td></tr></table>'
+    +(warn.length?'<div class="dwarn">'+warn.map(w=>"・"+w).join("<br>")+'</div>':'')
+    +'<p class="dmsg">読み込むと現在の判定は<b>ファイルの内容で置き換わる</b>（統合はしない）。'
+    +'直前の状態は localStorage の <code>'+KEY+':backup</code> に退避する。</p>';
+  const ans=await dialog(html,[{label:"置き換える",value:"ok",primary:true},
+                               {label:"別のファイルを選ぶ",value:"other"},
+                               {label:"やめる",value:null}]);
+  if(ans==="other") return loadJSON(true);
+  if(ans!=="ok") return;
+  localStorage.setItem(KEY+":backup",
+    JSON.stringify({saved_at:new Date().toISOString(),store:store}));
+  const keep=RECORDS[view[cur]].record_id;
+  store={}; Object.keys(r.ok).forEach(id=>{store[id]=r.ok[id]});
+  undo=[];  // 取り消し履歴は捨てた状態を指しているので持ち越さない
+  save(); rebuild(keep);
+  toast("読み込んだ: "+name+"（判定済 "+tally().done+" 件）");
 }
 
 const KEYMAP=[
@@ -467,7 +792,9 @@ const KEYMAP=[
   ...REASONS.map((x,n)=>[String(n+1),"Exclude — "+x.value]),
   ["j / →","次へ"],["k / ←","前へ"],["m","メモ欄へ"],["z","直前を取り消し"],
   ["h","ハイライト切替"],["t","訳の表示切替（原文のみ → 対訳 → 訳のみ）"],
-  ["r","キー凡例の表示切替"],["e","CSV書き出し"],["?","このヘルプ"],
+  ["r","キー凡例の表示切替"],["e","CSV書き出し"],
+  ["s","途中保存（進捗を JSON に書き出す）"],
+  ["l","途中経過を読み込む（Shift+L でファイルを選ぶ）"],["?","このヘルプ"],
 ];
 // 訳が1件でも載っていれば切替ボタンを出す。
 if(RECORDS.some(r=>r.ja)){
@@ -480,7 +807,8 @@ document.getElementById("keys").innerHTML=
   .concat(REASONS.map((x,n)=>
     '<span class="rchip"><kbd>'+(n+1)+'</kbd> '+esc(x.value)+'</span>'))
   .concat(['<kbd>j</kbd>/<kbd>k</kbd> 移動','<kbd>m</kbd> メモ','<kbd>z</kbd> 取消',
-   '<kbd>t</kbd> 訳','<kbd>r</kbd> 凡例','<kbd>e</kbd> 書き出し','<kbd>?</kbd> ヘルプ'])
+   '<kbd>t</kbd> 訳','<kbd>r</kbd> 凡例','<kbd>e</kbd> CSV',
+   '<kbd>s</kbd> JSON保存','<kbd>l</kbd> JSON読込','<kbd>?</kbd> ヘルプ'])
   .join("　");
 
 // ---- 常時表示のキー凡例 ----
@@ -497,6 +825,7 @@ document.getElementById("legend").innerHTML=
     ["m","メモ欄へ"],["z","直前を取り消し"],
     ["h","ハイライト切替"],["t","訳の切替"],
     ["r","この凡例を閉じる"],["e","CSV書き出し"],
+    ["s","途中保存(JSON)"],["l","途中経過の読込"],
     ["?","ヘルプ"]]
    .map(([k,v])=>'<div class="row"><kbd>'+esc(k)+'</kbd><span class="lb">'+esc(v)+'</span></div>').join("")
   +'<div class="foot"><b>優先</b> は理由が2つ以上当てはまるときに'
@@ -521,6 +850,7 @@ document.addEventListener("keydown",e=>{
     return;
   }
   if(e.ctrlKey||e.metaKey||e.altKey) return;
+  if(modalOn()) return;   // 確認ダイアログを開いている間は判定キーを効かせない
   const k=e.key;
   if(k==="r"||k==="R"){toggleLegend();e.preventDefault();return}
   if(k==="?"){document.getElementById("help").classList.toggle("on");e.preventDefault();return}
@@ -536,10 +866,15 @@ document.addEventListener("keydown",e=>{
     const b=document.getElementById("jamode"); if(b)b.textContent="訳 "+JA_MODE_LABEL[jaMode];
     return}
   if(k==="e"||k==="E"){exportCSV();return}
+  if(k==="s"||k==="S"){saveJSON();e.preventDefault();return}
+  if(k==="l"){loadJSON(false);e.preventDefault();return}
+  if(k==="L"){loadJSON(true);e.preventDefault();return}
   if(k==="z"||k==="Z"){const u=undo.pop(); if(u){ if(u.prev&&u.prev.decision)store[u.id]=u.prev; else delete store[u.id];
     save(); rebuild(u.id);} return}
 });
 document.getElementById("exp").onclick=exportCSV;
+document.getElementById("sav").onclick=()=>saveJSON();
+document.getElementById("ld").onclick=()=>loadJSON(false);
 document.getElementById("hlp").onclick=()=>document.getElementById("help").classList.toggle("on");
 document.getElementById("filter").onchange=()=>{cur=0;rebuild()};
 window.addEventListener("beforeunload",e=>{
@@ -589,9 +924,13 @@ def main() -> None:
         stale = len(translations) - nja
         print(f"     日本語訳 {nja:,} 件を対訳表示"
               + (f"（原文と不一致で不採用 {stale:,} 件）" if stale > 0 else ""))
+    print(f"     指紋 {fingerprint(payload)}（進捗JSON の照合に使う）")
     print(f"     ブラウザで開いて判定 → E キーで decisions_{args.id}.csv を書き出す")
+    print(f"     途中保存: S キーで JSON 書き出し（保存先フォルダは初回に screening/json を選ぶ）")
+    print(f"     途中復帰: L キーで JSON 読み込み（Shift+L でファイルを選ぶ）")
     print(f"     反映: python -X utf8 scripts/apply_review_decisions.py "
           f"--id {args.id} --input decisions_{args.id}.csv")
+    print(f"           （JSON をそのまま渡してもよい: --input screening/json/progress_{args.id}.json）")
 
 
 if __name__ == "__main__":

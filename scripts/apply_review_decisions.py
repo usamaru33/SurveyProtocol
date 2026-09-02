@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""review_<id>.html が書き出した decisions CSV を判定シート(xlsx/csv)へ反映する。
+"""review_<id>.html が書き出した判定を判定シート(xlsx/csv)へ反映する。
+
+入力は `E` キーの decisions CSV でも、`S` キーの進捗JSON(format=phase3b-progress)でも
+よい。拡張子が .json なら後者として読む。検証はどちらでも同じ。
 
 検証してから書く。落ちる条件:
   - 担当外の record_id が混じっている
@@ -17,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import json
 import shutil
 import sys
 from datetime import datetime
@@ -32,11 +36,46 @@ SCREENING = ROOT / "screening"
 CANON = {d.lower(): d for d in DECISIONS}
 
 
+def read_progress_json(path: Path, sheet_id: str) -> dict:
+    """閲覧アプリの進捗JSON を CSV と同じ形（record_id -> dict）に開く。
+
+    ここで見るのは「そもそも受け取ってよいファイルか」だけ。判定値・語彙・上書きの
+    検証は CSV 経路と同じコードに通す(二重に書くと必ず片方が古くなる)。
+    """
+    data = json.loads(path.read_text(encoding="utf-8-sig"))
+    if not isinstance(data, dict):
+        sys.exit(f"[ERROR] {path.name} の中身がオブジェクトでない")
+    if data.get("format") != "phase3b-progress":
+        sys.exit(f"[ERROR] {path.name} は閲覧アプリの進捗JSONでない "
+                 f"(format={data.get('format')!r})")
+    if int(data.get("version") or 0) > 1:
+        sys.exit(f"[ERROR] version={data.get('version')} はこのスクリプトより新しい。"
+                 "scripts/apply_review_decisions.py を更新すること")
+    if data.get("sheet") != sheet_id:
+        sys.exit(f"[ERROR] シートIDが違う（ファイル: {data.get('sheet')!r} / --id: {sheet_id!r}）。"
+                 "他人の判定を自分のシートへ反映してはいけない")
+    dec = data.get("decisions")
+    if not isinstance(dec, dict):
+        sys.exit("[ERROR] decisions が無い（または形式が違う）")
+    print(f"[INFO] 進捗JSON {path.name}: 保存 {data.get('saved_at')} / "
+          f"fingerprint {data.get('fingerprint')}")
+    counts = data.get("counts") or {}
+    if counts.get("done") is not None and int(counts["done"]) != len(dec):
+        print(f"[WARN] counts.done={counts['done']} と decisions {len(dec)} 件が食い違う。"
+              "手で編集したファイルかもしれない")
+    return {rid: {"record_id": rid,
+                  "decision": (v or {}).get("decision", ""),
+                  "reason": (v or {}).get("reason", ""),
+                  "note": (v or {}).get("note", "")}
+            for rid, v in dec.items()}
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--id", default="author")
-    ap.add_argument("--input", required=True, type=Path)
+    ap.add_argument("--input", required=True, type=Path,
+                    help="decisions_<id>.csv または screening/json/progress_<id>.json")
     ap.add_argument("--dry-run", action="store_true", help="検証だけして書かない")
     ap.add_argument("--force", action="store_true",
                     help="既存の判定を上書きする（既定は拒否）")
@@ -48,8 +87,11 @@ def main() -> None:
     if not args.input.exists():
         sys.exit(f"[ERROR] {args.input} が無い")
 
-    with args.input.open(encoding="utf-8-sig", newline="") as f:
-        incoming = {r["record_id"]: r for r in csv.DictReader(f) if r.get("record_id")}
+    if args.input.suffix.lower() == ".json":
+        incoming = read_progress_json(args.input, args.id)
+    else:
+        with args.input.open(encoding="utf-8-sig", newline="") as f:
+            incoming = {r["record_id"]: r for r in csv.DictReader(f) if r.get("record_id")}
     print(f"[INFO] 入力 {len(incoming):,} 件")
 
     try:
