@@ -1741,4 +1741,26 @@ Rev.21 の調査で「Cochrane のガイダンス [R4] は二重判定の割合�
 3. 回収後: `score_screening.py` → κ 算出 → Rev.21 の閾値方針に従って対応
 4. 原稿 §3 Positioning の改稿（承認ゲートを通す）。以降 §4 以降も同様に節単位で
 5. `\pending{}` の数値流し込み（§1 に8スロット、原稿全体で41箇所）
+
+### 2026-09-12
+
+- Watanabe が校正セット223件を再提出（本体+補足59件）。`sheet_watanabe.xlsx`/
+  `supplement_sheet_watanabe.xlsx` を更新（旧版は `.bak.xlsx` で保全）し `score_screening.py` を再実行。
+- **κ（3カテゴリ、校正セット223件）: 著者×Kataoka 0.456 / 著者×Watanabe 0.468 /
+  Kataoka×Watanabe 0.581 / 平均 0.502（moderate）**。Rev.26暫定値(0.196・slight)から改善。
+  Watanabeの不備（補足未提出・Unsure使用0%・「S: 原著論文でない」37.2%）は解消を確認。
+- kataoka の Rbf4733c09（reason空欄）はメモ記載に基づき `I: HMD-VR でない` を補って解消。
+  記入検査は問題0件。
+- moderate域のためRev.21の追加診断を実施: 真の不一致52件中18件(38%)が
+  「I: スケール操作/多感覚刺激が無い」に集中(境界的な身体所有感・パーソナルスペース等の論文)。
+  対応は新規再判定ラウンドを起こさず、**stage 2生成時に境界例リストを補足として添付**する形に決定。
+  詳細・数値は `docs/log/protocol_changelog.md` Rev.27。
+- 不一致・Unsure 77件を `screening/consensus_worklist.csv` に出力済み（未協議）。
+
+#### 次回やること
+
+1. `consensus_worklist.csv` の77件を3名で協議（解決しなければ Include に倒す）
+2. stage 2 シート生成（`make_screening_stage2.py`）。生成時に境界例リストを補足添付
+3. κは再算出しない（校正セット評価はRev.27の1回のみ）
+4. 原稿にκ=0.502(moderate)と診断・対応を記載
 6. Overleaf と GitHub の同期運用を決める（ミラーか双方向か）
