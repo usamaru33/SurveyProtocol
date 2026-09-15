@@ -1,78 +1,78 @@
 ﻿record_id,block,title,doi,reviewer_a,decision_a,reason_a,reviewer_b,decision_b,reason_b,final_decision,consensus_note
-Rbd706e525,1,Virtual reality for driving simulation,10.1145/229459.229468,author,Exclude,スコープ外(主題が無関係),kataoka,Unsure,,,
-Ra5cfb588c,1,Session details: Augmented &amp; Virtual Reality in the Real World,10.1145/3251761,author,Unsure,,watanabe,Unsure,,,
-R8f3ba8c18,2,FingerMapper: Mapping Finger Motions onto Virtual Arms to Enable Safe Virtual Reality Interaction in Confined Spaces,10.1145/3544548.3580736,author,Exclude,O: スケール知覚の測定が無い,kataoka,Unsure,,,
-R4269f5e23,1,Haptic Biosignals Affect Proxemics Toward Virtual Reality Agents,10.1145/3706598.3713231,author,Include,,watanabe,Exclude,I: スケール操作/多感覚刺激が無い,,
-R6aa7a794d,1,The virtual tricorder,10.1145/215585.215647,author,Unsure,,watanabe,Unsure,,,
-R7e885c2b9,2,The Virtual Meditative Walk,10.1145/2702123.2702344,author,Exclude,スコープ外(主題が無関係),kataoka,Unsure,,,
-R69d1ff33c,2,Global multi-user virtual environments (panel),10.1145/237170.237294,author,Unsure,,watanabe,Exclude,I: HMD-VR でない,,
-R66ac6b17d,3,Real-time acoustic modeling for distributed virtual environments,10.1145/311535.311590,author,Exclude,スコープ外(主題が無関係),kataoka,Unsure,,,
-R31f43832b,3,Moving objects in space: exploiting proprioception in virtual-environment interaction,10.1145/258734.258747,author,Include,,kataoka,Unsure,,,
-Rdfdfbb255,3,The HoloSketch VR sketching system,10.1145/229459.229466,author,Exclude,スコープ外(主題が無関係),watanabe,Unsure,,,
-Reb24ebdd1,3,Personal space evaluation and protection in social VR,10.1109/vrw52623.2021.00124,author,Unsure,,kataoka,Exclude,I: スケール操作/多感覚刺激が無い,,
-R420f1a894,3,Realistic immersion of a user into humanoids of different sizes and proportions in lmmersive virtual reality,10.1109/vr.2013.6549406,author,Unsure,,watanabe,Include,,,
-R5a06bae06,1,Using virtual reality to support acting in motion capture with differently scaled characters,10.1109/vr50410.2021.00063,author,Include,,watanabe,Exclude,O: スケール知覚の測定が無い,,
-R79a600c2e,2,"Human, virtual human, bump! A preliminary study on haptic feedback",10.1109/vr.2019.8798139,author,Unsure,,kataoka,Exclude,I: スケール操作/多感覚刺激が無い,,
-R157aaa021,1,Body warping versus change blindness remapping: a comparison of two approaches to repurposing haptic proxies for virtual reality,10.1109/vr51125.2022.00039,author,Include,,watanabe,Exclude,I: スケール操作/多感覚刺激が無い,,
-Re223ccc3f,2,Tangiball: Foot-enabled embodied tangible interaction with a ball in virtual reality,10.1109/vr51125.2022.00103,author,Exclude,O: スケール知覚の測定が無い,kataoka,Unsure,,,
-R9dadc7e35,1,EgoPoseVR: Spatiotemporal multi-modal reasoning for egocentric full-body pose in virtual reality,10.1109/tvcg.2026.3680618,author,Include,,kataoka,Exclude,I: スケール操作/多感覚刺激が無い,,
-R04ad7a330,3,The Role of VR in Supporting Body-Centered Phenomenology in Interior Design Education,10.3390/buildings16020250,author,Unsure,,watanabe,Exclude,I: スケール操作/多感覚刺激が無い,,
-R3062b906e,2,How to Worship in the Metaverse: Religious Experience and the Affordances of a New Medium,10.3390/rel15040487,author,Unsure,,kataoka,Exclude,スコープ外(主題が無関係),,
-R4f0934072,3,Can the left hand benefit from being right? The influence of body side on perceived grasping ability,10.3758/s13414-024-02983-7,author,Include,,kataoka,Unsure,,,
-R0877910b9,1,Shaping health behaviors beyond reality: A full body illusion to experience the consequences of unhealthy snacking,10.1016/j.chb.2024.108376,author,Include,,watanabe,Exclude,O: スケール知覚の測定が無い,,
-R4f590e591,3,The effects of long-term exposure to microgravity and body orientation relative to gravity on perceived traveled distance,10.1038/s41526-024-00376-6,author,Include,,watanabe,Exclude,I: スケール操作/多感覚刺激が無い,,
-Rc4274e858,2,Manipulating objects during learning shrinks the global scale of spatial representations in memory: a virtual reality study,10.1038/s41598-024-53239-1,author,Unsure,,kataoka,Unsure,,,
-Rcf10e0ab5,3,THINKING THROUGH THE TOOL: COLLABORATIVE ARCHAEOLOGICAL BODYWORK IN IMMERSIVE VIRTUAL REALITY; [PENSAR A TRAVÉS DE LA HERRAMIENTA: TRABAJO CORPORAL ARQUEOLÓGICO COLABORATIVO EN REALIDAD VIRTUAL INMERSIVA],10.4995/var.2024.19806,author,Unsure,,watanabe,Exclude,S: 原著論文でない,,
-Rc00ad1392,3,Sizing up the crowd: Assessing spatial integration difficulties in body size judgements across eating disorder symptomatology,10.3389/fpsyg.2022.1003250,author,Exclude,P: 対象者が不適合,kataoka,Unsure,,,
-R76f7df8d3,3,Investigating body perception of multiple virtual hands in synchronized and asynchronized conditions,10.3389/frvir.2024.1383957,author,Exclude,O: スケール知覚の測定が無い,kataoka,Unsure,,,
-Rf5064924d,3,Influencing Human Escape Maneuvers with Perceptual Cues in the Presence of a Visual Task,10.1109/thms.2021.3108962,author,Exclude,O: スケール知覚の測定が無い,kataoka,Unsure,,,
-R85c327975,3,The effects of partial proxy embodiment on the awareness of linear distance in omnidirectional treadmill enabled immersive virtual environment,10.1016/j.chbr.2022.100203,author,Include,,watanabe,Exclude,I: スケール操作/多感覚刺激が無い,,
-Rc41cf0d9e,2,Exercise in virtual reality with a muscular avatar influences performance on a weightlifting exercise,10.5817/cp2021-3-10,author,Exclude,スコープ外(主題が無関係),watanabe,Include,,,
-R452edba3c,3,Dissociating gait from static appearance: A virtual reality study of the role of dynamic identity signatures in person recognition,10.1016/j.cognition.2020.104445,author,Unsure,,kataoka,Exclude,I: スケール操作/多感覚刺激が無い,,
-R0340e93be,2,Visuo-tactile congruency influences the body schema during full body ownership illusion,10.1016/j.concog.2019.05.006,author,Include,,kataoka,Exclude,I: スケール操作/多感覚刺激が無い,,
-Rfb559e4b4,3,The virtual hand illusion is moderated by context-induced spatial reference frames,10.3389/fpsyg.2015.01659,author,Unsure,,watanabe,Exclude,I: スケール操作/多感覚刺激が無い,,
-R55cbbb2b7,2,Sensorimotor body-environment interaction serves to regulate emotional experience and exploratory behavior,10.1016/j.heliyon.2016.e00173,author,Exclude,I: スケール操作/多感覚刺激が無い,kataoka,Unsure,,,
-Rca12ed409,3,Body space in social interactions: A comparison of reaching and comfort distance in immersive virtual reality,10.1371/journal.pone.0111511,author,Unsure,,kataoka,Exclude,O: スケール知覚の測定が無い,,
-Rca66392d9,3,Fear reactivity to head-mounted display perceptual illusion challenges is associated with suicidality,10.1016/j.psychres.2018.12.106,author,Unsure,,kataoka,Exclude,O: スケール知覚の測定が無い,,
-R6e3a5fc9d,1,The shape of personal space,10.1016/j.actpsy.2018.12.009,author,Exclude,I: スケール操作/多感覚刺激が無い,kataoka,Unsure,,,
-Rddf81debb,1,Illusory body ownership of an invisible body interpolated between virtual hands and feet via visual-motor synchronicity /631/378/2649/1723 /631/477/2811 article,10.1038/s41598-018-25951-2,author,Include,,watanabe,Exclude,I: スケール操作/多感覚刺激が無い,,
-R105725908,2,The proteus effect: Implications of transformed digital self-representation on online and offline behavior,10.1177/0093650208330254,author,Unsure,,watanabe,Include,,,
-R062a2965d,1,Distorting the visual size of the hand affects hand pre-shaping during grasping,10.1007/s00221-009-2143-4,author,Unsure,,kataoka,Unsure,,,
-Rf7d0f9eae,1,Judgment under Uncertainty: Heuristics and Biases. Science,,author,Unsure,,watanabe,Unsure,,,
-R40ff9ad79,3,Obstacles Affect Perceptions of Egocentric Distances in Virtual Environments,10.3389/frvir.2021.726114,author,Unsure,,watanabe,Exclude,I: スケール操作/多感覚刺激が無い,,
-R6315e46bb,1,The Plausibility Paradox in Small-Scale Virtual Environments,,author,Unsure,,kataoka,Unsure,,,
-Rb56c2b536,2,Revisiting the effect of quality of graphics on distance judgments in virtual environments: A comparison of verbal reports and blind walking,10.3758/app.71.6.1284,author,Unsure,,kataoka,Exclude,I: スケール操作/多感覚刺激が無い,,
-Re3e61ac0f,2,Distance determined by the angular declination below the horizon,10.1038/35102562,author,Unsure,,watanabe,Unsure,,,
-R47439ccb0,1,Handbook of Perception and Human Performance,,author,Unsure,,watanabe,Unsure,,,
-Rd2a77d01b,3,Visual Perceptual Confidence: Exploring Discrepancies Between Self-reported and Actual Distance Perception In Virtual Reality,10.1109/tvcg.2024.3456165,author,Include,,watanabe,Exclude,I: スケール操作/多感覚刺激が無い,,
-R35c442ad0,1,Immersive storm surge flooding: Scale and risk perception in virtual reality,10.1016/j.jenvp.2022.101764,author,Unsure,,watanabe,Unsure,,,
-R303eee6e9,3,Investigating the Distance Compression on Virtual Environments by Comparing Visualization Devices,10.1109/svr.2015.13,author,Unsure,,kataoka,Unsure,,,
-R83a024b3f,2,Transformation of spatial perception in gate passage by using a wearable interface with changeable vertical viewpoint,10.1145/3657547.3657556,author,Include,,kataoka,Unsure,,,
-Rc61d4c8de,3,Is the street-crossing behavior with a head-mounted display different from that behavior in a CAVE? A study among young adults and children,10.1016/j.trf.2021.07.016,author,Exclude,I: HMD-VR でない,watanabe,Unsure,,,
-Rfa3b533da,1,Equivalent Physical Constant Hypothesis for Skill Transmission in Scale Conversion Telexistence,10.2312/egve.20181314,author,Unsure,,watanabe,Unsure,,,
-Rcce71e720,1,Visual Perception of Egocentric Distance in Virtual Environments un-published Doctoral Dissertation,,author,Exclude,S: 原著論文でない,watanabe,Unsure,,,
-Radcbd586a,2,"We conducted our study at the CERN main site located in Meyrin, during the week-end of the CERN Open Days",,author,Exclude,スコープ外(主題が無関係),watanabe,Unsure,,,
-R666007d14,3,"Costantini M, Haggard P (2007) The rubber hand illusion: sensitivity and reference frame for body ownership. Conscious Cogn 16(2):229–240",10.1016/j.concog.2007.01.001,author,Exclude,I: HMD-VR でない,kataoka,Unsure,,,
-R6dc3b3e40,2,"Giummarra MJ, Gibson SJ, Georgiou-Karistianis N, Bradshaw JL (2008) Mechanisms underlying embodiment, disembodiment and loss of embodiment. Neurosci Biobehav Rev 32(1):143–160",10.1016/j.neubiorev.2007.07.001,author,Exclude,S: 原著論文でない,watanabe,Unsure,,,
-Rd69f37011,1,"Maravita A, Iriki A (2004) Tools for the body (schema). Trends Cogn Sci 8(2):79–86",10.1016/j.tics.2003.12.008,author,Unsure,,kataoka,Unsure,,,
-Rcaf74ed95,2,Tsakiris M (2010) My body in the brain: a neurocognitive model of body-ownership. Neuropsychologia 48(3):703–712,10.1016/j.neuropsychologia.2009.09.034,author,Exclude,S: 原著論文でない,kataoka,Unsure,,,
-R2eb77ed99,1,The two-user seating buck: Enabling face-to-face discussions of novel car interface concepts,,author,Exclude,スコープ外(主題が無関係),watanabe,Unsure,,,
-R9ef6eb79e,2,Evaluation of the impact of different levels of self-representation and body tracking on the sense of presence and embodiment in immersive VR,10.1007/s10055-021-00530-5,author,Unsure,,watanabe,Unsure,,,
-R4133f7f22,3,The effectiveness of training in virtual environments,,author,Exclude,スコープ外(主題が無関係),kataoka,Unsure,,,
-Rbf4733c09,1,Remain seated: towards fully-immersive desktop VR,10.1109/wevr.2017.7957707,author,Unsure,,watanabe,Unsure,,,
-R51e721f6e,3,Natural Interaction Metaphors for Functional Validations of Virtual Car Models,10.1109/tvcg.2011.36,author,Exclude,スコープ外(主題が無関係),kataoka,Unsure,,,
-Rfbc734c75,1,AN ABSTRACT OF THE THESIS OF,,author,Exclude,スコープ外(主題が無関係),watanabe,Unsure,,,
-Rb33e74e24,1,Immersion factors affecting perception and behaviour in a virtual reality power wheelchair simulator.,10.1016/j.apergo.2016.05.003,author,Unsure,,watanabe,Unsure,,,
-R0e318abaf,2,Virtual Reality Interface Factors in a Power Wheelchair Simulator,,author,Unsure,,kataoka,Unsure,,,
-R175f9d5df,3,Augmented Virtual Studio for Architectural Exploration,,author,Unsure,,watanabe,Unsure,,,
-Rcc1c7d129,3,Gait Parameters in Stressful Virtual Environments,,author,Unsure,,watanabe,Unsure,,,
-R6cc488272,3,Rubber hands ‘feel’ touch that eyes see,10.1038/35784,author,Exclude,I: HMD-VR でない,kataoka,Unsure,,,
-R4229009ca,2,"The ""sense of agency"" and its underlying cognitive and neural mechanisms.",10.1016/j.concog.2008.03.004,author,Unsure,,kataoka,Unsure,,,
-Rbcd3b1595,2,Functional and Neural Mechanisms of Embodiment: Importance of the Vestibular System and the Temporal Parietal Junction,10.1515/revneuro.2006.17.6.643,author,Unsure,,kataoka,Unsure,,,
-R1d89e7d9b,1,What is embodiment? A psychometric approach.,10.1016/j.cognition.2007.12.004,author,Exclude,I: HMD-VR でない,watanabe,Unsure,,,
-R85d2cc8f4,1,Self awareness and the body image.,10.1016/j.actpsy.2009.02.003,author,Unsure,,watanabe,Unsure,,,
-R38dae68a2,2,Body ownership and embodiment: vestibular and multisensory mechanisms.,10.1016/j.neucli.2007.12.006,author,Unsure,,watanabe,Unsure,,,
-R3dcafd4fd,2,If I Were You: Perceptual Illusion of Body Swapping,10.1371/journal.pone.0003832,author,Include,,watanabe,Exclude,I: スケール操作/多感覚刺激が無い,,
-R997a8f168,3,Hands only illusion: multisensory integration elicits sense of ownership for body parts but not for non-corporeal objects,10.1007/s00221-009-2039-3,author,Unsure,,kataoka,Unsure,,,
-R43a9a1951,1,The role of the right temporo-parietal junction in maintaining a coherent sense of one's body.,10.1016/j.neuropsychologia.2008.06.004,author,Unsure,,watanabe,Unsure,,,
-R9ff89e573,2,Having a body versus moving your body: How agency structures body-ownership.,10.1016/j.concog.2005.09.004,author,Unsure,,watanabe,Unsure,,,
+Rbd706e525,1,Virtual reality for driving simulation,10.1145/229459.229468,author,Exclude,スコープ外(主題が無関係),kataoka,Unsure,,Exclude,スコープ外(主題が無関係)
+Ra5cfb588c,1,Session details: Augmented &amp; Virtual Reality in the Real World,10.1145/3251761,author,Unsure,,watanabe,Unsure,,Exclude,S: 原著論文でない
+R8f3ba8c18,2,FingerMapper: Mapping Finger Motions onto Virtual Arms to Enable Safe Virtual Reality Interaction in Confined Spaces,10.1145/3544548.3580736,author,Exclude,O: スケール知覚の測定が無い,kataoka,Unsure,,Exclude,I: スケール操作/多感覚刺激が無い
+R4269f5e23,1,Haptic Biosignals Affect Proxemics Toward Virtual Reality Agents,10.1145/3706598.3713231,author,Include,,watanabe,Exclude,I: スケール操作/多感覚刺激が無い,Exclude,I: スケール操作/多感覚刺激が無い
+R6aa7a794d,1,The virtual tricorder,10.1145/215585.215647,author,Unsure,,watanabe,Unsure,,Exclude,スコープ外(主題が無関係)
+R7e885c2b9,2,The Virtual Meditative Walk,10.1145/2702123.2702344,author,Exclude,スコープ外(主題が無関係),kataoka,Unsure,,Exclude,スコープ外(主題が無関係)
+R69d1ff33c,2,Global multi-user virtual environments (panel),10.1145/237170.237294,author,Unsure,,watanabe,Exclude,I: HMD-VR でない,Exclude,S: 原著論文でない
+R66ac6b17d,3,Real-time acoustic modeling for distributed virtual environments,10.1145/311535.311590,author,Exclude,スコープ外(主題が無関係),kataoka,Unsure,,Exclude,スコープ外(主題が無関係)
+R31f43832b,3,Moving objects in space: exploiting proprioception in virtual-environment interaction,10.1145/258734.258747,author,Include,,kataoka,Unsure,,Include,協議未解決→Includeに倒す(rule.md Phase 3b、再現率優先)
+Rdfdfbb255,3,The HoloSketch VR sketching system,10.1145/229459.229466,author,Exclude,スコープ外(主題が無関係),watanabe,Unsure,,Exclude,スコープ外(主題が無関係)
+Reb24ebdd1,3,Personal space evaluation and protection in social VR,10.1109/vrw52623.2021.00124,author,Unsure,,kataoka,Exclude,I: スケール操作/多感覚刺激が無い,Exclude,I: スケール操作/多感覚刺激が無い
+R420f1a894,3,Realistic immersion of a user into humanoids of different sizes and proportions in lmmersive virtual reality,10.1109/vr.2013.6549406,author,Unsure,,watanabe,Include,,Include,
+R5a06bae06,1,Using virtual reality to support acting in motion capture with differently scaled characters,10.1109/vr50410.2021.00063,author,Include,,watanabe,Exclude,O: スケール知覚の測定が無い,Exclude,O: スケール知覚の測定が無い
+R79a600c2e,2,"Human, virtual human, bump! A preliminary study on haptic feedback",10.1109/vr.2019.8798139,author,Unsure,,kataoka,Exclude,I: スケール操作/多感覚刺激が無い,Exclude,I: スケール操作/多感覚刺激が無い
+R157aaa021,1,Body warping versus change blindness remapping: a comparison of two approaches to repurposing haptic proxies for virtual reality,10.1109/vr51125.2022.00039,author,Include,,watanabe,Exclude,I: スケール操作/多感覚刺激が無い,Exclude,I: スケール操作/多感覚刺激が無い
+Re223ccc3f,2,Tangiball: Foot-enabled embodied tangible interaction with a ball in virtual reality,10.1109/vr51125.2022.00103,author,Exclude,O: スケール知覚の測定が無い,kataoka,Unsure,,Exclude,I: スケール操作/多感覚刺激が無い
+R9dadc7e35,1,EgoPoseVR: Spatiotemporal multi-modal reasoning for egocentric full-body pose in virtual reality,10.1109/tvcg.2026.3680618,author,Include,,kataoka,Exclude,I: スケール操作/多感覚刺激が無い,Exclude,I: スケール操作/多感覚刺激が無い
+R04ad7a330,3,The Role of VR in Supporting Body-Centered Phenomenology in Interior Design Education,10.3390/buildings16020250,author,Unsure,,watanabe,Exclude,I: スケール操作/多感覚刺激が無い,Exclude,I: スケール操作/多感覚刺激が無い
+R3062b906e,2,How to Worship in the Metaverse: Religious Experience and the Affordances of a New Medium,10.3390/rel15040487,author,Unsure,,kataoka,Exclude,スコープ外(主題が無関係),Exclude,スコープ外(主題が無関係)
+R4f0934072,3,Can the left hand benefit from being right? The influence of body side on perceived grasping ability,10.3758/s13414-024-02983-7,author,Include,,kataoka,Unsure,,Include,
+R0877910b9,1,Shaping health behaviors beyond reality: A full body illusion to experience the consequences of unhealthy snacking,10.1016/j.chb.2024.108376,author,Include,,watanabe,Exclude,O: スケール知覚の測定が無い,Exclude,O: スケール知覚の測定が無い
+R4f590e591,3,The effects of long-term exposure to microgravity and body orientation relative to gravity on perceived traveled distance,10.1038/s41526-024-00376-6,author,Include,,watanabe,Exclude,I: スケール操作/多感覚刺激が無い,Exclude,I: スケール操作/多感覚刺激が無い
+Rc4274e858,2,Manipulating objects during learning shrinks the global scale of spatial representations in memory: a virtual reality study,10.1038/s41598-024-53239-1,author,Unsure,,kataoka,Unsure,,Include,協議未解決→Includeに倒す(rule.md Phase 3b、再現率優先)
+Rcf10e0ab5,3,THINKING THROUGH THE TOOL: COLLABORATIVE ARCHAEOLOGICAL BODYWORK IN IMMERSIVE VIRTUAL REALITY; [PENSAR A TRAVÉS DE LA HERRAMIENTA: TRABAJO CORPORAL ARQUEOLÓGICO COLABORATIVO EN REALIDAD VIRTUAL INMERSIVA],10.4995/var.2024.19806,author,Unsure,,watanabe,Exclude,S: 原著論文でない,Exclude,S: ユーザー実験が無い
+Rc00ad1392,3,Sizing up the crowd: Assessing spatial integration difficulties in body size judgements across eating disorder symptomatology,10.3389/fpsyg.2022.1003250,author,Exclude,P: 対象者が不適合,kataoka,Unsure,,Exclude,P: 対象者が不適合
+R76f7df8d3,3,Investigating body perception of multiple virtual hands in synchronized and asynchronized conditions,10.3389/frvir.2024.1383957,author,Exclude,O: スケール知覚の測定が無い,kataoka,Unsure,,Exclude,I: スケール操作/多感覚刺激が無い
+Rf5064924d,3,Influencing Human Escape Maneuvers with Perceptual Cues in the Presence of a Visual Task,10.1109/thms.2021.3108962,author,Exclude,O: スケール知覚の測定が無い,kataoka,Unsure,,Exclude,I: スケール操作/多感覚刺激が無い
+R85c327975,3,The effects of partial proxy embodiment on the awareness of linear distance in omnidirectional treadmill enabled immersive virtual environment,10.1016/j.chbr.2022.100203,author,Include,,watanabe,Exclude,I: スケール操作/多感覚刺激が無い,Include,
+Rc41cf0d9e,2,Exercise in virtual reality with a muscular avatar influences performance on a weightlifting exercise,10.5817/cp2021-3-10,author,Exclude,スコープ外(主題が無関係),watanabe,Include,,Exclude,I: スケール操作/多感覚刺激が無い
+R452edba3c,3,Dissociating gait from static appearance: A virtual reality study of the role of dynamic identity signatures in person recognition,10.1016/j.cognition.2020.104445,author,Unsure,,kataoka,Exclude,I: スケール操作/多感覚刺激が無い,Exclude,I: スケール操作/多感覚刺激が無い
+R0340e93be,2,Visuo-tactile congruency influences the body schema during full body ownership illusion,10.1016/j.concog.2019.05.006,author,Include,,kataoka,Exclude,I: スケール操作/多感覚刺激が無い,Include,
+Rfb559e4b4,3,The virtual hand illusion is moderated by context-induced spatial reference frames,10.3389/fpsyg.2015.01659,author,Unsure,,watanabe,Exclude,I: スケール操作/多感覚刺激が無い,Exclude,I: スケール操作/多感覚刺激が無い
+R55cbbb2b7,2,Sensorimotor body-environment interaction serves to regulate emotional experience and exploratory behavior,10.1016/j.heliyon.2016.e00173,author,Exclude,I: スケール操作/多感覚刺激が無い,kataoka,Unsure,,Exclude,I: スケール操作/多感覚刺激が無い
+Rca12ed409,3,Body space in social interactions: A comparison of reaching and comfort distance in immersive virtual reality,10.1371/journal.pone.0111511,author,Unsure,,kataoka,Exclude,O: スケール知覚の測定が無い,Exclude,I: スケール操作/多感覚刺激が無い
+Rca66392d9,3,Fear reactivity to head-mounted display perceptual illusion challenges is associated with suicidality,10.1016/j.psychres.2018.12.106,author,Unsure,,kataoka,Exclude,O: スケール知覚の測定が無い,Exclude,I: スケール操作/多感覚刺激が無い
+R6e3a5fc9d,1,The shape of personal space,10.1016/j.actpsy.2018.12.009,author,Exclude,I: スケール操作/多感覚刺激が無い,kataoka,Unsure,,Exclude,I: スケール操作/多感覚刺激が無い
+Rddf81debb,1,Illusory body ownership of an invisible body interpolated between virtual hands and feet via visual-motor synchronicity /631/378/2649/1723 /631/477/2811 article,10.1038/s41598-018-25951-2,author,Include,,watanabe,Exclude,I: スケール操作/多感覚刺激が無い,Exclude,I: スケール操作/多感覚刺激が無い
+R105725908,2,The proteus effect: Implications of transformed digital self-representation on online and offline behavior,10.1177/0093650208330254,author,Unsure,,watanabe,Include,,Include,協議未解決→Includeに倒す(rule.md Phase 3b、再現率優先)
+R062a2965d,1,Distorting the visual size of the hand affects hand pre-shaping during grasping,10.1007/s00221-009-2143-4,author,Unsure,,kataoka,Unsure,,Include,協議未解決→Includeに倒す(rule.md Phase 3b、再現率優先)
+Rf7d0f9eae,1,Judgment under Uncertainty: Heuristics and Biases. Science,,author,Unsure,,watanabe,Unsure,,Exclude,スコープ外(主題が無関係)
+R40ff9ad79,3,Obstacles Affect Perceptions of Egocentric Distances in Virtual Environments,10.3389/frvir.2021.726114,author,Unsure,,watanabe,Exclude,I: スケール操作/多感覚刺激が無い,Exclude,HMD使っていないかも
+R6315e46bb,1,The Plausibility Paradox in Small-Scale Virtual Environments,,author,Unsure,,kataoka,Unsure,,Exclude,原著ではない
+Rb56c2b536,2,Revisiting the effect of quality of graphics on distance judgments in virtual environments: A comparison of verbal reports and blind walking,10.3758/app.71.6.1284,author,Unsure,,kataoka,Exclude,I: スケール操作/多感覚刺激が無い,Exclude,スコープ外(主題が無関係)
+Re3e61ac0f,2,Distance determined by the angular declination below the horizon,10.1038/35102562,author,Unsure,,watanabe,Unsure,,Exclude,スコープ外(主題が無関係)
+R47439ccb0,1,Handbook of Perception and Human Performance,,author,Unsure,,watanabe,Unsure,,Exclude,S: 原著論文でない
+Rd2a77d01b,3,Visual Perceptual Confidence: Exploring Discrepancies Between Self-reported and Actual Distance Perception In Virtual Reality,10.1109/tvcg.2024.3456165,author,Include,,watanabe,Exclude,I: スケール操作/多感覚刺激が無い,Exclude,I: スケール操作/多感覚刺激が無い
+R35c442ad0,1,Immersive storm surge flooding: Scale and risk perception in virtual reality,10.1016/j.jenvp.2022.101764,author,Unsure,,watanabe,Unsure,,Exclude,スコープ外(主題が無関係)
+R303eee6e9,3,Investigating the Distance Compression on Virtual Environments by Comparing Visualization Devices,10.1109/svr.2015.13,author,Unsure,,kataoka,Unsure,,Include,協議未解決→Includeに倒す(rule.md Phase 3b、再現率優先)
+R83a024b3f,2,Transformation of spatial perception in gate passage by using a wearable interface with changeable vertical viewpoint,10.1145/3657547.3657556,author,Include,,kataoka,Unsure,,Include,
+Rc61d4c8de,3,Is the street-crossing behavior with a head-mounted display different from that behavior in a CAVE? A study among young adults and children,10.1016/j.trf.2021.07.016,author,Exclude,I: HMD-VR でない,watanabe,Unsure,,Exclude,I: HMD-VR でない
+Rfa3b533da,1,Equivalent Physical Constant Hypothesis for Skill Transmission in Scale Conversion Telexistence,10.2312/egve.20181314,author,Unsure,,watanabe,Unsure,,Exclude,スコープ外(主題が無関係)
+Rcce71e720,1,Visual Perception of Egocentric Distance in Virtual Environments un-published Doctoral Dissertation,,author,Exclude,S: 原著論文でない,watanabe,Unsure,,Exclude,S: 原著論文でない
+Radcbd586a,2,"We conducted our study at the CERN main site located in Meyrin, during the week-end of the CERN Open Days",,author,Exclude,スコープ外(主題が無関係),watanabe,Unsure,,Exclude,スコープ外(主題が無関係)
+R666007d14,3,"Costantini M, Haggard P (2007) The rubber hand illusion: sensitivity and reference frame for body ownership. Conscious Cogn 16(2):229–240",10.1016/j.concog.2007.01.001,author,Exclude,I: HMD-VR でない,kataoka,Unsure,,Exclude,I: HMD-VR でない
+R6dc3b3e40,2,"Giummarra MJ, Gibson SJ, Georgiou-Karistianis N, Bradshaw JL (2008) Mechanisms underlying embodiment, disembodiment and loss of embodiment. Neurosci Biobehav Rev 32(1):143–160",10.1016/j.neubiorev.2007.07.001,author,Exclude,S: 原著論文でない,watanabe,Unsure,,Exclude,S: 原著論文でない
+Rd69f37011,1,"Maravita A, Iriki A (2004) Tools for the body (schema). Trends Cogn Sci 8(2):79–86",10.1016/j.tics.2003.12.008,author,Unsure,,kataoka,Unsure,,Exclude,スコープ外(主題が無関係)
+Rcaf74ed95,2,Tsakiris M (2010) My body in the brain: a neurocognitive model of body-ownership. Neuropsychologia 48(3):703–712,10.1016/j.neuropsychologia.2009.09.034,author,Exclude,S: 原著論文でない,kataoka,Unsure,,Exclude,スコープ外(主題が無関係)
+R2eb77ed99,1,The two-user seating buck: Enabling face-to-face discussions of novel car interface concepts,,author,Exclude,スコープ外(主題が無関係),watanabe,Unsure,,Include,協議未解決→Includeに倒す(rule.md Phase 3b、再現率優先)
+R9ef6eb79e,2,Evaluation of the impact of different levels of self-representation and body tracking on the sense of presence and embodiment in immersive VR,10.1007/s10055-021-00530-5,author,Unsure,,watanabe,Unsure,,Exclude,スケール操作してない
+R4133f7f22,3,The effectiveness of training in virtual environments,,author,Exclude,スコープ外(主題が無関係),kataoka,Unsure,,Include,協議未解決→Includeに倒す(rule.md Phase 3b、再現率優先)
+Rbf4733c09,1,Remain seated: towards fully-immersive desktop VR,10.1109/wevr.2017.7957707,author,Unsure,,watanabe,Unsure,,Exclude,I: HMD-VR でない
+R51e721f6e,3,Natural Interaction Metaphors for Functional Validations of Virtual Car Models,10.1109/tvcg.2011.36,author,Exclude,スコープ外(主題が無関係),kataoka,Unsure,,Include,協議未解決→Includeに倒す(rule.md Phase 3b、再現率優先)
+Rfbc734c75,1,AN ABSTRACT OF THE THESIS OF,,author,Exclude,スコープ外(主題が無関係),watanabe,Unsure,,Exclude,
+Rb33e74e24,1,Immersion factors affecting perception and behaviour in a virtual reality power wheelchair simulator.,10.1016/j.apergo.2016.05.003,author,Unsure,,watanabe,Unsure,,Exclude,スコープ外(主題が無関係)
+R0e318abaf,2,Virtual Reality Interface Factors in a Power Wheelchair Simulator,,author,Unsure,,kataoka,Unsure,,Exclude,スコープ外(主題が無関係)
+R175f9d5df,3,Augmented Virtual Studio for Architectural Exploration,,author,Unsure,,watanabe,Unsure,,Exclude,スコープ外(主題が無関係)
+Rcc1c7d129,3,Gait Parameters in Stressful Virtual Environments,,author,Unsure,,watanabe,Unsure,,Exclude,スコープ外(主題が無関係)
+R6cc488272,3,Rubber hands ‘feel’ touch that eyes see,10.1038/35784,author,Exclude,I: HMD-VR でない,kataoka,Unsure,,Exclude,I: HMD-VR でない
+R4229009ca,2,"The ""sense of agency"" and its underlying cognitive and neural mechanisms.",10.1016/j.concog.2008.03.004,author,Unsure,,kataoka,Unsure,,Exclude,スコープ外(主題が無関係)
+Rbcd3b1595,2,Functional and Neural Mechanisms of Embodiment: Importance of the Vestibular System and the Temporal Parietal Junction,10.1515/revneuro.2006.17.6.643,author,Unsure,,kataoka,Unsure,,Exclude,スコープ外(主題が無関係)
+R1d89e7d9b,1,What is embodiment? A psychometric approach.,10.1016/j.cognition.2007.12.004,author,Exclude,I: HMD-VR でない,watanabe,Unsure,,Include,協議未解決→Includeに倒す(rule.md Phase 3b、再現率優先)
+R85d2cc8f4,1,Self awareness and the body image.,10.1016/j.actpsy.2009.02.003,author,Unsure,,watanabe,Unsure,,Include,協議未解決→Includeに倒す(rule.md Phase 3b、再現率優先)
+R38dae68a2,2,Body ownership and embodiment: vestibular and multisensory mechanisms.,10.1016/j.neucli.2007.12.006,author,Unsure,,watanabe,Unsure,,Include,協議未解決→Includeに倒す(rule.md Phase 3b、再現率優先)
+R3dcafd4fd,2,If I Were You: Perceptual Illusion of Body Swapping,10.1371/journal.pone.0003832,author,Include,,watanabe,Exclude,I: スケール操作/多感覚刺激が無い,Exclude,HMD使っているか分からない
+R997a8f168,3,Hands only illusion: multisensory integration elicits sense of ownership for body parts but not for non-corporeal objects,10.1007/s00221-009-2039-3,author,Unsure,,kataoka,Unsure,,Include,協議未解決→Includeに倒す(rule.md Phase 3b、再現率優先)
+R43a9a1951,1,The role of the right temporo-parietal junction in maintaining a coherent sense of one's body.,10.1016/j.neuropsychologia.2008.06.004,author,Unsure,,watanabe,Unsure,,Exclude,スコープ外(主題が無関係)
+R9ff89e573,2,Having a body versus moving your body: How agency structures body-ownership.,10.1016/j.concog.2005.09.004,author,Unsure,,watanabe,Unsure,,Exclude,HMDでない

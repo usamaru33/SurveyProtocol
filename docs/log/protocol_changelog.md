@@ -95,6 +95,23 @@ Kataoka最大420/Watanabe最大409）の中で本基準に該当する記録を�
   （`supplement_sheet_kataoka.xlsx`、バックアップ: `supplement_sheet_kataoka.20260912_fix.bak.xlsx`）。
   `score_screening.py` の検査で問題0件を確認
 
+### 追記（2026-09-15）: 協議完了・校正セット確定・stage 2 着手
+
+3名で `screening/consensus_meeting.xlsx` を用いて協議を実施し、77件全件に最終判定を記入。
+転記時に **12件が最終判定「Unsure」のまま**残っていたため、`rule.md` の既定ルール
+（「協議で解決しなければ Include に倒す（再現率優先）」）を適用し、著者が Include へ変換した
+（`consensus_note` に「協議未解決→Includeに倒す」と記録）。
+
+`score_screening.py` を再実行し、校正セット223件の最終判定
+**343件（Include 144 → Phase 4 へ / Exclude 199）** を `screening/final_decisions.csv` に確定。
+κ の値・解釈（平均0.502・moderate）は変更しない。
+
+続けて `make_screening_stage2.py` を実行し、校正セット外709件（著者Exclude 606 + Unsure 103）の
+stage 2 シートを生成（Kataoka 363件 / Watanabe 346件）。決定事項2（境界例リストの補足）を反映し、
+協議で実際に判断した18件（「I: スケール操作/多感覚刺激が無い」が絡んだもの、Include 2 / Exclude 16）
+を「境界例メモ(参考)」シートとして各stage2ファイルに追加（`scripts/add_stage2_note.py`）。
+**除外理由の語彙・判定基準は変更していない**（Rev.19の凍結維持。あくまで既存基準の適用例の共有）。
+
 ---
 
 ## 2026-09-07 — Rev.26: κ の初回算出で低値を検出、Rev.21 の既定対応を一時保留し評価者へ確認を先行（プロトコル変更なし）
