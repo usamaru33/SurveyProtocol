@@ -1764,3 +1764,36 @@ Rev.21 の調査で「Cochrane のガイダンス [R4] は二重判定の割合�
 3. κは再算出しない（校正セット評価はRev.27の1回のみ）
 4. 原稿にκ=0.502(moderate)と診断・対応を記載
 6. Overleaf と GitHub の同期運用を決める（ミラーか双方向か）
+
+### 2026-09-24 — stage 2 提出2名分を取り込み、協議ミーティング用シートを再生成
+
+（9/14 の協議ミーティングで校正セット77件は確定済み。その後 `make_screening_stage2.py` で
+stage 2 シート（Kataoka 363件 / Watanabe 346件）を生成し配布していた分の回収。）
+
+- **Kataoka の stage 2 提出**（`stage2_sheet_kataoka_submit.xlsx`、363件・全件記入・reason欠落0件）を
+  `stage2_sheet_kataoka.xlsx` へ反映。旧テンプレートは `stage2_sheet_kataoka.20260924_232040_prev.bak.xlsx` に保全。
+- **Watanabe の stage 2 提出**は当初 `sheet_watanabe_submit.xlsx` という名前で置かれていたが、
+  中身は stage 1 校正セット(164件)と同一で別物と判明。正しい提出は
+  `stage2_sheet_watanabe_copy_20260915.xlsx`（346件・全件記入・reason欠落0件）だった。
+  `stage2_sheet_watanabe.xlsx` へ反映し、旧テンプレートは
+  `stage2_sheet_watanabe.20260924_232756_prev.bak.xlsx` に保全。
+- `score_screening.py` 再実行。κ（校正セット223件）は不変（平均0.502・moderate、Rev.9値）。
+  **両者一致(協議不要) 869件 / 要協議 183件**（内訳: 既解決77件 + 新規106件〔Kataoka分50 + Watanabe分56〕）。
+  `consensus_worklist.csv` は既存77件の記入内容を変更せず106件を追記のみ（純追記であることを diff で確認済み）。
+- **機械的な自動解決の可否を実測で検証** — 「Exclude票が誰からも無い組み合わせなら無条件Includeにできないか」
+  という案を、既解決77件の内訳（著者×第2評価者の判定の組み合わせ別に最終判定を集計）で検証した。
+  結果、Unsure×Unsure（Exclude票0）ですら実際には76%（19/25件）が中身を読んだ上でExcludeに決まっており、
+  新規106件の9割を占める Unsure×Exclude 型は前例12/12件が全てExcludeだった。
+  **→ 組み合わせパターンから機械的に予測できる安全な部分集合は無いと判断し、106件全件を協議対象のまま維持**
+  （新しい自動化ルールは導入していない。既存の完全一致・liberal accelerated の1名Include通過のみ従来通り自動）。
+- `make_consensus_sheet.py` を再実行し `screening/consensus_meeting.xlsx` を再生成（183件）。
+  既解決77件は `consensus_worklist.csv` の `final_decision`/`consensus_note` を引き継いで表示、
+  新規106件は空欄。3者の判定が3通りに割れているもの9件を先頭に配置・ハイライト。
+
+#### 次回やること
+
+1. **3名で `consensus_meeting.xlsx` の新規106件を協議**（3者3様の9件を優先）。解決しなければ Include に倒す
+2. 協議結果を `consensus_worklist.csv` の `final_decision` / `consensus_note` へ転記
+3. `score_screening.py` を再実行 → 未解決0件になれば `final_decisions.csv`（Phase 4送りの最終リスト）を生成
+4. 原稿にκ=0.502(moderate)と診断・対応を記載（未了・9/12から持ち越し）
+5. Overleaf と GitHub の同期運用を決める（未了・9/12から持ち越し）
