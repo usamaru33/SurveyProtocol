@@ -58,3 +58,7 @@ screening/stage1/decisions_*.csv
 # 中の JSON だけを除外する。
 screening/stage1/json/*.json
 screening/**/*.bak.xlsx
+
+# Phase 4 の全文 PDF(著作権のある原本。追跡しない)。取得状況は fulltext/manifest.csv で管理する
+fulltext/pdf/
+fulltext/by_reviewer/
