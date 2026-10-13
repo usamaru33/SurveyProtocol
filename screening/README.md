@@ -30,6 +30,28 @@
 
 ---
 
+## 0. フォルダ構成（2026-09-27 にフェーズ別へ整理）
+
+ファイル数が増えて見通しが悪くなったため、フェーズごとにサブフォルダへ分けた。
+**判定内容・ファイル名はそのまま**で、置き場所だけを変更している（`score_screening.py` 等の
+スクリプト側もこの構成に追従済み）。
+
+```
+screening/
+├── README.md
+├── stage1/                  # 割当・stage 1 判定シート・記入見本・閲覧アプリ関連
+├── calibration_supplement/  # 校正セット 15%→20% 引き上げ分の補足シート(Rev.22)
+├── stage2/                  # stage 2(著者の Exclude/Unsure を確認するシート)
+├── consensus/               # 協議リスト・協議ミーティング用シート
+├── final/                   # 最終判定(final_decisions.csv)
+└── _archive/                # バックアップ・取り込み済みの提出コピー・旧日付版(追跡しない)
+```
+
+`_archive/` はフェーズ別のサブフォルダ(`stage1/` 等)を持つが、`.gitignore` で
+まとめて追跡除外している(監査目的でローカルには残すが、公開物ではない)。
+
+---
+
 ## 1. 何を判定しているか
 
 検索でヒットした 14,682 件を機械的に絞り込んだ **1,052 件** が判定対象です。
@@ -74,13 +96,15 @@
 
 | ファイル | 内容 | 誰が触るか |
 |---|---|---|
-| `assignment.csv` | 割当の正（record_id・block・担当2名・校正セット指定） | **編集しない** |
-| `sheet_<id>.csv` | 生成時の雛形（機械可読の正） | 触らない |
-| `sheet_<id>.xlsx` | **各評価者の作業ファイル** | 本人のみ |
-| `EXAMPLE_記入見本.xlsx` | 記入例5件。全員に同じものを配布 | 参照のみ |
-| `stage2_sheet_<id>.xlsx` | stage 2 の確認用（著者の stage 1 完了後に生成） | 本人のみ |
-| `consensus_worklist.csv` | 不一致と Unsure だけを抜いた協議リスト | 協議で記入 |
-| `final_decisions.csv` | 最終判定（Include が Phase 4 へ進む） | 自動生成 |
+| `stage1/assignment.csv` | 割当の正（record_id・block・担当2名・校正セット指定） | **編集しない** |
+| `stage1/sheet_<id>.csv` | 生成時の雛形（機械可読の正） | 触らない |
+| `stage1/sheet_<id>.xlsx` | **各評価者の作業ファイル** | 本人のみ |
+| `stage1/EXAMPLE_記入見本.xlsx` | 記入例5件。全員に同じものを配布 | 参照のみ |
+| `calibration_supplement/supplement_sheet_<id>.csv/.xlsx` | 校正セット 20% 引き上げ分の追加シート(Rev.22) | 本人のみ |
+| `stage2/stage2_sheet_<id>.xlsx` | stage 2 の確認用（著者の stage 1 完了後に生成） | 本人のみ |
+| `consensus/consensus_worklist.csv` | 不一致と Unsure だけを抜いた協議リスト | 協議で記入 |
+| `consensus/consensus_meeting.xlsx` | 3名の判定を横並びにした協議ミーティング用シート | 協議で記入 |
+| `final/final_decisions.csv` | 最終判定（Include が Phase 4 へ進む） | 自動生成 |
 
 ### ⚠️ 他人のシートは開かないこと
 
@@ -88,7 +112,7 @@
 先に書いた側の判定が見えると独立性が壊れ、κ が意味を失います。
 評価者ごとにファイルを分けてあるのはこのためです。判定についての事前の相談も行いません。
 
-`stage2_sheet_*.xlsx` は著者の判定列を空にしてありますが、**そこに含まれること自体が
+`stage2/stage2_sheet_*.xlsx` は著者の判定列を空にしてありますが、**そこに含まれること自体が
 「著者が Exclude / Unsure にした」という情報**です。そのため stage 2 のシートは
 著者の stage 1 完了後にしか生成しません。
 
@@ -191,14 +215,14 @@ Unsure は協議対象になるので、無理に二択にする必要はあり�
 そこで**読む速度だけを上げる**ローカルアプリを用意した。
 
 ```bash
-python -X utf8 scripts/make_review_app.py            # → screening/review_author.html
+python -X utf8 scripts/make_review_app.py            # → screening/stage1/review_author.html
 # ブラウザで開き、キーボードで判定
-#   s = 途中保存（screening/json/progress_author.json）   l = 途中経過の読み込み
+#   s = 途中保存（screening/stage1/json/progress_author.json）   l = 途中経過の読み込み
 #   e = decisions_author.csv を書き出す
 python -X utf8 scripts/apply_review_decisions.py --id author --input decisions_author.csv
 # 進捗JSON をそのまま渡してもよい（検証は CSV と同じ）
 python -X utf8 scripts/apply_review_decisions.py --id author \
-    --input screening/json/progress_author.json
+    --input screening/stage1/json/progress_author.json
 ```
 
 - 1件ずつ全画面表示。**`i`=Include / `u`=Unsure / `1`〜`9`=Exclude+除外理由**（1打で判定+理由）。
@@ -215,8 +239,8 @@ python -X utf8 scripts/apply_review_decisions.py --id author \
   ただし localStorage は**ブラウザの閲覧データを消すと一緒に消える**（別PC・別ブラウザにも
   引き継がれない）。区切りごとに **`s`** で JSON へ退避すること（次項）
 - **途中保存 `s` / 途中経過の読み込み `l`。** 判定を
-  `screening/json/progress_<id>.json` へ書き出す。保存先フォルダは初回に一度だけ選び
-  （`screening/json` を選ぶ）、2回目以降は同じフォルダへ上書きする。上部バーに
+  `screening/stage1/json/progress_<id>.json` へ書き出す。保存先フォルダは初回に一度だけ選び
+  （`screening/stage1/json` を選ぶ）、2回目以降は同じフォルダへ上書きする。上部バーに
   最後に保存した時刻と、それ以降に増えた判定の件数（`+n`）を出す
   - `l` はそのフォルダの `progress_<id>.json` を、`Shift`+`L` は選んだファイルを読む。
     読み込みは**置き換え**（統合はしない）。実行前に 新規／上書き／変わらない／
@@ -227,9 +251,9 @@ python -X utf8 scripts/apply_review_decisions.py --id author \
     担当外の record_id（読み飛ばして件数を報告）・**指紋**
     （`件数:record_id列のSHA-1先頭7桁`。判定対象の集合が違えば警告する）
   - フォルダ書き込みは File System Access API（Chrome / Edge）。使えないブラウザでは
-    通常のダウンロードに落ちるので、`screening/json/` へ自分で移す
+    通常のダウンロードに落ちるので、`screening/stage1/json/` へ自分で移す
   - JSON はそのまま反映できる:
-    `apply_review_decisions.py --id author --input screening/json/progress_author.json`
+    `apply_review_decisions.py --id author --input screening/stage1/json/progress_author.json`
 - 校正セット（`calibration=Y`）は **★ バッジと警告帯**を出す。**表示の正は `assignment.csv`**
   （`sheet_*.csv` は生成時点のスナップショットで、Rev.22 の 15%→20% 引き上げに追随していない）
 - 反映スクリプトは書き込む前に検証する: 担当外ID・不正な判定値・統制語彙の外の理由・
@@ -251,13 +275,13 @@ python -X utf8 scripts/apply_review_decisions.py --id author \
 ```bash
 python -X utf8 scripts/translate_abstracts.py --estimate                    # 見積もり(通信なし)
 python -X utf8 scripts/translate_abstracts.py --engine deepl --only-calibration
-python -X utf8 scripts/make_review_app.py --translations screening/abstract_ja.json
+python -X utf8 scripts/make_review_app.py --translations screening/stage1/abstract_ja.json
 ```
 
 閲覧アプリで **`t`** を押すと 原文のみ → **対訳** → 訳のみ を切り替える。**既定は対訳**で、
 訳文には常に「機械翻訳（参考）」の見出しが付く。
 
-- 訳文は `screening/abstract_ja.json` に固定する。各エントリに **原文の SHA-1・エンジン名・
+- 訳文は `screening/stage1/abstract_ja.json` に固定する。各エントリに **原文の SHA-1・エンジン名・
   実行日**を記録するので、**著者が実際に読んだ訳文を第三者が再現できる**
 - 原文が差し替わったのに古い訳が残っている場合、アプリは**その訳を採用しない**
   （SHA-1 が一致しないため。読んでいる訳と判定対象がズレるのを防ぐ）
@@ -299,7 +323,7 @@ python -X utf8 scripts/make_screening_example.py
 
 # --- 著者が stage 1 を終えたら ---
 python -X utf8 scripts/make_screening_stage2.py
-python -X utf8 scripts/make_screening_xlsx.py --prefix stage2_
+python -X utf8 scripts/make_screening_xlsx.py --dir screening/stage2 --prefix stage2_
 
 # --- 全員の記入が終わったら ---
 python -X utf8 scripts/score_screening.py
@@ -337,9 +361,11 @@ python -X utf8 scripts/score_screening.py
 
 ## 7. バージョン管理での扱い
 
-各評価者のシート `sheet_*.csv` / `sheet_*.xlsx` は **記入中は `.gitignore` で追跡しません**。
+各評価者のシート `stage1/sheet_*.csv` / `.xlsx`・`calibration_supplement/supplement_sheet_*` ・
+`stage2/stage2_sheet_*` は **記入中は `.gitignore` で追跡しません**。
 3人分がリポジトリに入ると互いの判定が見えてしまい、独立性が壊れるためです。
+`_archive/` 以下(バックアップ・取り込み済み提出コピー)も同様に追跡しません。
 
 ただしこれらは `rule.md` が要求する監査証跡でもあるので、
-**スクリーニング完了後に `git add -f screening/sheet_*.csv` で必ず追跡に加えてください。**
+**スクリーニング完了後に `git add -f screening/stage1/sheet_*.csv` で必ず追跡に加えてください。**
 割当表・協議リスト・最終判定・この README は最初から追跡しています。

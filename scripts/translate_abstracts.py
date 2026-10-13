@@ -28,7 +28,7 @@ JSON キャッシュに固定し、原文の SHA-1・エンジン名・実行日
     # 全件
     python -X utf8 scripts/translate_abstracts.py --engine deepl
 
-出力: screening/abstract_ja.json
+出力: screening/stage1/abstract_ja.json
 """
 from __future__ import annotations
 
@@ -48,7 +48,7 @@ csv.field_size_limit(10 ** 9)
 from api_search_common import load_dotenv as load_env  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-SCREENING = ROOT / "screening"
+SCREENING = ROOT / "screening" / "stage1"
 CACHE = SCREENING / "abstract_ja.json"
 
 # DeepL 無料枠。超過分は課金されるので、既定では確認を挟む。
@@ -222,7 +222,7 @@ def main() -> None:
     print(f"[OK] {CACHE}  （計 {len(cache):,} 件）")
     print("     閲覧アプリへ反映:")
     print(f"     python -X utf8 scripts/make_review_app.py --id {args.id} "
-          f"--translations screening/abstract_ja.json")
+          f"--translations screening/stage1/abstract_ja.json")
 
 
 if __name__ == "__main__":

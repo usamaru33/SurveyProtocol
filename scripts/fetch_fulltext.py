@@ -3,7 +3,7 @@
 使い方:
     python -X utf8 scripts/fetch_fulltext.py --targets <ids.json>
 
-入力  : ids.json(record_id の配列)と screening/assignment.csv(DOI・タイトル)
+入力  : ids.json(record_id の配列)と screening/stage1/assignment.csv(DOI・タイトル)
 出力  : fulltext/pdf/<record_id>.pdf        … 原本(1論文1ファイル)
         fulltext/by_reviewer/<人>/<record_id>.pdf … 担当者ごとのコピー
         fulltext/manifest.csv               … 取得状況・出所・担当ペア
@@ -76,7 +76,7 @@ def main() -> None:
     args = ap.parse_args()
     ids = json.loads(Path(args.targets).read_text(encoding="utf-8"))
     asg = {r["record_id"]: r for r in csv.DictReader(
-        (ROOT / "screening" / "assignment.csv").open(encoding="utf-8-sig", newline=""))}
+        (ROOT / "screening" / "stage1" / "assignment.csv").open(encoding="utf-8-sig", newline=""))}
 
     out = ROOT / "fulltext"
     (out / "pdf").mkdir(parents=True, exist_ok=True)

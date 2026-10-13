@@ -5,7 +5,7 @@ score_screening.py — Phase 3b の集計(Cohen's κ・不一致抽出・最終�
 ================================================================================
 
 【何を】
-評価者ごとの判定シート(`screening/sheet_<id>.csv`)を突き合わせて、
+評価者ごとの判定シート(`screening/stage1/sheet_<id>.csv`)を突き合わせて、
 
   1. 記入の妥当性を検査する(未記入・不正値・担当外レコード・取り違え)
   2. **ペアごとの Cohen's κ とその平均**を算出する(校正セットのみ。Rev.17)
@@ -30,9 +30,11 @@ Include / Exclude / Unsure の**3カテゴリで算出したものを主報告**
 Phase 4(全文評価)へ送る(再現率優先)。
 
 【入出力】
-  入力: screening/assignment.csv, screening/sheet_<id>.csv
-  出力: screening/consensus_worklist.csv  協議が必要なレコード(協議前)
-        screening/final_decisions.csv     最終判定(協議結果が揃っている場合のみ)
+  入力: screening/stage1/assignment.csv, screening/stage1/sheet_<id>.csv,
+        screening/calibration_supplement/supplement_sheet_<id>.csv,
+        screening/stage2/stage2_sheet_<id>.csv
+  出力: screening/consensus/consensus_worklist.csv  協議が必要なレコード(協議前)
+        screening/final/final_decisions.csv         最終判定(協議結果が揃っている場合のみ)
         標準出力                          検査結果・κ・分布
 
 実行:
@@ -200,19 +202,26 @@ def main() -> None:
                     help="未記入・不正値があれば非ゼロ終了する")
     args = ap.parse_args()
 
-    apath = args.dir / "assignment.csv"
+    # フェーズ別サブフォルダ(2026-09-27 の整理で screening/ 直下から分割)
+    stage1_dir = args.dir / "stage1"
+    calib_dir = args.dir / "calibration_supplement"
+    stage2_dir = args.dir / "stage2"
+    consensus_dir = args.dir / "consensus"
+    final_dir = args.dir / "final"
+
+    apath = stage1_dir / "assignment.csv"
     if not apath.exists():
         sys.exit(f"[ERROR] {apath} がありません。先に make_screening_sheets.py を実行すること")
     with apath.open(encoding="utf-8-sig", newline="") as f:
         assignment = {r["record_id"]: r for r in csv.DictReader(f)}
 
-    sheets = {rid: load_sheet(args.dir / f"sheet_{rid}.csv") for rid in REVIEWERS}
+    sheets = {rid: load_sheet(stage1_dir / f"sheet_{rid}.csv") for rid in REVIEWERS}
 
     # Rev.22: 校正セットを 15% → 20% に広げた分(59件)は、配布済みシートを作り直さず
     # supplement_sheet_<id> として別に配った。両方を読んで1人分としてまとめる。
     # 既存シートの判定を捨てないための措置(閾値が単調なので既出は外れない)。
     for rid in REVIEWERS:
-        sup = load_sheet(args.dir / f"supplement_sheet_{rid}.csv")
+        sup = load_sheet(calib_dir / f"supplement_sheet_{rid}.csv")
         if not sup:
             continue
         dup = set(sheets[rid]) & set(sup)
@@ -352,7 +361,7 @@ def main() -> None:
     # --- 3. 協議リスト -----------------------------------------------------
     worklist, agreed = [], []
     # stage 2(著者が Exclude/Unsure にした分の第2評価)。無ければ空。
-    stage2 = {rv: load_sheet(args.dir / f"stage2_sheet_{rv}.csv")
+    stage2 = {rv: load_sheet(stage2_dir / f"stage2_sheet_{rv}.csv")
               for rv in REVIEWERS if rv != "author"}
     n_liberal = 0
     for rid, a in assignment.items():
@@ -412,8 +421,8 @@ def main() -> None:
             "reviewer_b", "decision_b", "reason_b",
             "final_decision", "consensus_note"]
 
-    args.dir.mkdir(parents=True, exist_ok=True)
-    wpath = args.dir / "consensus_worklist.csv"
+    consensus_dir.mkdir(parents=True, exist_ok=True)
+    wpath = consensus_dir / "consensus_worklist.csv"
     if worklist:
         # 既存の協議結果を消さないよう、記入済みがあればマージする
         prev = load_sheet(wpath)
@@ -444,7 +453,8 @@ def main() -> None:
         final = agreed + worklist
         for r in final:
             r["final_decision"] = CANON[r["final_decision"].strip().lower()]
-        fpath = args.dir / "final_decisions.csv"
+        final_dir.mkdir(parents=True, exist_ok=True)
+        fpath = final_dir / "final_decisions.csv"
         with fpath.open("w", encoding="utf-8-sig", newline="") as f:
             w = csv.DictWriter(f, fieldnames=cols, extrasaction="ignore")
             w.writeheader()

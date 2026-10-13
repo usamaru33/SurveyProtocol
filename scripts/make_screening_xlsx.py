@@ -29,8 +29,9 @@ make_screening_xlsx.py — Phase 3b 判定シートの Excel 版を生成する
 - 列見出しに日本語の説明を入れ、別紙を見なくても意味が分かるようにする
 
 【入出力】
-  入力: screening/sheet_<id>.csv(+ 記入済みがあればその内容を引き継ぐ)
-  出力: screening/sheet_<id>.xlsx
+  入力: screening/stage1/sheet_<id>.csv(+ 記入済みがあればその内容を引き継ぐ)
+        --dir/--prefix で screening/stage2, screening/calibration_supplement 等も対象にできる
+  出力: screening/stage1/sheet_<id>.xlsx
 
 実行:
   python -X utf8 scripts/make_screening_xlsx.py
@@ -377,7 +378,9 @@ def build_sheet(ws, rows: list[dict]) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="Phase 3b 判定シートの Excel 版を生成")
-    ap.add_argument("--dir", type=Path, default=ROOT / "screening")
+    ap.add_argument("--dir", type=Path, default=ROOT / "screening" / "stage1",
+                     help="対象フォルダ(stage2 は screening/stage2、補足は "
+                          "screening/calibration_supplement --prefix supplement_)")
     ap.add_argument("--prefix", type=str, default="",
                     help="シート名の接頭辞(stage2_ など)")
     ap.add_argument("--only", type=str, default="",
@@ -414,7 +417,7 @@ def main() -> None:
         print(f"[INFO] 出力: {dst.name}  {len(rows):,} 行  担当={REVIEWERS[rev]}"
               f"  (うち要旨なし {no_abs} 件)")
 
-    print("\n[NEXT] 各評価者に .xlsx を配布する。記入後は screening/ に戻してもらい、")
+    print("\n[NEXT] 各評価者に .xlsx を配布する。記入後は元のフォルダに戻してもらい、")
     print("       `python -X utf8 scripts/score_screening.py` で集計する")
     print("       (xlsx があれば xlsx を、無ければ CSV を読む)。")
 

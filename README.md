@@ -176,10 +176,12 @@ SurveyProtocol/
 │   ├── make_screening_stage2.py # ★stage 2（著者の Exclude 分を第2評価者へ）
 │   ├── score_screening.py       # ★Phase 3b 集計（κ・協議リスト・最終判定）
 │   └── *_audit.py               # Venue照合・正規化衝突・PubMed固有件数などの監査
-├── screening/                   # ★Phase 3b の判定シート一式 → §11
-│   ├── assignment.csv           # 割当の正（record_id・calibration・第2評価者）
-│   ├── sheet_<id>.csv / .xlsx   # stage 1 の判定シート（評価者ごとに独立）
-│   └── stage2_sheet_<id>.csv    # stage 2（著者の記入完了後に生成）
+├── screening/                   # ★Phase 3b の判定シート一式 → §11（フェーズ別サブフォルダ、詳細は screening/README.md §0）
+│   ├── stage1/                  # assignment.csv・sheet_<id>.csv / .xlsx（stage 1、評価者ごとに独立）
+│   ├── calibration_supplement/  # supplement_sheet_<id>.csv / .xlsx（校正セット20%引き上げ分）
+│   ├── stage2/                  # stage2_sheet_<id>.csv / .xlsx（著者の記入完了後に生成）
+│   ├── consensus/               # consensus_worklist.csv・consensus_meeting.xlsx
+│   └── final/                   # final_decisions.csv（最終判定）
 ├── outputs/                     # 上記スクリプトの出力（監査CSV・実行ログ）
 │   ├── enriched_abstracts.csv   # ★ DOI から補完した要旨のキャッシュ（人手判定の材料専用）
 │   ├── snowballing_log.csv      # スノーボーリング結果（17列。判定は判定シートに統合）
@@ -1035,12 +1037,12 @@ Phase 3b のエラーは非対称（誤 Exclude は回復不能／誤 Include �
 python -X utf8 scripts/make_screening_sheets.py
 python -X utf8 scripts/make_screening_xlsx.py
 
-#   → screening/sheet_<id>.xlsx を各評価者に配布
-#   → 記入後に screening/ へ戻してもらう
+#   → screening/stage1/sheet_<id>.xlsx を各評価者に配布
+#   → 記入後に screening/stage1/ へ戻してもらう
 
 # stage 2: 著者の記入完了後、Exclude/Unsure だけを第2評価者へ
 python -X utf8 scripts/make_screening_stage2.py
-python -X utf8 scripts/make_screening_xlsx.py --prefix stage2_
+python -X utf8 scripts/make_screening_xlsx.py --dir screening/stage2 --prefix stage2_
 
 # 集計: κ・協議リスト・最終判定
 python -X utf8 scripts/score_screening.py

@@ -45,7 +45,7 @@ csv.field_size_limit(10 ** 9)
 from make_screening_sheets import norm_doi  # noqa: E402
 
 GOLD = ROOT / "self_scale_references.csv"
-SHEET = ROOT / "screening" / "sheet_author.csv"   # 判定対象の全件(1,052)
+SHEET = ROOT / "screening" / "stage1" / "sheet_author.csv"   # 判定対象の全件(1,052)
 OUT = ROOT / "outputs" / "known_item_in_screening.csv"
 
 

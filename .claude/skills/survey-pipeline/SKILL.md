@@ -1,4 +1,4 @@
----
+su---
 name: survey-pipeline
 description: サーベイのスクリーニングパイプライン（pipeline.py 等）の実行・改修をするときに使う。実行コマンド、入出力ファイル、注意点をまとめている。
 ---

@@ -1741,6 +1741,28 @@ Rev.21 の調査で「Cochrane のガイダンス [R4] は二重判定の割合�
 3. 回収後: `score_screening.py` → κ 算出 → Rev.21 の閾値方針に従って対応
 4. 原稿 §3 Positioning の改稿（承認ゲートを通す）。以降 §4 以降も同様に節単位で
 5. `\pending{}` の数値流し込み（§1 に8スロット、原稿全体で41箇所）
+
+### 2026-09-12
+
+- Watanabe が校正セット223件を再提出（本体+補足59件）。`sheet_watanabe.xlsx`/
+  `supplement_sheet_watanabe.xlsx` を更新（旧版は `.bak.xlsx` で保全）し `score_screening.py` を再実行。
+- **κ（3カテゴリ、校正セット223件）: 著者×Kataoka 0.456 / 著者×Watanabe 0.468 /
+  Kataoka×Watanabe 0.581 / 平均 0.502（moderate）**。Rev.26暫定値(0.196・slight)から改善。
+  Watanabeの不備（補足未提出・Unsure使用0%・「S: 原著論文でない」37.2%）は解消を確認。
+- kataoka の Rbf4733c09（reason空欄）はメモ記載に基づき `I: HMD-VR でない` を補って解消。
+  記入検査は問題0件。
+- moderate域のためRev.21の追加診断を実施: 真の不一致52件中18件(38%)が
+  「I: スケール操作/多感覚刺激が無い」に集中(境界的な身体所有感・パーソナルスペース等の論文)。
+  対応は新規再判定ラウンドを起こさず、**stage 2生成時に境界例リストを補足として添付**する形に決定。
+  詳細・数値は `docs/log/protocol_changelog.md` Rev.27。
+- 不一致・Unsure 77件を `screening/consensus_worklist.csv` に出力済み（未協議）。
+
+#### 次回やること
+
+1. `consensus_worklist.csv` の77件を3名で協議（解決しなければ Include に倒す）
+2. stage 2 シート生成（`make_screening_stage2.py`）。生成時に境界例リストを補足添付
+3. κは再算出しない（校正セット評価はRev.27の1回のみ）
+4. 原稿にκ=0.502(moderate)と診断・対応を記載
 6. Overleaf と GitHub の同期運用を決める（ミラーか双方向か）
 
 ### 2026-09-02 — 原稿 §2・§3 の改稿 / 査読2本 / 理論節の骨格の修正 / Rev.26 の持ち越し
@@ -1869,6 +1891,74 @@ Li et al. は表から外し、提示上の慣行（Challenges/Opportunities、e
 
 ---
 
+### 2026-09-24 — stage 2 提出2名分を取り込み、協議ミーティング用シートを再生成
+
+（9/14 の協議ミーティングで校正セット77件は確定済み。その後 `make_screening_stage2.py` で
+stage 2 シート（Kataoka 363件 / Watanabe 346件）を生成し配布していた分の回収。）
+
+- **Kataoka の stage 2 提出**（`stage2_sheet_kataoka_submit.xlsx`、363件・全件記入・reason欠落0件）を
+  `stage2_sheet_kataoka.xlsx` へ反映。旧テンプレートは `stage2_sheet_kataoka.20260924_232040_prev.bak.xlsx` に保全。
+- **Watanabe の stage 2 提出**は当初 `sheet_watanabe_submit.xlsx` という名前で置かれていたが、
+  中身は stage 1 校正セット(164件)と同一で別物と判明。正しい提出は
+  `stage2_sheet_watanabe_copy_20260915.xlsx`（346件・全件記入・reason欠落0件）だった。
+  `stage2_sheet_watanabe.xlsx` へ反映し、旧テンプレートは
+  `stage2_sheet_watanabe.20260924_232756_prev.bak.xlsx` に保全。
+- `score_screening.py` 再実行。κ（校正セット223件）は不変（平均0.502・moderate、Rev.9値）。
+  **両者一致(協議不要) 869件 / 要協議 183件**（内訳: 既解決77件 + 新規106件〔Kataoka分50 + Watanabe分56〕）。
+  `consensus_worklist.csv` は既存77件の記入内容を変更せず106件を追記のみ（純追記であることを diff で確認済み）。
+- **機械的な自動解決の可否を実測で検証** — 「Exclude票が誰からも無い組み合わせなら無条件Includeにできないか」
+  という案を、既解決77件の内訳（著者×第2評価者の判定の組み合わせ別に最終判定を集計）で検証した。
+  結果、Unsure×Unsure（Exclude票0）ですら実際には76%（19/25件）が中身を読んだ上でExcludeに決まっており、
+  新規106件の9割を占める Unsure×Exclude 型は前例12/12件が全てExcludeだった。
+  **→ 組み合わせパターンから機械的に予測できる安全な部分集合は無いと判断し、106件全件を協議対象のまま維持**
+  （新しい自動化ルールは導入していない。既存の完全一致・liberal accelerated の1名Include通過のみ従来通り自動）。
+- `make_consensus_sheet.py` を再実行し `screening/consensus_meeting.xlsx` を再生成（183件）。
+  既解決77件は `consensus_worklist.csv` の `final_decision`/`consensus_note` を引き継いで表示、
+  新規106件は空欄。3者の判定が3通りに割れているもの9件を先頭に配置・ハイライト。
+
+#### 次回やること
+
+1. **3名で `consensus_meeting.xlsx` の新規106件を協議**（3者3様の9件を優先）。解決しなければ Include に倒す
+2. 協議結果を `consensus_worklist.csv` の `final_decision` / `consensus_note` へ転記
+3. `score_screening.py` を再実行 → 未解決0件になれば `final_decisions.csv`（Phase 4送りの最終リスト）を生成
+4. 原稿にκ=0.502(moderate)と診断・対応を記載（未了・9/12から持ち越し）
+5. Overleaf と GitHub の同期運用を決める（未了・9/12から持ち越し）
+
+### 2026-09-27 — screening/ をフェーズ別サブフォルダへ整理
+
+ファイル数が増え見通しが悪くなったため、`screening/` 直下に並んでいた判定関連ファイルを
+フェーズ別サブフォルダへ再配置した。**判定内容・ファイル名・スクリプトの集計ロジックは
+変更していない**（純粋なファイル配置の変更）。
+
+- 新構成: `stage1/`（割当・stage1シート・記入見本・閲覧アプリ関連）/
+  `calibration_supplement/`（校正セット20%引き上げ分）/ `stage2/`（stage2シート）/
+  `consensus/`（協議リスト・協議ミーティング用シート）/ `final/`（最終判定）/
+  `_archive/`（バックアップ・取り込み済み提出コピー・旧日付版、フェーズ別サブフォルダ持ち・追跡しない）
+- 追従して更新したスクリプト: `score_screening.py`・`make_consensus_sheet.py`・
+  `make_calibration_supplement.py`・`make_screening_stage2.py`・`make_screening_xlsx.py`
+  （`--dir` の既定値を `stage1/` に変更、stage2/補足には `--dir` を明示指定する運用へ）・
+  `make_screening_sheets.py`・`make_screening_example.py`・`apply_review_decisions.py`・
+  `make_review_app.py`・`translate_abstracts.py`・`enrich_screening_abstracts.py`・
+  `audit_manuscript_figures.py`・`known_item_screening_audit.py`・`add_stage2_note.py`
+- `.gitignore` のパターンも新パスに追従（`screening/_archive/` は丸ごと追跡除外）
+- **検証**: 移動後に `score_screening.py` を再実行し、κ(0.502・moderate)・
+  一致869件/要協議183件(内訳は変更前と同一)が完全に再現することを確認。
+  `consensus_worklist.csv` は移動前と diff ゼロ(内容の変更なし、パスのみ移動)。
+  `make_consensus_sheet.py` も新パスで正常動作を確認。
+- 追従して更新した文書: `screening/README.md`(新設§0に構成図を追加)・
+  `docs/protocol/screening_protocol.md`・ルート `README.md`・
+  `.claude/skills/survey-pr/SKILL.md`。
+  `docs/log/protocol_changelog.md`・`consistency_audit_log.md` 等の**過去日付の記述は
+  当時のパスのまま変更していない**(履歴の書き換えを避けるため)。
+
+#### 次回やること
+
+1. **3名で `screening/consensus/consensus_meeting.xlsx` の新規106件を協議**（3者3様の9件を優先）。解決しなければ Include に倒す
+2. 協議結果を `screening/consensus/consensus_worklist.csv` の `final_decision` / `consensus_note` へ転記
+3. `score_screening.py` を再実行 → 未解決0件になれば `screening/final/final_decisions.csv`（Phase 4送りの最終リスト）を生成
+4. 原稿にκ=0.502(moderate)と診断・対応を記載（未了・9/12から持ち越し）
+5. Overleaf と GitHub の同期運用を決める（未了・9/12から持ち越し）
+
 ### 2026-10-13 — Phase 3b: stage 1/2 完了の確認・協議シート突合・Phase 4 の全文取得開始
 
 #### 現在地(実データで確認)
@@ -1915,3 +2005,22 @@ Li et al. は表から外し、提示上の慣行（Challenges/Opportunities、e
 
 - `screening/consensus_meeting*.xlsx`(3 名の判定が並ぶ協議シート。協議 2 回目が未完了のため)。
 - リポジトリ直下の未追跡 `PROGRESS_LOG.md`(`docs/log/PROGRESS_LOG.md` と別物の古い複製。内容は未確認)。
+
+#### 追記(2026-10-13・別デバイスの作業との統合時)
+
+上の 10-13 の記述は、09-12〜09-27 の別デバイスでのコミット(Rev.27・協議1回目の確定・stage 2 取り込み・
+`screening/` の再配置)を取り込む前に書かれた。統合後の状態との差を記録する(上の本文は当時のまま残す)。
+
+- **Rev.27 は記録済み**(`protocol_changelog.md` の 2026-09-12 項と 09-15 追記)。「未実施」は解消している。
+  決定内容は「Rev.21 step 3 を、別の再判定ラウンドを設けず stage 2 の設計に組み込む形で適用し、
+  境界例18件を stage 2 シートの『境界例メモ』として添える(語彙・基準は不変)」。
+- **「52 件」「I 基準 18 件」は Rev.27 で記入済みシートから算出済み**(真の不一致 52 件のうち理由のある 47 件中 18 件=38%)。
+- **κ は記入済みシートで再計算して一致を確認**(0.456 / 0.468 / 0.581、平均 0.502)。要協議 183 件
+  (既解決 77 + 未解決 106)も再現。協議2回目の記入(159 件)は OneDrive の `consensus_meeting_2.xlsx` にあり、
+  リポジトリの `consensus_worklist.csv` へはまだ転記していない。
+- **パスの変更**: 本文中の `screening/stage2_sheet_*.xlsx` は `screening/stage2/`、`consensus_worklist.csv`・
+  `consensus_meeting*.xlsx` は `screening/consensus/`、`final_decisions.csv` は `screening/final/` に移動済み。
+  `scripts/fetch_fulltext.py` の入力パスは `screening/stage1/assignment.csv` に修正した。
+- `.gitignore` の協議シート除外を `consensus_meeting*.xlsx` に広げた(`consensus_meeting_2.xlsx` を誤って追跡しないため)。
+- 「次回やること」3 の校正セットの記入済みシートはこのデバイスにある。校正セット分の最終判定は
+  `screening/final/final_decisions.csv`(343 件・Include 144)として確定済み。

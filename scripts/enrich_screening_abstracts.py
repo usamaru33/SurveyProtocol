@@ -7,7 +7,7 @@ enrich_screening_abstracts.py — Phase 3b 判定対象の要旨を DOI から�
 ⚠️ **外部 API に通信する**(Crossref / Semantic Scholar)。著者の指示があるときだけ実行する。
 
 【何を】
-Phase 3b の判定対象(`screening/assignment.csv` の全レコード)のうち **要旨が無いもの**に
+Phase 3b の判定対象(`screening/stage1/assignment.csv` の全レコード)のうち **要旨が無いもの**に
 ついて、DOI をキーに要旨を取得し、`outputs/enriched_abstracts.csv` にキャッシュする。
 判定シートの生成時(`make_screening_sheets.py`)にこのキャッシュが参照される。
 
@@ -35,7 +35,7 @@ Phase 3b の判定対象(`screening/assignment.csv` の全レコード)のうち
 パイプライン(`pipeline.py`)の入力も step ファイルも一切書き換えない。
 
 【入出力】
-  入力: screening/assignment.csv(判定対象の DOI 一覧)
+  入力: screening/stage1/assignment.csv(判定対象の DOI 一覧)
         step3_kw_included.csv / outputs/snowballing_log.csv(既存の要旨の有無を見る)
   出力: outputs/enriched_abstracts.csv
         列: doi, abstract, source, chars, fetched_at
@@ -140,7 +140,7 @@ def load_cache(path: Path) -> dict[str, dict]:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="Phase 3b 判定対象の要旨を DOI から補完")
-    ap.add_argument("--assignment", type=Path, default=ROOT / "screening" / "assignment.csv")
+    ap.add_argument("--assignment", type=Path, default=ROOT / "screening" / "stage1" / "assignment.csv")
     ap.add_argument("--out", type=Path, default=ROOT / "outputs" / "enriched_abstracts.csv")
     ap.add_argument("--limit", type=int, default=0, help="処理上限(0=無制限)。試験に使う")
     ap.add_argument("--retry-notfound", action="store_true",
