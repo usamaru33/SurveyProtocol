@@ -30,7 +30,7 @@ screening/calibration_supplement/supplement_sheet_*.xlsx
 screening/stage2/stage2_sheet_*.csv
 screening/stage2/stage2_sheet_*.xlsx
 # 協議ミーティング用シートも記入中は追跡しない(埋まったら consensus_worklist.csv へ転記される)。
-screening/consensus/consensus_meeting.xlsx
+screening/consensus/consensus_meeting*.xlsx
 # 過去のバックアップ・取り込み済み提出コピーの退避先。監査証跡としてローカルには残すが追跡しない。
 screening/_archive/
 

@@ -2005,3 +2005,22 @@ stage 2 シート（Kataoka 363件 / Watanabe 346件）を生成し配布して�
 
 - `screening/consensus_meeting*.xlsx`(3 名の判定が並ぶ協議シート。協議 2 回目が未完了のため)。
 - リポジトリ直下の未追跡 `PROGRESS_LOG.md`(`docs/log/PROGRESS_LOG.md` と別物の古い複製。内容は未確認)。
+
+#### 追記(2026-10-13・別デバイスの作業との統合時)
+
+上の 10-13 の記述は、09-12〜09-27 の別デバイスでのコミット(Rev.27・協議1回目の確定・stage 2 取り込み・
+`screening/` の再配置)を取り込む前に書かれた。統合後の状態との差を記録する(上の本文は当時のまま残す)。
+
+- **Rev.27 は記録済み**(`protocol_changelog.md` の 2026-09-12 項と 09-15 追記)。「未実施」は解消している。
+  決定内容は「Rev.21 step 3 を、別の再判定ラウンドを設けず stage 2 の設計に組み込む形で適用し、
+  境界例18件を stage 2 シートの『境界例メモ』として添える(語彙・基準は不変)」。
+- **「52 件」「I 基準 18 件」は Rev.27 で記入済みシートから算出済み**(真の不一致 52 件のうち理由のある 47 件中 18 件=38%)。
+- **κ は記入済みシートで再計算して一致を確認**(0.456 / 0.468 / 0.581、平均 0.502)。要協議 183 件
+  (既解決 77 + 未解決 106)も再現。協議2回目の記入(159 件)は OneDrive の `consensus_meeting_2.xlsx` にあり、
+  リポジトリの `consensus_worklist.csv` へはまだ転記していない。
+- **パスの変更**: 本文中の `screening/stage2_sheet_*.xlsx` は `screening/stage2/`、`consensus_worklist.csv`・
+  `consensus_meeting*.xlsx` は `screening/consensus/`、`final_decisions.csv` は `screening/final/` に移動済み。
+  `scripts/fetch_fulltext.py` の入力パスは `screening/stage1/assignment.csv` に修正した。
+- `.gitignore` の協議シート除外を `consensus_meeting*.xlsx` に広げた(`consensus_meeting_2.xlsx` を誤って追跡しないため)。
+- 「次回やること」3 の校正セットの記入済みシートはこのデバイスにある。校正セット分の最終判定は
+  `screening/final/final_decisions.csv`(343 件・Include 144)として確定済み。
