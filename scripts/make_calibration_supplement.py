@@ -6,7 +6,7 @@ make_calibration_supplement.py — 校正セット拡大の差分だけを補足
 
 【何を】
 校正セットの割合を引き上げたとき(Rev.22: 15% → 20%)、**新たに校正セットへ入った
-文献だけ**を抜き出して `screening/supplement_sheet_<id>.csv` を出力する。
+文献だけ**を抜き出して `screening/calibration_supplement/supplement_sheet_<id>.csv` を出力する。
 
 【なぜ差分なのか — 配布済みの判定を捨てないため】
 校正セットの抽出は `md5("cal:"+key) % 100 < pct` で、**閾値について単調**である。
@@ -30,7 +30,7 @@ make_calibration_supplement.py — 校正セット拡大の差分だけを補足
   出力: screening/calibration_supplement/supplement_sheet_<id>.csv
 
 続けて Excel 版を作る:
-  python -X utf8 scripts/make_screening_xlsx.py --prefix supplement_
+  python -X utf8 scripts/make_screening_xlsx.py --dir screening/calibration_supplement --prefix supplement_
 
 実行:
   python -X utf8 scripts/make_calibration_supplement.py
@@ -128,7 +128,7 @@ def main() -> None:
         print(f"       既存 {len(already)} 件 + 追加 {len(rows)} 件 = {len(already)+len(rows)} 件")
 
     print("\n[NEXT] Excel 版を作る:")
-    print("       python -X utf8 scripts/make_screening_xlsx.py --prefix supplement_")
+    print("       python -X utf8 scripts/make_screening_xlsx.py --dir screening/calibration_supplement --prefix supplement_")
     print("       **既存の sheet_<id>.xlsx は再生成しないこと**(配布済み・記入進行中)")
 
 
