@@ -194,7 +194,10 @@ def write_manual_list(rows: list[dict], path: Path) -> None:
             groups.setdefault(key, []).append(r)
     lines = ["# Phase 4 手動取得リスト", "",
              "`scripts/fetch_fulltext.py` が manifest.csv から自動生成する。手で編集しない。",
-             "取得した PDF は `fulltext/pdf/<record_id>.pdf` に置き、スクリプトを再実行すると担当者フォルダへ配られる。",
+             "ブラウザで開いて保存した PDF(ファイル名はそのままでよい)を `fulltext/inbox/` に入れ、",
+             "`python -X utf8 scripts/sort_fulltext_inbox.py` を実行すると、中身で照合して record_id に振り分け、",
+             "担当者フォルダへ配り、このリストを更新する。照合できなかったファイルは受け箱に残る",
+             "(`--assign \"ファイル名=record_id\"` で手動指定)。出版社サイトの一括・自動ダウンロードは規約違反になるので行わない。",
              "", f"未取得 {sum(map(len, groups.values()))} 件", ""]
     for key, rs in sorted(groups.items(), key=lambda kv: -len(kv[1])):
         lines += [f"## {key}({len(rs)} 件)", ""]
