@@ -1836,3 +1836,82 @@ Li et al. は表から外し、提示上の慣行（Challenges/Opportunities、e
 6. `docs/manuscript-background-and-positioning` の push と PR
 7. `\pending{}` の数値流し込み（§1 に8、§2 に1、全体41）
 8. Overleaf と GitHub の同期運用を決める（ミラーか双方向か）
+
+---
+
+### 2026-09-11 — CSUR査読(11節・白紙査読サブエージェント)への対応、方法論の未決事項3件を保留
+
+`SelfScaleSurvey/docs/reviews/2026-09-11_sec1〜11_*.md` として全11節を査読。対応方針を節ごとに
+`main.tex` 側で協議中(詳細は原稿リポジトリ側)。このうち3件は `SurveyProtocol/docs` を確認したが
+記載がなく、**著者判断が必要な方法論の未決事項**として浮上した。著者の指示により
+**Phase 3b スクリーニング完了まで保留**。Phase 4・Taxonomy コーディング着手前に決定すること。
+
+#### ★ 保留中の未決事項(スクリーニング完了後に決定)
+
+1. **Axis 3(帰属の裁定)の既定コーディング規則。** `rule.md` §3.3(3) は
+   stimulus-overriding/context-dominant/conflict-threshold の3値を定義するが、`main.tex`
+   自身が「著者はそう言う仮説をめったに明示しない」と書いており(main.tex:421-423)、
+   3値のどれにも受動的に転記できないケースの扱いが未定義。選択肢: (a) 報告内容から2名の
+   コーダーが推定してコードする、(b) "Not stated / cannot be determined" を第4の値として追加する。
+   (b) は Axis 2 の Ambiguous/Mixed とカテゴリが重複するリスクがある(査読 §2 M3 で指摘)。
+2. **3軸タキソノミー・コーディングの一致度(κ)を報告するか。** Phase 3b の screening κ
+   (rule.md §3.2、Rev.21 の閾値方針あり)とは別に、Phase 4後の3軸コーディング自体にも
+   Cohen's κ を軸ごとに算出・報告するかは rule.md に記載がない。現状の `main.tex`(905-907行)は
+   「独立にコードし不一致は協議で解消」とだけ書いており、一致度の数値化はしていない(査読 §4 M1)。
+3. **Axis 1(介入モダリティ)に非視覚カテゴリを設けるか。** `rule.md` §3.3(1) は
+   Unimodal を「視覚情報のみを操作する古典的アプローチ」、Multimodal を「視覚を含む」として
+   設計しており、視覚を含まない単感覚・多感覚研究の受け皿が構造的にない。この設計は §2.1
+   の調査目的(視覚優位/非視覚の構造的欠落を示す)と整合しているため意図的だが、Phase 4で
+   該当研究が実際に見つかった場合にどう分類するかが未定義(査読 §6 M2)。
+
+3件とも Phase 4・Taxonomy コーディング開始前に決定すれば手戻りがない。決定次第
+`consistency_audit_log.md` の決定ログ形式で確定させ、`rule.md` と `main.tex` を同時に揃える。
+
+---
+
+### 2026-10-13 — Phase 3b: stage 1/2 完了の確認・協議シート突合・Phase 4 の全文取得開始
+
+#### 現在地(実データで確認)
+
+- **κ(校正セット 223 件・3カテゴリ)は著者×Kataoka 0.456 / 著者×Watanabe 0.468 / Kataoka×Watanabe 0.581、平均 0.502**
+  (別デバイスで算出した値を著者が報告。リポジトリ内には記入済みシートが無く、本セッションでは再計算していない)。
+  Rev.21 の「0.41–0.60」帯に当たる。同帯の規定は「不一致・Unsure の全件協議 → 除外理由の分布を検査 →
+  特定基準に集中していればその基準の全件を3名で再判定」。著者の運用方針は**再判定せず、境界例リストを
+  第2評価の補足として添える**もの(語彙は不変)。これは Rev.21 の文言と異なるため、
+  **Rev.27 として理由を記録し Threats にも明記する必要がある(未実施)**。「集中」の閾値は Rev.21 に定量定義がない。
+- **stage 2 は完了**(`screening/stage2_sheet_*.xlsx`)。確認件数は Kataoka 363 / Watanabe 346(計 709、
+  割当上限は 420/409)。Exclude 699 / Unsure 9 / Include 1。対象は 829 件(1,052−校正 223)から著者 Include の
+  120 件を除いたもの。除外理由は評価者で偏りが異なる(Kataoka は「I: スケール操作/多感覚刺激が無い」225 件、
+  Watanabe は「I: HMD-VR でない」118 件と同 117 件)。
+- **協議シート**: 1 回目 `consensus_meeting.xlsx` は 77 件(3名全員の判定あり。最終 Exclude 60 / Unsure 12 / Include 5)。
+  2 回目 `consensus_meeting_2.xlsx` は 183 件 = 1 回目の 77 件 + **stage 2 由来 106 件**。
+  2 回目の「はじめに」シートは「校正セット 223 件のうち」と書いており 106 件について不正確(要修正)。
+  2 回目時点の最終判定は 159 件記入(Exclude 141 / Include 18)、**空欄 24 件(すべて stage 2 由来)**を
+  協議で決める予定。1 回目で Unsure だった 12 件は 2 回目で全件 Include になっている(同点は Include のルール)。
+  空欄 24 件の一覧は `consensus_meeting_2_blank24.md`。
+- 「判定が割れた 52 件」「I 基準 18 件」という著者の報告値は、シートからは再現できていない(未突合)。
+
+#### Phase 4 の全文取得(暫定)
+
+- `scripts/fetch_fulltext.py` を新設。OpenAlex で OA の PDF の場所を調べ、curl で取得する
+  (Python 単体では TLS の CA が見つからず検証が通らないため curl を使用。TLS 検証は無効にしていない)。
+  購読誌の有料壁は回避しない。出力は `fulltext/`(PDF は `.gitignore` で追跡外、`manifest.csv` のみ追跡)。
+- **暫定対象 162 件**(著者 Include 120 + 協議 Include 18 + 空欄 24)に対し **57 件取得、105 件は手動取得が必要**
+  (IEEE 48 / ACM 10 / DOI なし 10 / その他)。担当ペアは record_id の md5 による仮割当
+  (author×kataoka / author×watanabe / kataoka×watanabe)。
+- **校正セットで 3 名全員が Include だった論文は対象に含まれていない**(記入済みの校正シートが手元に無い)。
+  最終対象は `final_decisions.csv` の確定後に作り直す。
+
+#### 次回やること
+
+1. 協議 2 回目の残り 24 件を決定し、`consensus_worklist.csv` へ転記 → `score_screening.py` で `final_decisions.csv` を確定
+   (`screening/` は凍結中。転記は著者の許可が要る)。
+2. Rev.21 の扱い(再判定するか否か)を Rev.27 として記録する。
+3. 3 名の校正シートか、全員 Include の一覧を取り込み、Phase 4 の対象件数を確定する。
+4. 手動取得分(105 件)を学内ライセンスで取得する。
+5. 保留中の 3 件の方法論判断(上記 9/11 の項)と Rev.26(軸 1 下位区分の定義)を Phase 4 着手前に決める。
+
+#### この PR に含めなかったもの
+
+- `screening/consensus_meeting*.xlsx`(3 名の判定が並ぶ協議シート。協議 2 回目が未完了のため)。
+- リポジトリ直下の未追跡 `PROGRESS_LOG.md`(`docs/log/PROGRESS_LOG.md` と別物の古い複製。内容は未確認)。
