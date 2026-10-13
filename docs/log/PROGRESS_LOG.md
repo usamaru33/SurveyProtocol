@@ -1797,3 +1797,38 @@ stage 2 シート（Kataoka 363件 / Watanabe 346件）を生成し配布して�
 3. `score_screening.py` を再実行 → 未解決0件になれば `final_decisions.csv`（Phase 4送りの最終リスト）を生成
 4. 原稿にκ=0.502(moderate)と診断・対応を記載（未了・9/12から持ち越し）
 5. Overleaf と GitHub の同期運用を決める（未了・9/12から持ち越し）
+
+### 2026-09-27 — screening/ をフェーズ別サブフォルダへ整理
+
+ファイル数が増え見通しが悪くなったため、`screening/` 直下に並んでいた判定関連ファイルを
+フェーズ別サブフォルダへ再配置した。**判定内容・ファイル名・スクリプトの集計ロジックは
+変更していない**（純粋なファイル配置の変更）。
+
+- 新構成: `stage1/`（割当・stage1シート・記入見本・閲覧アプリ関連）/
+  `calibration_supplement/`（校正セット20%引き上げ分）/ `stage2/`（stage2シート）/
+  `consensus/`（協議リスト・協議ミーティング用シート）/ `final/`（最終判定）/
+  `_archive/`（バックアップ・取り込み済み提出コピー・旧日付版、フェーズ別サブフォルダ持ち・追跡しない）
+- 追従して更新したスクリプト: `score_screening.py`・`make_consensus_sheet.py`・
+  `make_calibration_supplement.py`・`make_screening_stage2.py`・`make_screening_xlsx.py`
+  （`--dir` の既定値を `stage1/` に変更、stage2/補足には `--dir` を明示指定する運用へ）・
+  `make_screening_sheets.py`・`make_screening_example.py`・`apply_review_decisions.py`・
+  `make_review_app.py`・`translate_abstracts.py`・`enrich_screening_abstracts.py`・
+  `audit_manuscript_figures.py`・`known_item_screening_audit.py`・`add_stage2_note.py`
+- `.gitignore` のパターンも新パスに追従（`screening/_archive/` は丸ごと追跡除外）
+- **検証**: 移動後に `score_screening.py` を再実行し、κ(0.502・moderate)・
+  一致869件/要協議183件(内訳は変更前と同一)が完全に再現することを確認。
+  `consensus_worklist.csv` は移動前と diff ゼロ(内容の変更なし、パスのみ移動)。
+  `make_consensus_sheet.py` も新パスで正常動作を確認。
+- 追従して更新した文書: `screening/README.md`(新設§0に構成図を追加)・
+  `docs/protocol/screening_protocol.md`・ルート `README.md`・
+  `.claude/skills/survey-pr/SKILL.md`。
+  `docs/log/protocol_changelog.md`・`consistency_audit_log.md` 等の**過去日付の記述は
+  当時のパスのまま変更していない**(履歴の書き換えを避けるため)。
+
+#### 次回やること
+
+1. **3名で `screening/consensus/consensus_meeting.xlsx` の新規106件を協議**（3者3様の9件を優先）。解決しなければ Include に倒す
+2. 協議結果を `screening/consensus/consensus_worklist.csv` の `final_decision` / `consensus_note` へ転記
+3. `score_screening.py` を再実行 → 未解決0件になれば `screening/final/final_decisions.csv`（Phase 4送りの最終リスト）を生成
+4. 原稿にκ=0.502(moderate)と診断・対応を記載（未了・9/12から持ち越し）
+5. Overleaf と GitHub の同期運用を決める（未了・9/12から持ち越し）

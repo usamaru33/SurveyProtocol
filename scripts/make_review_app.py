@@ -14,8 +14,8 @@
   したがって本ツールが提供するのは **読む速度** であって **判断の代行** ではない。
   キーワードは「並べ替え」と「ハイライト」にのみ使う(下記 --rules)。
 
-入力:  screening/sheet_<id>.csv (雛形。既に xlsx に記入があればそれも読む)
-出力:  screening/review_<id>.html  … 単体で開けるHTML(依存なし・オフライン動作)
+入力:  screening/stage1/sheet_<id>.csv (雛形。既に xlsx に記入があればそれも読む)
+出力:  screening/stage1/review_<id>.html  … 単体で開けるHTML(依存なし・オフライン動作)
 
 使い方:
     python -X utf8 scripts/make_review_app.py                # 著者用
@@ -27,7 +27,7 @@
 `scripts/apply_review_decisions.py`。
 
 途中経過は `S` キーで JSON へ書き出し、`L` キーで読み戻せる(既定の保存先は
-`screening/json/progress_<id>.json`)。localStorage はブラウザの閲覧データ削除で
+`screening/stage1/json/progress_<id>.json`)。localStorage はブラウザの閲覧データ削除で
 消えるため、JSON がその唯一のバックアップになる。JSON は
 `apply_review_decisions.py --input ...json` でそのまま xlsx へ反映できる。
 """
@@ -52,7 +52,7 @@ csv.field_size_limit(10 ** 9)
 from make_screening_xlsx import DECISIONS, EXCLUDE_REASONS, REASON_OTHER  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-SCREENING = ROOT / "screening"
+SCREENING = ROOT / "screening" / "stage1"
 
 # 複数該当時の優先順位 (Rev.24)。正は docs/reference/reviewer_briefing.md §3.3。
 #   上位ほど「下位の基準を評価する前提そのものが崩れている」順に並ぶ。
@@ -360,7 +360,7 @@ select{font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);
     xlsx に反映してください。<br><br>
     <b>途中保存は <kbd>S</kbd>。</b> 判定を JSON ファイル
     （<code>progress___SHEET_ID__.json</code>）へ書き出します。保存先フォルダは
-    初回に一度だけ選びます（<code>screening/json</code> を選んでください）。2回目以降は
+    初回に一度だけ選びます（<code>screening/stage1/json</code> を選んでください）。2回目以降は
     同じフォルダへ上書きします。<kbd>L</kbd> でそのファイルを読み戻し、
     <kbd>Shift</kbd>+<kbd>L</kbd> でファイルを選んで読み込みます。<br>
     localStorage は<b>ブラウザの閲覧データを消すと一緒に消えます</b>。JSON がその唯一の
@@ -531,7 +531,7 @@ function download(text,name,type){
 // ---- 途中経過の JSON 書き出し / 読み込み -------------------------------------
 // localStorage はブラウザの閲覧データ削除・別PC・別ブラウザで失われる。1,052件を
 // 読み直す羽目になるので、同じ内容をファイルへ退避できるようにする。
-// 保存先フォルダ(screening/json/)は初回に一度だけ選ぶ。File System Access API の
+// 保存先フォルダ(screening/stage1/json/)は初回に一度だけ選ぶ。File System Access API の
 // ハンドルを IndexedDB に覚えるので、2回目以降はダイアログなしで上書きできる。
 // IndexedDB が使えない環境ではセッション中だけ覚え、API 自体が無ければ通常の
 // ダウンロードへ落とす。どの経路でも保存自体は必ずできるようにしてある。
@@ -656,7 +656,7 @@ async function saveJSON(){
   download(text,PROGRESS_FILE,"application/json");
   noteSaved(p,"（ダウンロード）"+PROGRESS_FILE);
   toast("書き出した: "+PROGRESS_FILE+"（判定済 "+p.counts.done
-       +" 件）ダウンロードフォルダから screening/json/ へ移すこと");
+       +" 件）ダウンロードフォルダから screening/stage1/json/ へ移すこと");
 }
 
 // 受け取った JSON は「他人が書いたかもしれないファイル」として扱う。
@@ -926,11 +926,11 @@ def main() -> None:
               + (f"（原文と不一致で不採用 {stale:,} 件）" if stale > 0 else ""))
     print(f"     指紋 {fingerprint(payload)}（進捗JSON の照合に使う）")
     print(f"     ブラウザで開いて判定 → E キーで decisions_{args.id}.csv を書き出す")
-    print(f"     途中保存: S キーで JSON 書き出し（保存先フォルダは初回に screening/json を選ぶ）")
+    print(f"     途中保存: S キーで JSON 書き出し（保存先フォルダは初回に screening/stage1/json を選ぶ）")
     print(f"     途中復帰: L キーで JSON 読み込み（Shift+L でファイルを選ぶ）")
     print(f"     反映: python -X utf8 scripts/apply_review_decisions.py "
           f"--id {args.id} --input decisions_{args.id}.csv")
-    print(f"           （JSON をそのまま渡してもよい: --input screening/json/progress_{args.id}.json）")
+    print(f"           （JSON をそのまま渡してもよい: --input screening/stage1/json/progress_{args.id}.json）")
 
 
 if __name__ == "__main__":

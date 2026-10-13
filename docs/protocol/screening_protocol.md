@@ -70,7 +70,7 @@ python -X utf8 scripts/make_screening_sheets.py
 python -X utf8 scripts/make_screening_xlsx.py
 ```
 
-出力（`screening/`）:
+出力（`screening/stage1/`。2026-09-27 にフェーズ別サブフォルダへ整理、詳細は `screening/README.md` §0）:
 
 | ファイル | 内容 | 誰が触るか |
 |---|---|---|
@@ -223,10 +223,10 @@ python -X utf8 scripts/make_screening_xlsx.py
 
 ```bash
 python -X utf8 scripts/make_screening_stage2.py
-python -X utf8 scripts/make_screening_xlsx.py --prefix stage2_
+python -X utf8 scripts/make_screening_xlsx.py --dir screening/stage2 --prefix stage2_
 ```
 
-`screening/stage2_sheet_<id>.xlsx` が出力される。**著者の判定は入っていない**
+`screening/stage2/stage2_sheet_<id>.xlsx` が出力される。**著者の判定は入っていない**
 （見えると独立性が壊れるため、判定列は空にしてある）。
 
 ---
@@ -245,7 +245,7 @@ python -X utf8 scripts/score_screening.py
 2. **ペアごとの Cohen's κ とその平均**（3カテゴリ版が主報告。Unsure→Include に寄せた
    2カテゴリ版も参考として併記される。どちらを本文に載せるかは著者が決めるが、
    **両方を出したうえで選ぶ**ことで恣意的に見えないようにしている）
-3. `screening/consensus_worklist.csv` — 不一致と Unsure だけを抜いた協議リスト
+3. `screening/consensus/consensus_worklist.csv` — 不一致と Unsure だけを抜いた協議リスト
 4. **κ の閾値判定と、発動すべき対応**（Rev.21。下記）
 
 ### κ が基準を下回った場合（Rev.21、2026-08-20 事前確定）
@@ -274,7 +274,7 @@ python -X utf8 scripts/score_screening.py
 > 明記すること。後から件数を数えられる状態にしておく。
 
 再度 `score_screening.py` を実行すると、未解決がゼロなら
-`screening/final_decisions.csv`（最終判定）が生成される。Include のものが Phase 4 へ進む。
+`screening/final/final_decisions.csv`（最終判定）が生成される。Include のものが Phase 4 へ進む。
 
 ---
 
@@ -292,10 +292,10 @@ PRISMA / 本文に載せるため、以下を `score_screening.py` の出力か�
 `screening/` 一式（割当・各評価者のシート・協議リスト・最終判定）は
 **監査可能性のため supplementary material として公開する**。
 
-> **バージョン管理での扱い（注意）:** 各評価者のシート `sheet_*.csv` / `sheet_*.xlsx` は
+> **バージョン管理での扱い（注意）:** 各評価者のシート `stage1/sheet_*.csv` / `.xlsx` は
 > **記入中は `.gitignore` で追跡しない**。3人分がリポジトリに入ると互いの判定が
 > 見えてしまい、独立性が壊れるため。ただしこれらは `rule.md` が要求する監査証跡でも
-> あるので、**スクリーニング完了後に `git add -f screening/sheet_*.csv` で必ず
+> あるので、**スクリーニング完了後に `git add -f screening/stage1/sheet_*.csv` で必ず
 > 追跡に加える**こと。割当表・協議リスト・最終判定は最初から追跡している。
 
 ---
@@ -319,7 +319,7 @@ PRISMA / 本文に載せるため、以下を `score_screening.py` の出力か�
 python -X utf8 scripts/make_screening_example.py
 ```
 
-出力: `screening/EXAMPLE_記入見本.xlsx`（全員に同じものを配る）
+出力: `screening/stage1/EXAMPLE_記入見本.xlsx`（全員に同じものを配る）
 
 5件の例で次を示している。
 
@@ -359,10 +359,10 @@ python -X utf8 scripts/make_screening_example.py
 ### 配布物
 
 ```
-screening/EXAMPLE_記入見本.xlsx   ← 全員に配る
-screening/sheet_kataoka.xlsx      ← Kataoka（164件・2026-08-19 配布）
-screening/sheet_watanabe.xlsx     ← WATANABE（164件・2026-08-19 配布）
-screening/supplement_sheet_kataoka.xlsx   ← Kataoka 追加59件（Rev.22・2026-08-20）
-screening/supplement_sheet_watanabe.xlsx  ← WATANABE 追加59件（Rev.22・2026-08-20）
-screening/sheet_author.xlsx       ← 著者（1,052件）
+screening/stage1/EXAMPLE_記入見本.xlsx   ← 全員に配る
+screening/stage1/sheet_kataoka.xlsx      ← Kataoka（164件・2026-08-19 配布）
+screening/stage1/sheet_watanabe.xlsx     ← WATANABE（164件・2026-08-19 配布）
+screening/calibration_supplement/supplement_sheet_kataoka.xlsx   ← Kataoka 追加59件（Rev.22・2026-08-20）
+screening/calibration_supplement/supplement_sheet_watanabe.xlsx  ← WATANABE 追加59件（Rev.22・2026-08-20）
+screening/stage1/sheet_author.xlsx       ← 著者（1,052件）
 ```

@@ -44,10 +44,10 @@ MD5 から決める。乱数を使わないので**誰がいつ実行しても�
 **全件を判定する義務は変わらない**。
 
 【出力】
-  screening/assignment.csv         割当の正(record_id・calibration・第2評価者)
-  screening/sheet_author.csv       著者の判定シート(全1,052件)
-  screening/sheet_kataoka.csv      Kataoka の stage 1 シート(校正セットのみ)
-  screening/sheet_watanabe.csv     WATANABE の stage 1 シート(校正セットのみ)
+  screening/stage1/assignment.csv         割当の正(record_id・calibration・第2評価者)
+  screening/stage1/sheet_author.csv       著者の判定シート(全1,052件)
+  screening/stage1/sheet_kataoka.csv      Kataoka の stage 1 シート(校正セットのみ)
+  screening/stage1/sheet_watanabe.csv     WATANABE の stage 1 シート(校正セットのみ)
 
 実行:
   python -X utf8 scripts/make_screening_sheets.py
@@ -271,7 +271,7 @@ def main() -> None:
     ap.add_argument("--abstract-cache", type=Path,
                     default=ROOT / "outputs" / "enriched_abstracts.csv",
                     help="DOI から補完した要旨のキャッシュ(人手判定の材料としてのみ使う)")
-    ap.add_argument("--outdir", type=Path, default=ROOT / "screening")
+    ap.add_argument("--outdir", type=Path, default=ROOT / "screening" / "stage1")
     ap.add_argument("--dry-run", action="store_true", help="件数だけ表示して書き込まない")
     args = ap.parse_args()
 

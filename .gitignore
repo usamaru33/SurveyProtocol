@@ -18,18 +18,21 @@ raw/IEEE2/
 # 理由: 3人分をコミットすると互いの判定が見えてしまい、二重スクリーニングの
 # 独立性が壊れる(κ が意味を失う)。
 # ただし判定シートは rule.md が要求する監査証跡でもあるため、
-# **スクリーニング完了後に `git add -f screening/sheet_*.csv` で必ず追跡に加える**
+# **スクリーニング完了後に `git add -f screening/stage1/sheet_*.csv` で必ず追跡に加える**
 # (独立性はその時点で問題にならず、公開義務だけが残るため)。
 # 割当表・協議リスト・最終判定は最初から追跡する。
-screening/sheet_*.csv
-screening/sheet_*.xlsx
+# 2026-09-27: screening/ をフェーズ別サブフォルダへ整理したのに合わせてパスを更新。
+screening/stage1/sheet_*.csv
+screening/stage1/sheet_*.xlsx
 # 接頭辞つきの派生シートも同じ理由で追跡しない。
-# `screening/sheet_*` は "supplement_sheet_..." や "stage2_sheet_..." に一致しないため
-# 明示的に列挙する(2026-08-20 に補足シートを作った際に判明した穴)。
-screening/supplement_sheet_*.csv
-screening/supplement_sheet_*.xlsx
-screening/stage2_sheet_*.csv
-screening/stage2_sheet_*.xlsx
+screening/calibration_supplement/supplement_sheet_*.csv
+screening/calibration_supplement/supplement_sheet_*.xlsx
+screening/stage2/stage2_sheet_*.csv
+screening/stage2/stage2_sheet_*.xlsx
+# 協議ミーティング用シートも記入中は追跡しない(埋まったら consensus_worklist.csv へ転記される)。
+screening/consensus/consensus_meeting.xlsx
+# 過去のバックアップ・取り込み済み提出コピーの退避先。監査証跡としてローカルには残すが追跡しない。
+screening/_archive/
 
 # Excel の一時ロックファイル(シートを開いている間だけ生成される)。
 # 配布物に紛れると受け取り側が混乱するため、追跡もアーカイブもしない。
@@ -47,11 +50,11 @@ screening/~$*
 # 閲覧アプリの生成物と、そこから書き出す判定 CSV。
 # 判定シートと同じ理由で追跡しない（3人分が入ると互いの判定が見え独立性が壊れる）。
 # HTML はコーパス全文を埋め込んだ生成物でもあるため、リポジトリには置かない。
-screening/review_*.html
+screening/stage1/review_*.html
 decisions_*.csv
-screening/decisions_*.csv
+screening/stage1/decisions_*.csv
 # 閲覧アプリの途中保存(進捗JSON)。中身は判定そのものなので CSV と同じ理由で
 # 追跡しない。フォルダは追跡したい(クローン直後に保存先として選べるように)ので、
 # 中の JSON だけを除外する。
-screening/json/*.json
-screening/*.bak.xlsx
+screening/stage1/json/*.json
+screening/**/*.bak.xlsx

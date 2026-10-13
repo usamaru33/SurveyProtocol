@@ -11,8 +11,8 @@ Rev.27（`docs/log/protocol_changelog.md`）で決めた対応:
 既存の判定シート(`make_screening_xlsx.py`)には手を入れず、追加シートとして挿入するだけ。
 
 【入出力】
-  入力: screening/consensus_worklist.csv(final_decision 記入済み)
-  出力: screening/stage2_sheet_<id>.xlsx に「境界例メモ(参考)」シートを追加(上書き)
+  入力: screening/consensus/consensus_worklist.csv(final_decision 記入済み)
+  出力: screening/stage2/stage2_sheet_<id>.xlsx に「境界例メモ(参考)」シートを追加(上書き)
 
 実行:
   python -X utf8 scripts/add_stage2_note.py
@@ -53,7 +53,7 @@ INTRO_LINES = [
 
 
 def load_examples() -> list[dict]:
-    wpath = ROOT / "screening" / "consensus_worklist.csv"
+    wpath = ROOT / "screening" / "consensus" / "consensus_worklist.csv"
     with wpath.open(encoding="utf-8-sig", newline="") as f:
         rows = list(csv.DictReader(f))
     return [r for r in rows
@@ -106,7 +106,7 @@ def main() -> None:
     if not examples:
         sys.exit("[ERROR] consensus_worklist.csv に対象レコードが無い(final_decision未記入?)")
     for rv in ("kataoka", "watanabe"):
-        path = ROOT / "screening" / f"stage2_sheet_{rv}.xlsx"
+        path = ROOT / "screening" / "stage2" / f"stage2_sheet_{rv}.xlsx"
         if not path.exists():
             print(f"[SKIP] {path.name} が無い")
             continue

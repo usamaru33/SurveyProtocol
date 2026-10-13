@@ -32,7 +32,7 @@ csv.field_size_limit(10 ** 9)
 from make_screening_xlsx import DECISIONS, REASON_OTHER, REASON_VALUES  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-SCREENING = ROOT / "screening"
+SCREENING = ROOT / "screening" / "stage1"
 CANON = {d.lower(): d for d in DECISIONS}
 
 
@@ -75,7 +75,7 @@ def main() -> None:
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--id", default="author")
     ap.add_argument("--input", required=True, type=Path,
-                    help="decisions_<id>.csv または screening/json/progress_<id>.json")
+                    help="decisions_<id>.csv または screening/stage1/json/progress_<id>.json")
     ap.add_argument("--dry-run", action="store_true", help="検証だけして書かない")
     ap.add_argument("--force", action="store_true",
                     help="既存の判定を上書きする（既定は拒否）")

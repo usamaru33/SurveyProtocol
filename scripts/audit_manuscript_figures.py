@@ -144,7 +144,7 @@ for r in new:
     uniq.setdefault(r['found_doi'].strip().lower()
                     or 'T:' + r['found_title'].strip().lower(), r)
 titled = [r for r in uniq.values() if r['found_title'].strip()]
-sheet = load('screening/sheet_author.csv')
+sheet = load('screening/stage1/sheet_author.csv')
 snow = [r for r in sheet if r['source'] == 'snowballing']
 check('one-hop records', len(sb), 475)
 check('already in database corpus', len(sb) - len(new), 158)
@@ -158,7 +158,7 @@ print()
 print('== screening corpus ==')
 check('total records', len(sheet), 1052)
 check('database route', sum(1 for r in sheet if r['source'] == 'database'), 795)
-check('calibration set', sum(1 for r in load('screening/assignment.csv')
+check('calibration set', sum(1 for r in load('screening/stage1/assignment.csv')
                              if r['calibration'] == 'Y'), 223)
 check('no abstract at screening',
       sum(1 for r in sheet if r['has_abstract'] == 'N'), 191)

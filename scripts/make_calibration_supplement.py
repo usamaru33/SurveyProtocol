@@ -25,9 +25,9 @@ make_calibration_supplement.py — 校正セット拡大の差分だけを補足
 (そちらに載っている文献は引き続き校正セットである)。
 
 【入出力】
-  入力: screening/assignment.csv        (新しい割合で再生成済み)
-        screening/sheet_<id>.csv        (配布済み。どの文献が既出かの判定に使う)
-  出力: screening/supplement_sheet_<id>.csv
+  入力: screening/stage1/assignment.csv (新しい割合で再生成済み)
+        screening/stage1/sheet_<id>.csv (配布済み。どの文献が既出かの判定に使う)
+  出力: screening/calibration_supplement/supplement_sheet_<id>.csv
 
 続けて Excel 版を作る:
   python -X utf8 scripts/make_screening_xlsx.py --prefix supplement_
@@ -64,7 +64,9 @@ def main() -> None:
     ap.add_argument("--force", action="store_true", help="既存の補足シートを上書きする")
     args = ap.parse_args()
 
-    apath = args.dir / "assignment.csv"
+    stage1_dir = args.dir / "stage1"
+    calib_dir = args.dir / "calibration_supplement"
+    apath = stage1_dir / "assignment.csv"
     if not apath.exists():
         sys.exit("[ERROR] assignment.csv が無い。先に make_screening_sheets.py を実行すること")
 
@@ -75,7 +77,7 @@ def main() -> None:
     targets = [r for r in REVIEWERS if r != "author"]
 
     for rev in targets:
-        existing_path = args.dir / f"sheet_{rev}.csv"
+        existing_path = stage1_dir / f"sheet_{rev}.csv"
         if not existing_path.exists():
             sys.exit(f"[ERROR] {existing_path.name} が無い。配布済みシートが必要")
         already = {r["record_id"] for r in load(existing_path)}
@@ -87,7 +89,7 @@ def main() -> None:
 
         # 補足シートの行は「判定対象の全件シート」から引く。
         # 著者シートは全1,052件を含むため、ここから該当行を取り出せる。
-        src = load(args.dir / "sheet_author.csv")
+        src = load(stage1_dir / "sheet_author.csv")
         rows = [r for r in src if r["record_id"] in add_ids]
         if len(rows) != len(add_ids):
             sys.exit(f"[ERROR] {rev}: 追加対象 {len(add_ids)} 件のうち "
@@ -110,10 +112,11 @@ def main() -> None:
             return (kw, yr, r["record_id"])
         rows.sort(key=sort_key)
 
-        out = args.dir / f"supplement_sheet_{rev}.csv"
+        out = calib_dir / f"supplement_sheet_{rev}.csv"
         if out.exists() and not args.force:
             print(f"[SKIP] {out.name} は既にある(上書きするなら --force)")
             continue
+        calib_dir.mkdir(parents=True, exist_ok=True)
         with out.open("w", encoding="utf-8-sig", newline="") as f:
             w = csv.DictWriter(f, fieldnames=SHEET_COLS, extrasaction="ignore")
             w.writeheader()

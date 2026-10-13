@@ -48,7 +48,7 @@ git -C SurveyProtocol diff --stat origin/main..HEAD | grep -i "sheet_"
 |---|---|
 | PRISMA の各段の件数 | `README.md`・`docs/log/PROGRESS_LOG.md`・`docs/protocol/rule.md`・`docs/log/protocol_changelog.md` |
 | Phase 3b の判定対象・内訳 | 上記 + `screening/README.md`・`docs/protocol/screening_protocol.md` |
-| 割当件数（校正セット・第2評価者） | `screening/README.md`・`docs/protocol/screening_protocol.md`・`screening/assignment.csv` |
+| 割当件数（校正セット・第2評価者） | `screening/README.md`・`docs/protocol/screening_protocol.md`・`screening/stage1/assignment.csv` |
 | 要旨欠落・補完件数 | `docs/protocol/screening_protocol.md`・`screening/README.md` |
 
 ```bash
@@ -63,7 +63,7 @@ grep -rnE "1,052|14,682|795|257|191|164" README.md docs/*.md screening/README.md
 python -X utf8 -c "
 import csv; csv.field_size_limit(10**9)
 from collections import Counter
-rows=list(csv.DictReader(open('screening/sheet_author.csv',encoding='utf-8-sig')))
+rows=list(csv.DictReader(open('screening/stage1/sheet_author.csv',encoding='utf-8-sig')))
 print('総件数:', len(rows))
 print('取得経路:', dict(Counter(r['source'] for r in rows)))
 print('要旨なし:', sum(1 for r in rows if r['has_abstract']=='N'))
@@ -113,7 +113,7 @@ python -X utf8 scripts/make_screening_example.py
 > python -X utf8 -c "
 > import openpyxl
 > for n in ['author','kataoka','watanabe']:
->     ws=openpyxl.load_workbook(f'screening/sheet_{n}.xlsx')['判定']
+>     ws=openpyxl.load_workbook(f'screening/stage1/sheet_{n}.xlsx')['判定']
 >     print(n, sum(1 for r in range(2,ws.max_row+1) if ws.cell(r,2).value), '件記入済')
 > "
 > ```

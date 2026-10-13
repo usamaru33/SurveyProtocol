@@ -6,7 +6,7 @@ make_screening_example.py — 配布時に見せる「記入見本」シート�
 
 【何を】
 評価者に判定シートを配るとき、**どう記入すればよいかを示す見本**(1ファイル)を作る。
-`screening/EXAMPLE_記入見本.xlsx`。
+`screening/stage1/EXAMPLE_記入見本.xlsx`。
 
 【★ 実際の判定は絶対に入れない】
 本プロトコルは `rule.md` Rev.2 で **包含/除外判定に LLM を一切使用しない**と定めており、
@@ -24,7 +24,7 @@ make_screening_example.py — 配布時に見せる「記入見本」シート�
 
 【使い方】
   python -X utf8 scripts/make_screening_example.py
-  → screening/EXAMPLE_記入見本.xlsx を評価者に配る(実シートと一緒に)
+  → screening/stage1/EXAMPLE_記入見本.xlsx を評価者に配る(実シートと一緒に)
 
 **配布前に著者が内容を確認し、必要なら判定・理由を書き換えること。**
 見本の判定は「記入の形式」を示すためのもので、著者の判断として提示される。
@@ -135,7 +135,7 @@ def main() -> None:
                 "year": (r.get("Year") or "").strip()}
 
     # 汚染チェック: 見本の文献が判定対象に入っていないことを確認する
-    apath = ROOT / "screening" / "assignment.csv"
+    apath = ROOT / "screening" / "stage1" / "assignment.csv"
     target_dois = set()
     if apath.exists():
         with apath.open(encoding="utf-8-sig", newline="") as f:
@@ -166,7 +166,7 @@ def main() -> None:
     if not rows:
         sys.exit("[ERROR] 見本に使える文献が1件も見つかりませんでした")
 
-    out_csv = ROOT / "screening" / "EXAMPLE_記入見本.csv"
+    out_csv = ROOT / "screening" / "stage1" / "EXAMPLE_記入見本.csv"
     out_csv.parent.mkdir(parents=True, exist_ok=True)
     with out_csv.open("w", encoding="utf-8-sig", newline="") as f:
         w = csv.DictWriter(f, fieldnames=SHEET_COLS, extrasaction="ignore")
@@ -220,7 +220,7 @@ def main() -> None:
     # 見本であることを視覚的にも示す(色だけに頼らず、source 列に「見本」と入れてある)
     ws["A1"].fill = PatternFill("solid", fgColor="9C0006")
     wb.active = 1
-    out_xlsx = ROOT / "screening" / "EXAMPLE_記入見本.xlsx"
+    out_xlsx = ROOT / "screening" / "stage1" / "EXAMPLE_記入見本.xlsx"
     wb.save(out_xlsx)
     print(f"[INFO] 出力: {out_xlsx.name}")
     print("\n[NEXT] 配布前に著者が内容を確認し、必要なら判定・理由を書き換えること。")

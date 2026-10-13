@@ -18,9 +18,10 @@ Watanabe **3名全員の判定・除外理由・メモ**を1行に並べたシ�
 「内訳」(何対何で割れているか)列を追加した点。
 
 【入出力】
-  入力: screening/assignment.csv, screening/sheet_<id>.csv, screening/supplement_sheet_<id>.csv
+  入力: screening/consensus/consensus_worklist.csv, screening/stage1/sheet_<id>.csv,
+        screening/calibration_supplement/supplement_sheet_<id>.csv
         (xlsx があれば xlsx を優先。score_screening.py と同じ読み込みを使う)
-  出力: screening/consensus_meeting.xlsx
+  出力: screening/consensus/consensus_meeting.xlsx
 
 実行:
   python -X utf8 scripts/make_consensus_sheet.py
@@ -68,18 +69,18 @@ REVIEWER_LABEL = {"author": "著者", "kataoka": "Kataoka", "watanabe": "Watanab
 # 幅は make_screening_xlsx.COLUMNS の対応列(ID/タイトル/DOI/掲載先/要旨/判定/理由/メモ)に合わせた。
 META_COLUMNS = [
     ("ID", 13, False, False),
-    ("タイトル", 52, True, False),
-    ("DOI", 26, False, False),
-    ("掲載先", 30, True, False),
-    ("要旨", 95, True, False),
+    ("タイトル", 48, True, False),
+    ("DOI", 24, False, False),
+    ("掲載先", 24, True, False),
+    ("要旨", 70, True, False),
 ]
 PER_REVIEWER_COLUMNS = [
-    ("判定", 13, False, False),
-    ("理由", 34, True, False),
-    ("メモ", 22, True, False),
+    ("判定", 11, False, False),
+    ("理由", 30, True, False),
+    ("メモ", 24, True, False),
 ]
 TAIL_COLUMNS = [
-    ("内訳", 20, False, False),
+    ("内訳", 22, False, False),
     ("最終判定 ★", 13, False, True),
     ("協議メモ ★", 34, True, True),
 ]
@@ -129,7 +130,7 @@ INTRO = [
     ("・入力する2列以外はロックしてあります(誤編集の防止)。", ""),
     ("", ""),
     ("■ 終わったら", "h"),
-    ("この内容を screening/consensus_worklist.csv の final_decision / consensus_note へ転記し、", ""),
+    ("この内容を screening/consensus/consensus_worklist.csv の final_decision / consensus_note へ転記し、", ""),
     ("score_screening.py を再実行してください(final_decisions.csv が確定します)。", ""),
 ]
 
@@ -137,10 +138,15 @@ INTRO = [
 def load_all_sheets() -> dict[str, dict[str, dict]]:
     sheets = {}
     for rid in REVIEWER_ORDER:
-        base = load_sheet(ROOT / "screening" / f"sheet_{rid}.csv")
-        sup = load_sheet(ROOT / "screening" / f"supplement_sheet_{rid}.csv")
+        base = load_sheet(ROOT / "screening" / "stage1" / f"sheet_{rid}.csv")
+        sup = load_sheet(ROOT / "screening" / "calibration_supplement" / f"supplement_sheet_{rid}.csv")
         merged = dict(sup)
         merged.update(base)
+        if rid != "author":
+            # stage 2(著者が Exclude/Unsure にした分の第2評価)。校正セットとは
+            # record_id が重複しないので単純にマージしてよい。
+            stage2 = load_sheet(ROOT / "screening" / "stage2" / f"stage2_sheet_{rid}.csv")
+            merged.update(stage2)
         sheets[rid] = merged
     return sheets
 
@@ -215,7 +221,7 @@ def build_sheet(ws, rows: list[dict]) -> None:
         ws.row_dimensions[i].height = 85
 
     last = len(rows) + 1
-    ws.freeze_panes = "C2"     # 見出し行 + ID・タイトル列を固定(個人シートは ID 列のみ固定)
+    ws.freeze_panes = "F2"     # 見出し行 + 書誌情報5列(ID〜要旨)を固定
     ws.auto_filter.ref = f"A1:{get_column_letter(len(columns))}{last}"
 
     # --- 最終判定列のドロップダウン(個人シートの判定列と同じ方式) ---
@@ -246,7 +252,7 @@ def build_sheet(ws, rows: list[dict]) -> None:
 
 
 def main() -> None:
-    wpath = ROOT / "screening" / "consensus_worklist.csv"
+    wpath = ROOT / "screening" / "consensus" / "consensus_worklist.csv"
     if not wpath.exists():
         sys.exit(f"[ERROR] {wpath} がありません。先に score_screening.py を実行すること")
     with wpath.open(encoding="utf-8-sig", newline="") as f:
@@ -300,12 +306,14 @@ def main() -> None:
     ws = wb.create_sheet("協議")
     build_sheet(ws, rows)
     wb.active = 1
-    wb.save(ROOT / "screening" / "consensus_meeting.xlsx")
+    out_dir = ROOT / "screening" / "consensus"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    wb.save(out_dir / "consensus_meeting.xlsx")
 
-    print(f"[INFO] 出力: screening/consensus_meeting.xlsx  ({len(rows):,} 件)")
+    print(f"[INFO] 出力: screening/consensus/consensus_meeting.xlsx  ({len(rows):,} 件)")
     print(f"       3者が3通りに割れているもの: {n_flagged} 件(先頭に配置・淡い赤でハイライト)")
     print("[NEXT] ミーティングで「最終判定 ★」「協議メモ ★」を記入したら、")
-    print("       その内容を screening/consensus_worklist.csv の final_decision / consensus_note へ")
+    print("       その内容を screening/consensus/consensus_worklist.csv の final_decision / consensus_note へ")
     print("       転記して score_screening.py を再実行すること(final_decisions.csv が生成される)。")
 
 

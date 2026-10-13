@@ -27,8 +27,8 @@ stage 2 では配らない。κ はこの校正セットで算出する
 (除外プールだけでは著者の判定に分散が無く κ が常に 0 になるため)。
 
 【入出力】
-  入力: screening/assignment.csv, screening/sheet_author.(xlsx|csv)
-  出力: screening/stage2_sheet_<id>.csv / .xlsx
+  入力: screening/stage1/assignment.csv, screening/stage1/sheet_author.(xlsx|csv)
+  出力: screening/stage2/stage2_sheet_<id>.csv / .xlsx
 
 実行:
   python -X utf8 scripts/make_screening_stage2.py
@@ -59,13 +59,15 @@ def main() -> None:
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
-    apath = args.dir / "assignment.csv"
+    stage1_dir = args.dir / "stage1"
+    stage2_dir = args.dir / "stage2"
+    apath = stage1_dir / "assignment.csv"
     if not apath.exists():
         sys.exit(f"[ERROR] {apath} がありません")
     with apath.open(encoding="utf-8-sig", newline="") as f:
         assignment = {r["record_id"]: r for r in csv.DictReader(f)}
 
-    author = load_sheet(args.dir / "sheet_author.csv")
+    author = load_sheet(stage1_dir / "sheet_author.csv")
     if not author:
         sys.exit("[ERROR] 著者の判定シートが読めません")
 
@@ -109,8 +111,9 @@ def main() -> None:
         print("\n[DRY-RUN] ファイルは書き込んでいない。")
         return
 
+    stage2_dir.mkdir(parents=True, exist_ok=True)
     for r, lst in per.items():
-        p = args.dir / f"stage2_sheet_{r}.csv"
+        p = stage2_dir / f"stage2_sheet_{r}.csv"
         if p.exists():
             print(f"[SKIP] {p.name} は既にある(記入済みを壊さないため生成しない)")
             continue
@@ -121,7 +124,7 @@ def main() -> None:
         print(f"[INFO] 出力: {p.name}  ({len(lst):,} 行)  担当={REVIEWERS[r]}")
 
     print("\n[NEXT] Excel 版は "
-          "`python -X utf8 scripts/make_screening_xlsx.py --prefix stage2_` で作る。")
+          "`python -X utf8 scripts/make_screening_xlsx.py --dir screening/stage2 --prefix stage2_` で作る。")
     print("       ★ 第2評価者に**著者の判定は見せない**(独立性の担保。列は空にしてある)。")
 
 
