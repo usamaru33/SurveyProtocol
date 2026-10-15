@@ -131,7 +131,7 @@ git 管理されているのは `README.md`、`stage1/assignment.csv`・`abstrac
 | `manual_fetch.md` | 自動取得できなかった論文の手動取得リスト(`fetch_fulltext.py` が自動生成。手で編集しない) |
 | `pdf/<record_id>.pdf` | 全文 PDF の原本(git 管理外) |
 | `by_reviewer/{author,kataoka,watanabe}/` | 担当者ごとのコピー(git 管理外) |
-| `manual/` | ブラウザで手動取得した PDF の置き場(`sort_fulltext_inbox.py` で振り分け) |
+| `inbox/` | ブラウザで手動取得した PDF の受け箱(`fulltext_desk.py` が監視し、`sort_fulltext_inbox.py` の照合で振り分け。git 管理外) |
 
 ## `scripts/` スクリプト一覧
 
@@ -171,8 +171,9 @@ Python の実行は `python -X utf8 scripts/<name>.py`。出力を上書きす�
 ### Phase 4(全文)
 | ファイル | 内容 |
 |---|---|
-| `fetch_fulltext.py` | OpenAlex で OA の PDF を探して取得し、担当ペアごとのフォルダへ複製 |
+| `fetch_fulltext.py` | OpenAlex・Semantic Scholar で OA の PDF を探して取得し、担当ペアごとのフォルダへ複製。`manual_fetch.md` を生成 |
 | `sort_fulltext_inbox.py` | 手動取得した PDF を中身で照合して `record_id` に振り分け |
+| `fulltext_desk.py`(+`fulltext_desk.html`) | 手動取得の作業用ツール。ローカルの一覧ページから出版社ページを開き、受け箱に保存された PDF を自動で振り分ける |
 
 ## `outputs/` スクリプトの出力
 | ファイル | 出力元 |
@@ -193,7 +194,7 @@ Python の実行は `python -X utf8 scripts/<name>.py`。出力を上書きす�
 
 ## 追跡しないもの(`.gitignore`)
 `.env`、`raw/*.bib`・`raw/acm2/`・`raw/IEEE2/`、評価者の判定シート(`sheet_*`・`supplement_sheet_*`・`stage2_sheet_*`)、
-協議シート、`fulltext/pdf/`・`fulltext/by_reviewer/`、`__pycache__/`。
+協議シート、`fulltext/pdf/`・`fulltext/by_reviewer/`・`fulltext/inbox/`、`__pycache__/`。
 
 ## 別リポジトリ(同じ親フォルダ `SurveyPlot/` 内)
 | フォルダ | 内容 |
