@@ -68,26 +68,20 @@ def match(pdf: Path, records: list[dict]) -> tuple[list[dict], str]:
     return by_doi, "1ページ目の DOI"
 
 
-def main() -> None:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--inbox", type=Path, default=OUT / "inbox")
-    ap.add_argument("--assign", action="append", default=[],
-                    help="照合できないファイルを手で割り当てる: ファイル名=record_id(複数可)")
-    ap.add_argument("--dry-run", action="store_true", help="照合結果だけ表示し、何も動かさない")
-    args = ap.parse_args()
+def load_manifest() -> list[dict]:
+    return list(csv.DictReader((OUT / "manifest.csv").open(encoding="utf-8-sig", newline="")))
 
-    mpath = OUT / "manifest.csv"
-    rows = list(csv.DictReader(mpath.open(encoding="utf-8-sig", newline="")))
+
+def process(pdfs: list[Path], forced: dict[str, str] | None = None,
+            dry_run: bool = False) -> tuple[list, list, list[dict]]:
+    """pdfs を照合して振り分ける。(割り当てた [(ファイル名, record_id, 方法)], 残した [(ファイル名, 理由)],
+    manifest の行) を返す。fulltext_desk.py(作業用ツール)からも呼ばれる。"""
+    forced = forced or {}
+    rows = load_manifest()
     by_id = {r["record_id"]: r for r in rows}
-    forced = dict(a.split("=", 1) for a in args.assign)
     for name, rid in forced.items():
         if rid not in by_id:
-            raise SystemExit(f"--assign の record_id が manifest に無い: {rid}")
-
-    pdfs = sorted(p for p in args.inbox.glob("*") if p.suffix.lower() == ".pdf")
-    if not pdfs:
-        print(f"受け箱に PDF がありません: {args.inbox}")
-        return
+            raise ValueError(f"record_id が manifest に無い: {rid}")
 
     taken, left = [], []
     for pdf in pdfs:
@@ -112,9 +106,10 @@ def main() -> None:
             left.append((pdf.name, f"{r['record_id']} は取得済み(上書きしない)"))
             continue
         taken.append((pdf.name, r["record_id"], how))
-        if args.dry_run:
+        if dry_run:
             continue
         dest = OUT / "pdf" / f"{r['record_id']}.pdf"
+        dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.move(str(pdf), dest)
         for who in r["pair"].split("×"):
             d = OUT / "by_reviewer" / who
@@ -122,17 +117,40 @@ def main() -> None:
             shutil.copyfile(dest, d / dest.name)
         r["status"], r["source"] = "ok", f"manual: {pdf.name}"
 
-    for name, rid, how in taken:
-        print(f"  OK  {name} → {rid}({how}) {by_id[rid]['title'][:60]}")
-    for name, why in left:
-        print(f"  --  {name}: {why}")
-
-    if not args.dry_run and taken:
-        with mpath.open("w", encoding="utf-8-sig", newline="") as f:
+    if not dry_run and taken:
+        with (OUT / "manifest.csv").open("w", encoding="utf-8-sig", newline="") as f:
             w = csv.DictWriter(f, fieldnames=list(rows[0]))
             w.writeheader()
             w.writerows(rows)
         write_manual_list(rows, OUT / "manual_fetch.md")
+    return taken, left, rows
+
+
+def inbox_pdfs(inbox: Path) -> list[Path]:
+    return sorted(p for p in inbox.glob("*") if p.suffix.lower() == ".pdf")
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--inbox", type=Path, default=OUT / "inbox")
+    ap.add_argument("--assign", action="append", default=[],
+                    help="照合できないファイルを手で割り当てる: ファイル名=record_id(複数可)")
+    ap.add_argument("--dry-run", action="store_true", help="照合結果だけ表示し、何も動かさない")
+    args = ap.parse_args()
+
+    pdfs = inbox_pdfs(args.inbox)
+    if not pdfs:
+        print(f"受け箱に PDF がありません: {args.inbox}")
+        return
+    try:
+        taken, left, rows = process(pdfs, dict(a.split("=", 1) for a in args.assign), args.dry_run)
+    except ValueError as e:
+        raise SystemExit(f"--assign: {e}")
+    by_id = {r["record_id"]: r for r in rows}
+    for name, rid, how in taken:
+        print(f"  OK  {name} → {rid}({how}) {by_id[rid]['title'][:60]}")
+    for name, why in left:
+        print(f"  --  {name}: {why}")
     ok = sum(r["status"] == "ok" for r in rows)
     print(f"割り当て {len(taken)} 件 / 残り {len(left)} 件(受け箱に残置)。"
           f"取得済み {ok} / {len(rows)} 件{'(dry-run: 何も変更していない)' if args.dry_run else ''}")
