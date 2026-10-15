@@ -3,18 +3,28 @@
 > **PRISMA 2020準拠**のスクリーニングパイプラインと集計ツールの実装ドキュメント。  
 > VR空間における自己スケール感覚（Self-scale perception）の形成要因を網羅的に体系化するためのシステマティック・レビュープロジェクト。
 >
-> **現行の確定値 (2026-08-12 実行, Rev.13):** 入力 `ResearchVR4.csv`（26,434件 = 3DB × 第1波+第2波）
+> **現行の確定値 (2026-08-12 実行, Rev.13):** 入力 `data/merged/ResearchVR4.csv`（26,434件 = 3DB × 第1波+第2波）
 >
 > ```
 > 26,434 → 18,342（P1 重複削除）→ 6,317（P1.5 フィルタ層）→ 1,179（P2 Venue）→ 795（P3a キーワード）
 > ```
 >
+<!-- [2026-10-15 12:12 更新] 旧:
 > **⚠️ 本ドキュメントを読むときの前提（2026-08-12 時点）:**
 > 1. **プロトコルは Rev.13 まで確定。`step*.csv` は Rev.13 で再実行済み**（2026-07-17 以来の凍結は解除）。
 > 2. **§7 の追加分析の表は 2026-08-20 に現行データ（795件）で再実行済み**（旧版は 2026-05-25・1,784件時点だった）。
 >    再実行が必要（§7 冒頭の注記参照）。
 > 3. プロトコルの決定経緯・最新方針は `docs/log/protocol_changelog.md`（〜Rev.13）と
 >    `docs/protocol/search_strings.md` が一次情報。本 README と食い違う場合は **docs/ 側が正**。
+-->
+> **⚠️ 本ドキュメントを読むときの前提（2026-10-15 時点）:**
+> 1. **プロトコルは Rev.27 まで確定。** `data/pipeline/step*.csv` は 2026-08 に再実行して確定済みで、
+>    Phase 3b の判定シート配布（2026-08-19）以降は**凍結中**（解除は著者の明示的な指示があるときだけ）。
+> 2. **§7 の追加分析の表は 2026-08-20 に現行データ（795件）で再実行済み**（旧版は 2026-05-25・1,784件時点だった）。
+> 3. プロトコルの決定経緯・最新方針は `docs/log/protocol_changelog.md`（〜Rev.27）と
+>    `docs/protocol/search_strings.md` が一次情報。本 README と食い違う場合は **docs/ 側が正**。
+> 4. **現在地（2026-10-15）:** Phase 3b は stage 1・stage 2 とも判定を回収済みで、協議による最終判定
+>    （`screening/final/final_decisions.csv`）を確定する段階。Phase 4 は全文 PDF の取得に着手（`fulltext/`）。
 
 ---
 
@@ -142,25 +152,43 @@ Phase 4 は人手2名の二重スクリーニング（Cohen's κ で一致度を
 
 ## 4. ファイル構成
 
+> 各ファイルの場所と内容の索引は [`FILE_MAP.md`](FILE_MAP.md) を参照。
+
 ```
 SurveyProtocol/
-├── ResearchVR2.csv              # 生データ（全DB統合エクスポート, 14,385件, 〜2026-05-15）
-├── ResearchVR3.csv              # 旧入力（第1波4DB, 14,682件。経緯として保存）
-├── ResearchVR4.csv              # ★ 現行入力（3DB × 第1波+第2波 = 26,434件、Source_DB列つき）
+├── data/                        # 入力・参照表・パイプライン出力（旧: リポジトリ直下に散在していたもの）
+│   ├── merged/                  # 統合生データ
+│   │   ├── ResearchVR2.csv      #   生データ（全DB統合エクスポート, 14,385件, 〜2026-05-15）
+│   │   ├── ResearchVR3.csv      #   旧入力（第1波4DB, 14,682件。経緯として保存）
+│   │   └── ResearchVR4.csv      #   ★ 現行入力（3DB × 第1波+第2波 = 26,434件、Source_DB列つき）
+│   ├── reference/               # 参照表
+│   │   ├── CORE.csv             #   CORE学会ランキング（1,956エントリ。ファイル行数は 987）
+│   │   ├── scimagojr 2025.csv   #   SJRジャーナルランキング（50,327エントリ。ファイル行数は 32,193）
+│   │   ├── venue_aliases.csv    #   著者確認済みVenueエイリアス表（Phase 2 の最優先照合）
+│   │   └── self_scale_references.csv  # ★正式 gold set（SearchScope列: in-scope 17件 / background 8件）
+│   └── pipeline/                # pipeline.py の出力（公式 step ファイル。凍結中、再実行しない）
+│       ├── step1_dedup.csv              # Phase 1 出力: 重複削除済み（18,342件、フィールドマージ済み）
+│       ├── step1_5_filter_included.csv  # Phase 1.5 出力: フィルタ層 通過（6,317件）
+│       ├── step1_5_filter_excluded.csv  # Phase 1.5 出力: フィルタ層 除外（12,025件）
+│       ├── step2_rank_included.csv      # Phase 2 出力: 高ランクVenue通過（1,179件）
+│       ├── step2_rank_excluded.csv      # Phase 2 出力: 低ランクVenue除外（5,138件）
+│       ├── step3_kw_included.csv        # Phase 3a 出力: ★最終候補（795件）
+│       ├── step3_kw_excluded.csv        # Phase 3 出力: キーワード除外（384件）
+│       └── pipeline_log.txt             # パイプライン実行ログ（詳細・最新値はここ）
 ├── raw/                         # ZoteroのDB別コレクションエクスポート（PRISMA上段の根拠）
 │   ├── acm.csv / ieee.csv / IEEE_2025-2026.csv / PubMed.csv / Scopus.csv  # 初回検索（第1波）
 │   ├── scopus_wave2_20260730.ris   # Rev.6第2波 Scopus API 生出力（2,542件）
 │   ├── acm_wave2_20260803.csv / ieee_wave2_20260810.csv  # 第2波 ACM 9,630 / IEEE 361
 │   └── scopus_wave2_20260730.csv   # ★上記RISのZotero取込→CSVエクスポート（2,542件, Abstract 100%）
-├── CORE.csv                     # CORE学会ランキング（1,955エントリ）
-├── scimagojr 2025.csv           # SJRジャーナルランキング（50,326エントリ）
 │
-├── pipeline.py                  # ★ メインパイプライン (Phase 1-3)
-├── prisma_screening.py          # キーワード除外スクリーニング（単体実行用）
-├── venue_screening.py           # 学会ランクスクリーニング（プロトタイプ版）
-├── simulate_screening.py        # ★ 足切りシミュレーション・DB集計ツール
+├── pipeline.py                  # ★ メインパイプライン (Phase 1-3)。既定の入出力は data/ 配下
+├── legacy/                      # 現行フローでは使わない初期プロトタイプ（経緯として保存）
+│   ├── prisma_screening.py      #   キーワード除外スクリーニング（単体実行用）
+│   ├── venue_screening.py       #   学会ランクスクリーニング（プロトタイプ版）
+│   └── year_distribution.py / .png  # 年次分布の可視化（1,784件時点の図）
 │
 ├── scripts/                     # 検証・監査 / API連携スクリプト（要 requests）
+│   ├── simulate_screening.py    # ★ 足切りシミュレーション・DB集計ツール（読み取り専用）
 │   ├── api_search_common.py     # 共通部品: クエリビルダー・polite_get・RIS出力・.env読み込み
 │   ├── db_search_ieee.py        # IEEE Xplore API 検索（第2波。※要 IEEE_API_KEY）
 │   ├── db_search_scopus.py      # Scopus API 検索（第2波）
@@ -186,21 +214,10 @@ SurveyProtocol/
 │   ├── enriched_abstracts.csv   # ★ DOI から補完した要旨のキャッシュ（人手判定の材料専用）
 │   ├── snowballing_log.csv      # スノーボーリング結果（17列。判定は判定シートに統合）
 │   └── snowballing_log_pre20260810.csv  # 旧12列版（Rev.10 改修前。経緯として保存）
-│
-├── step1_dedup.csv              # Phase 1 出力: 重複削除済み（18,342件、フィールドマージ済み）
-├── step1_5_filter_included.csv  # Phase 1.5 出力: フィルタ層 通過（6,317件）
-├── step1_5_filter_excluded.csv  # Phase 1.5 出力: フィルタ層 除外（12,025件）
-├── step2_rank_included.csv      # Phase 2 出力: 高ランクVenue通過（1,179件）
-├── step2_rank_excluded.csv      # Phase 2 出力: 低ランクVenue除外（9,634件）
-├── step3_kw_included.csv        # Phase 3a 出力: ★最終候補（795件）
-├── step3_kw_excluded.csv        # Phase 3 出力: キーワード除外（1,082件）
-│
-├── pipeline_log.txt             # パイプライン実行ログ（詳細・最新値はここ）
+├── fulltext/                    # ★Phase 4 の全文 PDF（pdf/・by_reviewer/ は git 管理外）と manifest.csv
 │
 ├── .env                         # APIキー（**git管理外**。IEEE / Scopus / Semantic Scholar）
 ├── .env.example                 # 変数名テンプレート（コミット可・値は空）
-├── venue_aliases.csv            # 著者確認済みVenueエイリアス表（Phase 2 の最優先照合）
-├── self_scale_references.csv    # ★正式 gold set（SearchScope列: in-scope 17件 / background 8件）
 ├── README.md                    # このファイル
 └── docs/                        # 全文書（2026-08-20 に3分類へ再編）
     ├── protocol/                # ★ルールを定める文書。ここが一次情報
@@ -210,7 +227,7 @@ SurveyProtocol/
     │   ├── search_strings.md          # DB別検索式の記録（PRISMA Item #7）
     │   └── search_replication.md      # 検索記録の復元・再実行手順
     ├── log/                     # ★記録。時系列で追記し、過去分は遡及修正しない
-    │   ├── protocol_changelog.md      # プロトコル変更履歴（Rev.1〜21）— 方針の一次情報
+    │   ├── protocol_changelog.md      # プロトコル変更履歴（Rev.1〜27）— 方針の一次情報 <!-- [2026-10-15 12:12 更新] 旧: │   ├── protocol_changelog.md      # プロトコル変更履歴（Rev.1〜21）— 方針の一次情報 -->
     │   ├── PROGRESS_LOG.md            # 進捗ログ（セッションログ・次回タスク）
     │   └── consistency_audit_log.md   # 文書間の不整合と、その決定ログ
     └── reference/               # 分析・検討・配布物・入出力
@@ -224,6 +241,7 @@ SurveyProtocol/
         └── known_item_analysis.md        # ★自動生成: 脱落分析
 ```
 
+<!-- [2026-10-15 12:13 追加] §4 のディレクトリ構成は 2026-10-15 に全面更新（コードブロック内にはコメントを書けないためここに記す）。旧: ルート直下に ResearchVR2/3/4.csv・CORE.csv・scimagojr 2025.csv・venue_aliases.csv・self_scale_references.csv・step*.csv・pipeline_log.txt・prisma_screening.py・venue_screening.py・simulate_screening.py を並べていた。件数の旧値: CORE 1,955 / SJR 50,326 / step2 除外 9,634 / step3 除外 1,082。新値の根拠は data/pipeline/pipeline_log.txt と pipeline.py のローダー実測。詳細は docs/log/doc_audit_20261015.md -->
 > **文書の3分類（2026-08-20）:**
 > **`protocol/`** はルールを定める文書で、ここが一次情報。
 > **`log/`** は時系列の記録で、**過去のエントリは遡及修正しない**（当時の記述として正しいため。
@@ -242,7 +260,7 @@ python -X utf8 scripts/export_completeness_audit.py --expect acm_wave2=14340
 
 # 2. 統合生データを組み立てる（Source_DB 列を付与、PubMed は Rev.8 により既定で除外）
 python -X utf8 scripts/merge_raw.py --dry-run   # 件数の内訳を確認
-python -X utf8 scripts/merge_raw.py             # → ResearchVR4.csv
+python -X utf8 scripts/merge_raw.py             # → data/merged/ResearchVR4.csv
 ```
 
 `export_completeness_audit.py` が見るのは、件数の打ち切り疑い・ファイル内/間の重複・
@@ -251,14 +269,14 @@ DOI一致とタイトル一致を**別々に**判定し、「タイトルは一�
 `SUSPECT`（同名別論文を捕捉している疑い）として報告する。これは Known-Item Test の
 recall を過大評価させる要因なので、`SUSPECT` は `HIT` として数えない。
 
-`merge_raw.py` は `raw/*.csv` を連結して `ResearchVR4.csv` を作る。重複削除はしない（Phase 1 の責務）。
+`merge_raw.py` は `raw/*.csv` を連結して `data/merged/ResearchVR4.csv` を作る。重複削除はしない（Phase 1 の責務）。
 `known_item_test.py` は `ResearchVR*.csv` の名前昇順で最後を step0 に使うため、
 **ファイルを置くだけで検証対象が最新の統合データに切り替わる**。
 
 > **注（gold set の所在）:** `known_item_test.py` は `known_items.csv` → `known_items.md` →
-> `self_scale_references.csv` の順に探索する。`known_items.md` の表は有効行0のテンプレートなので、
-> 実際に使われる gold set は **`self_scale_references.csv`** に一本化されている（Rev.7）。
-> in-scope を 15〜25件へ拡充する際は `self_scale_references.csv` に `SearchScope=in-scope` 行を追加すること。
+> `data/reference/self_scale_references.csv` の順に探索する。`known_items.md` の表は有効行0のテンプレートなので、
+> 実際に使われる gold set は **`data/reference/self_scale_references.csv`** に一本化されている（Rev.7）。
+> in-scope を 15〜25件へ拡充する際は `data/reference/self_scale_references.csv` に `SearchScope=in-scope` 行を追加すること。
 
 > **注（`rule.md` の反映状況）:** DB構成=3DB・scope=TA・Threats への追記は Rev.8 で確定済みだが、
 > **`rule.md` 本文への反映は第2波再検索の完了後にまとめて行う**予定（`docs/log/PROGRESS_LOG.md` の
@@ -274,10 +292,10 @@ recall を過大評価させる要因なので、`SUSPECT` は `HIT` として�
 ## 5. パイプライン詳細
 
 `pipeline.py` は3フェーズを一括実行するメインスクリプト。  
-入力: 統合生データ / `CORE.csv` / `scimagojr 2025.csv` / `venue_aliases.csv`
+入力: 統合生データ / `data/reference/CORE.csv` / `data/reference/scimagojr 2025.csv` / `data/reference/venue_aliases.csv`
 
-> **注:** コード上の既定入力（`pipeline.py:23` の `DEFAULT_INPUT`）は **`ResearchVR2.csv` のまま**だが、
-> 現行の公式実行は **`--input ResearchVR4.csv`** で行われている（`pipeline_log.txt` の Input 行が正）。
+> **注:** コード上の既定入力（`pipeline.py:23` の `DEFAULT_INPUT`）は **`data/merged/ResearchVR2.csv` のまま**だが、
+> 現行の公式実行は **`--input data/merged/ResearchVR4.csv`** で行われている（`data/pipeline/pipeline_log.txt` の Input 行が正）。
 > 既定値の変更は公式再実行のタイミングで行う（step ファイル凍結中のため現在は触らない）。
 
 ### Phase 1: 重複削除 (`pipeline.py`)
@@ -320,7 +338,7 @@ recall を過大評価させる要因なので、`SUSPECT` は `HIT` として�
 除外になってしまう）。この設計で **gold set の脱落は 0件**。
 
 **出力列:** `Filter_Layer`（`pass` / `hold` / `fail`）、`Filter_Layer_Reason`（不成立の概念群）。
-`step1_5_filter_included.csv` / `step1_5_filter_excluded.csv` に分けて保存する。
+`data/pipeline/step1_5_filter_included.csv` / `data/pipeline/step1_5_filter_excluded.csv` に分けて保存する。
 
 #### Phase 1.5 結果
 
@@ -343,7 +361,7 @@ recall を過大評価させる要因なので、`SUSPECT` は `HIT` として�
 
 #### Venue照合ロジック（実装の実行順）
 
-**Step 0: 著者確認済みエイリアス表**（`venue_aliases.csv`、Rev.6 で追加）
+**Step 0: 著者確認済みエイリアス表**（`data/reference/venue_aliases.csv`、Rev.6 で追加）
 — 他のいずれの照合よりも**先に**参照する。正規化による同名衝突の誤照合を是正するための最優先テーブル
 （Presence誌29件・TAP誌49件の誤照合を修正、旧称 IEEE VR 8件をA*として救済）。
 
@@ -363,7 +381,7 @@ recall を過大評価させる要因なので、`SUSPECT` は `HIT` として�
 > ジャーナルが誤って CORE の類似会議名にマッチしうる。最大の実例は **PACM HCI 82件**
 > （SJR に完全一致があるのに CORE fuzzy が先に拾ってしまう）。全数監査の結果、
 > 正規化の同名衝突は 899キー・採否が反転するもの 426件（うちデータ出現 74キー）で、
-> `venue_aliases.csv` に MANUAL 行として自動追記済み。恒久対策は
+> `data/reference/venue_aliases.csv` に MANUAL 行として自動追記済み。恒久対策は
 > `docs/reference/normalization_design.md` の6案（推奨: 案6 順序修正 + 案1 種別マーカー +
 > 案3 短キーガード + 案4 サニティチェック）で、**適用は公式再実行時**。
 
@@ -475,7 +493,7 @@ Title + Abstract Note を結合したテキストに対して正規表現マッ�
 
 > **注1:** 上のキーワード別の値は**パターンごとのヒット件数**であり、1件の文献が複数パターンに
 > 該当しうるため、合計は「Cat*n* 除外件数」を上回る（例: Cat3 はヒット計 1,274 に対し除外 765件）。
-> 全パターンの内訳と「ヒット0のパターン」は `pipeline_log.txt` を参照。
+> 全パターンの内訳と「ヒット0のパターン」は `data/pipeline/pipeline_log.txt` を参照。
 >
 > **注2:** 1件の文献が複数カテゴリに該当する場合があるため、カテゴリ別件数の合計と除外合計も一致しない。
 
@@ -484,7 +502,7 @@ Title + Abstract Note を結合したテキストに対して正規表現マッ�
 ## 6. スクリーニング実績（PRISMA数値）
 
 ```
-元データ          : 26,434 件 (ResearchVR4.csv)
+元データ          : 26,434 件 (data/merged/ResearchVR4.csv)
 │                    内訳: ACM 7,997+9,630 / IEEE 1,276+297(更新)+361 / Scopus 4,331+2,542
 │                    ※PubMed は Rev.8 で不使用に確定。この内訳に含まない
 │
@@ -498,7 +516,7 @@ Title + Abstract Note を結合したテキストに対して正規表現マッ�
 │   └─ 高ランク通過: 1,179 件
 │
 └─ Phase 3a キーワード除外 ──────────── -384件
-    └─ 左カラム確定 : 795 件  ← step3_kw_included.csv
+    └─ 左カラム確定 : 795 件  ← data/pipeline/step3_kw_included.csv
 ```
 
 **引用探索（PRISMA 右カラム、§8）:**
@@ -527,10 +545,10 @@ Title + Abstract Note を結合したテキストに対して正規表現マッ�
 
 | 段 | 内容 | 担当 |
 |---|---|---|
-| stage 1 | 全1,052件を著者が判定。うち**校正セット164件（15%）は3名全員** | 著者 1,052 / 他2名 各164 |
+| stage 1 | 全1,052件を著者が判定。うち**校正セット223件（20%、Rev.22 で 15%→20%）は3名全員** | 著者 1,052 / 他2名 各223 | <!-- [2026-10-15 12:13 更新] 旧: | stage 1 | 全1,052件を著者が判定。うち**校正セット164件（15%）は3名全員** | 著者 1,052 / 他2名 各164 | -->
 | stage 2 | 著者が Exclude / Unsure にしたものだけ第2評価者が確認 | 2名で分担 |
 
-**κ は校正セット164件でのみ算出する。** 除外プールだけで計算すると著者の判定に分散が無く
+**κ は校正セット223件でのみ算出する。** 除外プールだけで計算すると著者の判定に分散が無く <!-- [2026-10-15 12:13 更新] 旧: **κ は校正セット164件でのみ算出する。** 除外プールだけで計算すると著者の判定に分散が無く -->
 **κ が常に 0** になるため（`docs/log/protocol_changelog.md` Rev.17）。
 判定シートは `screening/`（§10）。
 要旨欠落は **191件（18.2%）**＝左63 + 右128。Rev.16 で DOI から **134件**を外部補完した結果
@@ -548,7 +566,7 @@ PubMed∩Scopus 606 / Scopus∩IEEE 352 / Scopus∩ACM 142 / PubMed∩IEEE 39 / 
 
 ### 検索の網羅性検証（Known-Item Test）
 
-`scripts/known_item_test.py` が gold set（`self_scale_references.csv`、`SearchScope` 列で in-scope 17件）を
+`scripts/known_item_test.py` が gold set（`data/reference/self_scale_references.csv`、`SearchScope` 列で in-scope 17件）を
 各 step ファイルに突き合わせ、recall を測定して `known_item_analysis.md` を生成する。
 
 | 段階 | 生存 | recall |
@@ -571,15 +589,15 @@ PubMed∩Scopus 606 / Scopus∩IEEE 352 / Scopus∩ACM 142 / PubMed∩IEEE 39 / 
 
 ## 7. 追加分析ツール
 
-`simulate_screening.py` は **step3_kw_included.csv** に対して、  
+`scripts/simulate_screening.py` は **data/pipeline/step3_kw_included.csv** に対して、  
 **読み取り専用・ファイル出力なし**でコンソールに集計結果を表示するツール。
 
-> **本節の数値は 2026-08-20 に現行データ（`step3_kw_included.csv` = 795件）で再実行した結果。**
+> **本節の数値は 2026-08-20 に現行データ（`data/pipeline/step3_kw_included.csv` = 795件）で再実行した結果。**
 > 旧版は 2026-05-25・1,784件時点の集計だった（`docs/log/consistency_audit_log.md` 論点6）。
 
 実行方法:
 ```bash
-python -X utf8 simulate_screening.py
+python -X utf8 scripts/simulate_screening.py
 ```
 
 ---
@@ -609,7 +627,7 @@ python -X utf8 simulate_screening.py
 | 2022年以前（足切り対象になりうる） | 441件 |
 | 発行年不明 | 0件 |
 
-**発行年分布の概要（step3_kw_included.csv）:**
+**発行年分布の概要（data/pipeline/step3_kw_included.csv）:**
 
 | 期間 | 件数 |
 |---|---|
@@ -783,7 +801,7 @@ S2 は1リクエスト最大1,000件・`offset+limit ≤ 10,000` の制約があ
 ### 8.3 シード選定
 
 既定シードは **Venueフィルタで脱落した known-item 6件**。
-`outputs/venue_dropped_known_items.csv` の `#` 列を `self_scale_references.csv` の `ID` 列で結合し、
+`outputs/venue_dropped_known_items.csv` の `#` 列を `data/reference/self_scale_references.csv` の `ID` 列で結合し、
 `DOI_or_URL` 列から正規表現 `10\.\d{4,9}/\S+` で DOI 本体を抽出する（URL形式の混在に対応）。
 
 `--seeds-csv` で任意のCSVに差し替え可能（`Title`/`DOI` 列。列名は `#`/`ID`/`seed_id`、
@@ -798,7 +816,7 @@ S2 は1リクエスト最大1,000件・`offset+limit ≤ 10,000` の制約があ
 |---|---|
 | `raw/*.csv` | ZoteroのDB別エクスポート（第2波の取込済みCSVも自動的に含まれる） |
 | `raw/*.ris` | API検索の生出力。Zotero未取込のデータも簡易パース（`DO  - `/`TI  - `/`ER`）で判定に含める |
-| `step3_kw_included.csv` | 現行の最終候補 |
+| `data/pipeline/step3_kw_included.csv` | 現行の最終候補 |
 
 キーは **DOI優先・無ければ正規化タイトルに `T:` プレフィックス**を付ける方式で、
 `scripts/known_item_test.py` と**同一基準**（正規化は小文字化 → 非英数字を空白へ → 空白圧縮）。
@@ -851,7 +869,7 @@ Venue フィルタを適用すると**シード自身すら通らない**。
 | うち既存コーパスと重複 → **右カラムに計上しない** | 398 |
 | **New records via citation searching** | **1,403** |
 | うち DOI 欠落（手作業で同定が必要） | 135 |
-| Screened / Assessed | 未実施 |
+| Screened / Assessed | Phase 3b で判定済み（キーワード除外後の257件を判定対象に含む。§11） | <!-- [2026-10-15 12:13 更新] 旧: | Screened / Assessed | 未実施 | -->
 
 **右カラムには Phase 2（Venue フィルタ）を適用しない**（§8.5 の理由）。
 Title/Abstract 判定は Phase 3b と**同一基準**で行う。
@@ -925,25 +943,25 @@ SEMANTIC_SCHOLAR_API_KEY=...   # enrich_abstracts.py / snowball_search.py
 ```bash
 python -X utf8 pipeline.py
 # オプション指定の場合:
-python -X utf8 pipeline.py --input ResearchVR3.csv --core CORE.csv --sjr "scimagojr 2025.csv" --outdir ./
+python -X utf8 pipeline.py --input data/merged/ResearchVR3.csv --core data/reference/CORE.csv --sjr "data/reference/scimagojr 2025.csv" --outdir data/pipeline
 ```
 
-> ⚠️ 実行すると `step*.csv` と `pipeline_log.txt` が**上書きされる**。現行の step ファイルは
+> ⚠️ 実行すると `step*.csv` と `data/pipeline/pipeline_log.txt` が**上書きされる**。現行の step ファイルは
 > Rev.6 以前の状態で凍結中（§6）なので、公式再実行のタイミングは
 > `docs/log/PROGRESS_LOG.md` の方針に従うこと。
 
 ### 追加分析（足切りシミュレーション・DB集計）
 
 ```bash
-python -X utf8 simulate_screening.py
+python -X utf8 scripts/simulate_screening.py
 ```
 
 ### キーワード除外スクリーニング単体実行
 
 ```bash
-python -X utf8 prisma_screening.py --input step2_rank_included.csv --outdir ./
+python -X utf8 legacy/prisma_screening.py --input data/pipeline/step2_rank_included.csv --outdir ./
 # ドライランモード（ファイル出力なし）:
-python -X utf8 prisma_screening.py --dry-run
+python -X utf8 legacy/prisma_screening.py --dry-run
 ```
 
 ### 検索の網羅性検証（Known-Item Test）
@@ -979,7 +997,7 @@ scope 方針の変更にあたるので**プロトコル改訂なしに使わな
 
 ```bash
 python -X utf8 scripts/enrich_abstracts.py \
-  --in step1_dedup.csv --out outputs/enriched.csv --only-empty --limit 20
+  --in data/pipeline/step1_dedup.csv --out outputs/enriched.csv --only-empty --limit 20
 # --limit 0（既定）で無制限。Crossref の polite pool を使うため ENRICH_MAILTO の設定を推奨
 ```
 
@@ -1023,7 +1041,7 @@ python -X utf8 scripts/snowball_search.py --seeds-csv outputs/snowballing_hop2_s
 
 | 段 | 内容 | 担当 |
 |---|---|---|
-| stage 1 | 全1,052件を著者が判定。うち**校正セット164件（15%）は3名全員** | 著者 1,052 / 他2名 各164 |
+| stage 1 | 全1,052件を著者が判定。うち**校正セット223件（20%、Rev.22 で 15%→20%）は3名全員** | 著者 1,052 / 他2名 各223 | <!-- [2026-10-15 12:13 更新] 旧: | stage 1 | 全1,052件を著者が判定。うち**校正セット164件（15%）は3名全員** | 著者 1,052 / 他2名 各164 | -->
 | stage 2 | 著者が Exclude / Unsure にしたものだけ第2評価者が確認 | 2名で分担 |
 
 Phase 3b のエラーは非対称（誤 Exclude は回復不能／誤 Include は Phase 4 の手間が増えるだけ）で、
@@ -1055,7 +1073,7 @@ python -X utf8 scripts/score_screening.py
   **stage 2 のシートにも著者の判定は入れていない**
 - **割当は決定論的**（校正セットの抽出・第2評価者の振り分けとも文献キーの MD5）。
   乱数を使わないので再生成しても記入済みの作業は動かない
-- **κ は校正セット164件でのみ算出する。** 除外プールだけで計算すると著者の判定が
+- **κ は校正セット223件でのみ算出する。** 除外プールだけで計算すると著者の判定が <!-- [2026-10-15 12:13 更新] 旧: - **κ は校正セット164件でのみ算出する。** 除外プールだけで計算すると著者の判定が -->
   定義上すべて Exclude で分散が無く、**実際の一致率によらず κ が常に 0** になる
 - `kw_groups`（概念群スコア）は**読む順序のトリアージ専用**。この値による自動除外はしない
 - 判定シートは記入中は git 追跡しない（互いの判定が見えるため）。
@@ -1064,7 +1082,7 @@ python -X utf8 scripts/score_screening.py
 ### 11.4 報告に必要な数値
 
 - ペア別 Cohen's κ（3本）とその平均、Landis & Koch の解釈
-  — **校正セット164件で算出したものであることを明記する**
+  — **校正セット223件で算出したものであることを明記する** <!-- [2026-10-15 12:13 更新] 旧: — **校正セット164件で算出したものであることを明記する** -->
 - liberal accelerated で1名の Include により通過した件数（第2評価者を経ていない分）
 - 一致件数 / 要協議件数、協議で解決した件数 / 解決せず Include に倒した件数
 - Phase 3b の Include 件数（= Phase 4 の対象）と Exclude 件数
@@ -1089,7 +1107,7 @@ python -X utf8 scripts/score_screening.py
 
 ## 付記: 引用数の補完（未着手）
 
-`step3_kw_included.csv` には引用数列が存在しない（Zotero標準エクスポートの制約）ため、
+`data/pipeline/step3_kw_included.csv` には引用数列が存在しない（Zotero標準エクスポートの制約）ため、
 足切りシミュレーション（§7 タスク1A）は「全件0扱い」の最悪ケースにとどまっている。
 実態に即した値を得るには DOI を用いて外部APIから引用数を取得する必要がある。
 
@@ -1108,4 +1126,4 @@ params = {"fields": "citationCount"}   # GET /graph/v1/paper/DOI:{doi}
 
 ---
 
-*最終更新: 2026-07-30（README全体の実装・方針との突き合わせ）｜プロトコル: PRISMA 2020 準拠（〜Rev.8）*
+*最終更新: 2026-10-15（構成・件数・状態の記述を現状に更新。§5〜§8 の実装の詳細は 2026-07-30 版のまま）｜プロトコル: PRISMA 2020 準拠（〜Rev.27）* <!-- [2026-10-15 12:13 更新] 旧: *最終更新: 2026-07-30（README全体の実装・方針との突き合わせ）｜プロトコル: PRISMA 2020 準拠（〜Rev.8）* -->

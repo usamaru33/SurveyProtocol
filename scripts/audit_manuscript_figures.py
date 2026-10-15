@@ -58,8 +58,8 @@ def in_tex(*frags):
 
 
 print('== Phase 1-3a chain ==')
-inc15 = load('step1_5_filter_included.csv')
-exc15 = load('step1_5_filter_excluded.csv')
+inc15 = load('data/pipeline/step1_5_filter_included.csv')
+exc15 = load('data/pipeline/step1_5_filter_excluded.csv')
 dedup = inc15 + exc15
 check('deduplicated records', len(dedup), 18342)
 n_pass = sum(1 for r in inc15 if not (r.get('Filter_Layer_Reason') or '').strip())
@@ -67,9 +67,9 @@ n_hold = len(inc15) - n_pass
 check('filter layer pass', n_pass, 2610)
 check('filter layer hold', n_hold, 3707)
 check('filter layer excluded', len(exc15), 12025)
-check('step2 retained', len(load('step2_rank_included.csv')), 1179)
-kw_inc = load('step3_kw_included.csv')
-kw_exc = load('step3_kw_excluded.csv')
+check('step2 retained', len(load('data/pipeline/step2_rank_included.csv')), 1179)
+kw_inc = load('data/pipeline/step3_kw_included.csv')
+kw_exc = load('data/pipeline/step3_kw_excluded.csv')
 check('step3 retained', len(kw_inc), 795)
 check('step3 excluded', len(kw_exc), 384)
 

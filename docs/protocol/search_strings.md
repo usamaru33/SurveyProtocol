@@ -47,7 +47,7 @@ AND ("Size" OR "Scale" OR "Height" OR "Distance")
 > 判明したら遡って埋める(判明しなければ「記録なし」と明記し Threats で言及)。
 
 > **【Rev.10 確定(2026-08-10)/ Rev.11 で根拠を更新】実効 scope は Title-Abstract (TA) で最終確定。TAK への格上げは行わない。**
-> 第2波統合後の実測(`ResearchVR4.csv` 26,434件)で判断した: **第2波12,533件は gold set を1件も
+> 第2波統合後の実測(`data/merged/ResearchVR4.csv` 26,434件)で判断した: **第2波12,533件は gold set を1件も
 > 新規回収しなかった**。一方 TAK は Scopus 実測で +87%(2,533→4,727)であり、人手2名/件の
 > Phase 3b の工数をほぼ倍にする。
 > **【Rev.11 追記】** Rev.10 では「TA 準拠だと recall が 61.5% に落ちる」としていたが、
@@ -159,9 +159,9 @@ ACM DL のエクスポートは**1,000件で打ち切られる**(2026-08-02 実�
 ## 確定した PRISMA 上段(2026-07-17、`scripts/raw_db_audit.py` による)
 
 - Records identified: **ACM DL 7,997 / IEEE Xplore 1,276 + 297(更新検索) / PubMed 781 / Scopus 4,331 = 計 14,682**
-- 検証(初回検索分): raw 4ファイルと統合CSV(ResearchVR2.csv, 14,385件)は Zotero Key で **1:1 完全一致**(欠落・混入・コレクション重複所属 0件)
+- 検証(初回検索分): raw 4ファイルと統合CSV(data/merged/ResearchVR2.csv, 14,385件)は Zotero Key で **1:1 完全一致**(欠落・混入・コレクション重複所属 0件)
 - IEEE 更新検索(`raw/IEEE_2025-2026.csv`, 297件): 既存とDOI重複 196件 / 真に新規 **101件**。
-  `ResearchVR3.csv`(= ResearchVR2 + 297件)を現行パイプライン入力とし、重複は Phase 1 で除去
+  `data/merged/ResearchVR3.csv`(= ResearchVR2 + 297件)を現行パイプライン入力とし、重複は Phase 1 で除去
 - DB間重複(初回分、DOI/正規化タイトル一致、重複除去報告の内訳用):
   PubMed∩Scopus **606** / Scopus∩IEEE **352** / Scopus∩ACM **142** / PubMed∩IEEE **39** / ACM∩IEEE 0 / ACM∩PubMed 0
 - 詳細: `outputs/raw_db_audit.csv`
@@ -173,13 +173,13 @@ ACM DL のエクスポートは**1,000件で打ち切られる**(2026-08-02 実�
 - ~~PsycInfo の実行有無~~ → **未実行が確定**。不実行の判断理由の記載が残タスク。
 - ~~検索時点の非対称(IEEE のみ 2025-12 実行)~~ → **解消済み(2026-07-17)**:
   IEEE のみ出版年 2025〜2026 に限定した更新検索を実行し(297件、新規101件)、
-  `ResearchVR3.csv` に統合。PRISMA には IEEE の検索を2回(2025-12-25 / 2026-07-17)として報告する。
+  `data/merged/ResearchVR3.csv` に統合。PRISMA には IEEE の検索を2回(2025-12-25 / 2026-07-17)として報告する。
   なお更新検索の時点で今度は他3DB(2026-05-15)よりIEEEが約2ヶ月新しくなったが、
   差は軽微であり全DBの検索時点を本文に明記することで対応する。
 
 ## 現存データから分かること(参考値・PRISMA には使用不可)
 
-統合エクスポート `ResearchVR2.csv`(14,385件)には取得元DB列が無い(`Library Catalog` 全件空欄)。
+統合エクスポート `data/merged/ResearchVR2.csv`(14,385件)には取得元DB列が無い(`Library Catalog` 全件空欄)。
 URL/DOI プレフィックスによる **出版社ベースの推定**内訳は以下の通り:
 
 | 推定出版社 | 件数 |

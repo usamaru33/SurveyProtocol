@@ -42,7 +42,7 @@ citation searching は使わない。判断と理由は PROGRESS_LOG.md に記�
 
 | drop_category | 該当 | 処理 |
 |---|---|---|
-| `unmatched` | #7 Augmented Human / #8 APGV-SAP / #13 MIG | `venue_aliases.csv`・正規化改修(`normalization_design.md`)で救済を試す。A\*/A・Q1 に照合されれば **step2 に復帰**(左カラム。右カラムには計上しない) |
+| `unmatched` | #7 Augmented Human / #8 APGV-SAP / #13 MIG | `data/reference/venue_aliases.csv`・正規化改修(`normalization_design.md`)で救済を試す。A\*/A・Q1 に照合されれば **step2 に復帰**(左カラム。右カラムには計上しない) |
 | `below_rank` | #10 ICAT-EGVE(CORE C) | 会場はリストにあるがランク不足。品質基準を貫くなら除外維持。seminal な場合のみ**限定的復帰**を Threats に明記のうえ許容 |
 | `criterion` | #14 Cognitive Processing(SJR Q2) | 基準どおりの除外。**復帰させない**。Threats で「Q1限定により失われた主題関連文献」として報告 |
 
@@ -60,7 +60,7 @@ citation searching は使わない。判断と理由は PROGRESS_LOG.md に記�
 1. **step2 で脱落した Known-Item 5件**(`outputs/venue_dropped_known_items.csv`)。
    これらは (A) で直接回収する対象そのものではなく、**同種の未知文献を掘り当てるための起点**として使う
    (回収と発見の区別は §0)。
-2. **最終候補(step3_kw_included.csv)に生存した高中心性の文献**のうち、著者が
+2. **最終候補(data/pipeline/step3_kw_included.csv)に生存した高中心性の文献**のうち、著者が
    レビューの柱(Intro/RW/Taxonomy の引用予定)に据えるもの。数を絞る(例: 10〜20件)。
 3. Known-Item のうち **background(#19 Botvinick&Cohen 1998, #20 Lenggenhager 2007 等)**は、
    心理接合点の境界を示す文献として**後方探索の到達目標**に使う(これらに辿り着けるかで
@@ -168,7 +168,7 @@ S2 の `/paper/DOI:` で解決してから記録する(`resolve_missing_metadata
   **既知5件そのものの処理は §1.1 に集約した**(以下は同じ規則の詳述):
   - `criterion`(例 #14 Gulliver, SJR Q2): 品質基準どおりの除外。**原則として本編には復帰させず**、
     Threats to Validity で「Q1限定により失われた主題関連文献」として報告する。
-  - `unmatched`(例 #7/#8/#13, リスト未照合): まず `venue_aliases.csv`・正規化での救済を試す
+  - `unmatched`(例 #7/#8/#13, リスト未照合): まず `data/reference/venue_aliases.csv`・正規化での救済を試す
     (`normalization_design.md`)。救済で A\*/A・Q1 に照合されれば step2 に復帰。
     真にランキング未収載(ワークショップ等)なら、スノーボーリングでの回収+個別判断。
   - `below_rank`(例 #10 ICAT-EGVE=CORE C): 会場はリストにあるがランク不足。
@@ -187,7 +187,7 @@ Phase 4 の適格性評価で左カラムと合流する。
 ```mermaid
 flowchart TB
     subgraph L["Identification of studies via databases"]
-        L1["Records identified from databases<br/>第1波 ACM 7,997 / IEEE 1,276+297 / Scopus 4,331<br/>第2波 ACM 9,630 / IEEE 361 / Scopus 2,542<br/>n = 26,434 (ResearchVR4.csv)"]
+        L1["Records identified from databases<br/>第1波 ACM 7,997 / IEEE 1,276+297 / Scopus 4,331<br/>第2波 ACM 9,630 / IEEE 361 / Scopus 2,542<br/>n = 26,434 (data/merged/ResearchVR4.csv)"]
         L2["Duplicate records removed<br/>n = 8,092"]
         L3["Records after de-duplication<br/>n = 18,342"]
         LF["Records excluded by filter layer<br/>正規化クエリの再適用(Phase 1.5)<br/>n = 12,025"]

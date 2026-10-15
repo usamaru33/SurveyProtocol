@@ -251,5 +251,5 @@ python -X utf8 scripts/export_completeness_audit.py --files raw/acm_wave2_YYYYMM
 - [ ] `raw/` にDB別生ファイルが保存されている(加工なし・取得日入りファイル名)
 - [ ] DB別ヒット数の合計と統合前レコード数(14,385)の関係が説明できる(DB間重複を含む/含まない)
 - [ ] PRISMA フロー図上段(identified / duplicates removed)が新数値で更新されている
-- [ ] 旧データ(ResearchVR2.csv 系列)との差分を確認し、差分理由(DB更新・検索式差)を protocol_changelog.md に記録
+- [ ] 旧データ(data/merged/ResearchVR2.csv 系列)との差分を確認し、差分理由(DB更新・検索式差)を protocol_changelog.md に記録
 - [ ] known_items.md の Known-Item Test を新データで再実行(`scripts/known_item_test.py`)

@@ -19,6 +19,7 @@ description: サーベイのスクリーニングパイプライン（pipeline.p
 >
 > 凍結解除は著者の明示的な指示があるときだけ。判定が全員完了し `final_decisions.csv`
 > が確定するまでは、このファイル群を読むことはあっても書いてはならない。
+> （2026-10-15 現在: stage 1・stage 2 とも回収済みで協議中。`final_decisions.csv` は未確定のため、凍結は解除されていない。） <!-- [2026-10-15 12:13 追加] 旧: (記載なし)。直前の行は変更していない -->
 > 詳細は `docs/protocol/screening_protocol.md` と `screening/README.md` の凍結告知を参照。
 
 ## コマンド（Windows では必ず `-X utf8` を付ける）
@@ -28,10 +29,10 @@ description: サーベイのスクリーニングパイプライン（pipeline.p
 python -X utf8 pipeline.py
 
 # 足切りシミュレーション・DB集計（読み取り専用、ファイル出力なし）
-python -X utf8 simulate_screening.py
+python -X utf8 scripts/simulate_screening.py
 
-# 年次分布の可視化 → year_distribution.png
-python -X utf8 year_distribution.py
+# 年次分布の可視化 → legacy/year_distribution.png
+python -X utf8 legacy/year_distribution.py
 
 # Known-Item Test（known_items.md 記入後）→ outputs/known_item_test.csv
 python -X utf8 scripts/known_item_test.py
@@ -46,19 +47,19 @@ python -X utf8 scripts/unmatched_venue_audit.py
 ## データフロー（現行確定値: 2026-08-12 実行, Rev.13）
 
 ```
-ResearchVR4.csv (26,434)                # 3DB × 第1波+第2波、Source_DB 列つき
- → step1_dedup.csv (18,342)             # DOI→Key→Title の順で重複検出＋フィールドマージ
- → step1_5_filter_included.csv (6,317)  # フィルタ層: 正規化クエリを一律再適用
- → step2_rank_included.csv (1,179)      # CORE A/A* または SJR Q1 のみ通過
- → step3_kw_included.csv (795)          # キーワード除外（Phase 3a）
+data/merged/ResearchVR4.csv (26,434)                # 3DB × 第1波+第2波、Source_DB 列つき
+ → data/pipeline/step1_dedup.csv (18,342)             # DOI→Key→Title の順で重複検出＋フィールドマージ
+ → data/pipeline/step1_5_filter_included.csv (6,317)  # フィルタ層: 正規化クエリを一律再適用
+ → data/pipeline/step2_rank_included.csv (1,179)      # CORE A/A* または SJR Q1 のみ通過
+ → data/pipeline/step3_kw_included.csv (795)          # キーワード除外（Phase 3a）
 ```
 
 **Phase 3b の判定対象は 1,052件** = DB検索 795 + 引用探索（スノーボーリング）257。
 引用探索分には venue フィルタ（Phase 2）とフィルタ層（Phase 1.5）を適用していない
 （`docs/protocol/snowballing_protocol.md` §4.3b）。判定基準は両者で同一。
 
-> **旧値（14,682→12,543→2,909→1,827、入力 ResearchVR3.csv）は第1波・4DB 前提であり
-> 以後は使用しない。** さらに古い ResearchVR2.csv(14,385) 系も同様。
+> **旧値（14,682→12,543→2,909→1,827、入力 data/merged/ResearchVR3.csv）は第1波・4DB 前提であり
+> 以後は使用しない。** さらに古い data/merged/ResearchVR2.csv(14,385) 系も同様。
 
 ## Phase 3b（人手判定）の関連スクリプト
 

@@ -11,13 +11,14 @@ step3_kw_included.csv に対して以下を実行（読み取り専用・出力�
 import sys
 import re
 import io
+from pathlib import Path
 import pandas as pd
 
 # Windows cp932 環境でも絵文字・特殊文字を安全に出力するため utf-8 ラッパー
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
 # ─── データ読み込み ─────────────────────────────────────────────────────────────
-CSV_PATH = "step3_kw_included.csv"
+CSV_PATH = Path(__file__).resolve().parent.parent / "data" / "pipeline" / "step3_kw_included.csv"
 df = pd.read_csv(CSV_PATH, encoding="utf-8-sig", low_memory=False)
 TOTAL = len(df)
 

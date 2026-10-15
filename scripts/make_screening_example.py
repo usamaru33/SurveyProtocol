@@ -13,7 +13,7 @@ make_screening_example.py — 配布時に見せる「記入見本」シート�
 原稿にも "no large language model was used at any eligibility decision point" と記載している。
 したがって本スクリプトは **判定対象1,052件には一切触れない**。見本に使うのは:
 
-  - Phase 3a で**機械的に除外済み**の文献(`step3_kw_excluded.csv`)
+  - Phase 3a で**機械的に除外済み**の文献(`data/pipeline/step3_kw_excluded.csv`)
     … 除外理由が決定論的に記録済みなので、それを転記するだけで済む
   - gold set のうち**判定対象に含まれない**もの
     … 著者が既に「必須」と分類済みなので、新たな判定を伴わない
@@ -46,7 +46,7 @@ csv.field_size_limit(10 ** 9)
 from make_screening_sheets import SHEET_COLS, kw_group_count, norm_doi  # noqa: E402
 
 # 見本に使う文献(すべて判定対象1,052件の**外**)。
-#   src: 'excluded' = step3_kw_excluded.csv / 'gold' = self_scale_references.csv
+#   src: 'excluded' = data/pipeline/step3_kw_excluded.csv / 'gold' = data/reference/self_scale_references.csv
 EXAMPLES = [
     # --- 明確に Include ---
     dict(no=1, src="gold", doi="10.1145/3041164.3041204",
@@ -123,10 +123,10 @@ def _load(path: Path, doi_col: str, title_col: str, abs_col: str,
 
 
 def main() -> None:
-    excluded = _load(ROOT / "step3_kw_excluded.csv", "DOI", "Title",
+    excluded = _load(ROOT / "data/pipeline/step3_kw_excluded.csv", "DOI", "Title",
                      "Abstract Note", "Publication Title", "Publication Year")
     gold = {}
-    p = ROOT / "self_scale_references.csv"
+    p = ROOT / "data/reference/self_scale_references.csv"
     with p.open(encoding="utf-8-sig", newline="", errors="replace") as f:
         for r in csv.DictReader(f):
             gold[norm_doi(r.get("DOI_or_URL", ""))] = {

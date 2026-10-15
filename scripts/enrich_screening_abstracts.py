@@ -36,7 +36,7 @@ Phase 3b の判定対象(`screening/stage1/assignment.csv` の全レコード)�
 
 【入出力】
   入力: screening/stage1/assignment.csv(判定対象の DOI 一覧)
-        step3_kw_included.csv / outputs/snowballing_log.csv(既存の要旨の有無を見る)
+        data/pipeline/step3_kw_included.csv / outputs/snowballing_log.csv(既存の要旨の有無を見る)
   出力: outputs/enriched_abstracts.csv
         列: doi, abstract, source, chars, fetched_at
         source は crossref / semantic_scholar / notfound(要旨が存在しない) /
@@ -112,7 +112,7 @@ def fetch_s2_status(doi: str, api_key: str | None) -> tuple[str, str]:
 def load_existing_abstracts() -> dict[str, str]:
     """判定対象の DOI → 既存の要旨(空文字なら欠落)。"""
     have: dict[str, str] = {}
-    p = ROOT / "step3_kw_included.csv"
+    p = ROOT / "data/pipeline/step3_kw_included.csv"
     if p.exists():
         with p.open(encoding="utf-8-sig", newline="", errors="replace") as f:
             for r in csv.DictReader(f):

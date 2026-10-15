@@ -17,9 +17,9 @@ Levenshtein 最近傍(表記ゆれの疑い先)とそのランクを併記した
 証拠として記載する。既存の step1〜3 出力は一切変更しない(読み取り専用)。
 
 【入力】
-  - step2_rank_excluded.csv   Phase 2 除外レコード(Excl_Reason_Phase2 列で絞り込み)
-  - CORE.csv                  CORE 学会ランキング
-  - scimagojr 2025.csv        SJR ジャーナルランキング
+  - data/pipeline/step2_rank_excluded.csv   Phase 2 除外レコード(Excl_Reason_Phase2 列で絞り込み)
+  - data/reference/CORE.csv                  CORE 学会ランキング
+  - data/reference/scimagojr 2025.csv        SJR ジャーナルランキング
 
 【出力】
   - outputs/unmatched_venues_top50.csv
@@ -93,7 +93,7 @@ def nearest(norm: str, keys: list[str], entries: dict, cutoff: float):
 
 
 def main() -> None:
-    excl_path = ROOT / "step2_rank_excluded.csv"
+    excl_path = ROOT / "data/pipeline/step2_rank_excluded.csv"
     outdir = ROOT / "outputs"
     outdir.mkdir(exist_ok=True)
     out_csv = outdir / "unmatched_venues_top50.csv"
@@ -114,11 +114,11 @@ def main() -> None:
           f"ユニークVenue名: {len(counter):,} 種")
 
     # --- ランキングリストの索引(正規化キー → (原題, ランク)) ---
-    core_raw = load_core(ROOT / "CORE.csv")
+    core_raw = load_core(ROOT / "data/reference/CORE.csv")
     core_entries = {k: (v["original_title"], v["rank"]) for k, v in core_raw.items()}
     core_keys = list(core_entries)
 
-    sjr_raw = load_sjr(ROOT / "scimagojr 2025.csv")
+    sjr_raw = load_sjr(ROOT / "data/reference/scimagojr 2025.csv")
     sjr_entries = {k: (v["original_title"], v["quartile"])
                    for k, v in sjr_raw.items() if k != "__issn_index__"}
     sjr_keys = list(sjr_entries)

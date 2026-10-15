@@ -26,7 +26,7 @@ gold set の ACM 3件のうち 2件(#7 2017年 / #13 2014年)が欠落してい�
 
 【入力】
   - raw/*.csv                    Zotero コレクション別エクスポート(ファイル名 = DB名/波)
-  - self_scale_references.csv    gold set(SearchScope=in-scope を使用)
+  - data/reference/self_scale_references.csv    gold set(SearchScope=in-scope を使用)
 
 【出力】
   - outputs/export_completeness.csv   ファイル別の検査結果
@@ -54,7 +54,7 @@ from pathlib import Path
 _HERE = Path(__file__).resolve().parent
 ROOT = _HERE.parent
 RAW_DIR = ROOT / "raw"
-GOLD = ROOT / "self_scale_references.csv"
+GOLD = ROOT / "data/reference/self_scale_references.csv"
 
 # エクスポートUIの典型的な上限。ちょうどこの件数だと打ち切りを疑う。
 SUSPICIOUS_COUNTS = (100, 200, 250, 500, 1000, 2000, 5000, 10000)

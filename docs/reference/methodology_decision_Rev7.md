@@ -40,9 +40,9 @@ venue フィルタの学際会場取りこぼしの方が recall への影響が
 
 ### A-1. in-scope 13件の venue 分類
 
-一次データ: `self_scale_references.csv`(SearchScope=in-scope の 13件)。
+一次データ: `data/reference/self_scale_references.csv`(SearchScope=in-scope の 13件)。
 
-| 分類 | 件数 | 該当(# = self_scale_references.csv の ID) |
+| 分類 | 件数 | 該当(# = data/reference/self_scale_references.csv の ID) |
 |---|---|---|
 | VR/CG/HCI 会場 | **9 (69%)** | #3 Presence, #7 Augmented Human, #8 ACM SAP, #9/#12/#18 Frontiers in Virtual Reality, #10 ICAT-EGVE, #11 IEEE VR, #13 ACM TAP |
 | 心理・神経科学系ジャーナル | **4 (31%)** | #4 PLoS ONE(Being Barbie/Ehrsson), #5 PLoS ONE(Welcome to Wonderland), #6 PNAS(Banakou/Slater), #14 Cognitive Processing |
@@ -219,7 +219,7 @@ Zhou et al. が「検索段階の学際取りこぼし」を自認したのに�
 5. **心理接合点 background known-item の追加**(Botvinick&Cohen 1998 / Lenggenhager 2007 等、§A-2)—
    接合点主張の gold set 化。
 6. **各DBの verbatim フィールド指定構文**(TITLE-ABS-KEY vs TITLE-ABS vs [tiab])— 実効 scope 非対称の源泉。
-7. **known_items.md の位置づけ** — 現在テンプレート(有効行0)。実測は `self_scale_references.csv` を使用中。
+7. **known_items.md の位置づけ** — 現在テンプレート(有効行0)。実測は `data/reference/self_scale_references.csv` を使用中。
    正式 gold set をどちらにするか(または 15〜25件へ拡充)を確定。
 
 ---
@@ -237,12 +237,12 @@ Zhou et al. が「検索段階の学際取りこぼし」を自認したのに�
 - Known-Item Test 維持、目標 step0 ≥ 80%。現 69.2% は Rev.6 再検索(第2波)後に再測定。
 
 **Gold set の一本化(§著者確認#7 の解決):**
-正式 quasi-gold standard は **`self_scale_references.csv`(SearchScope 列)に一本化**。
+正式 quasi-gold standard は **`data/reference/self_scale_references.csv`(SearchScope 列)に一本化**。
 `known_items.md` の表は「拡充用の下書き」と位置づけ(冒頭に注記済み)。
 Rev.7 で心理接合点の古典 2件を background として追加(#19 Botvinick & Cohen 1998、
 #20 Lenggenhager 2007。非VR・実行クエリでは取れない前提、recall 分母外=検索対象と
 スノーボーリングの境界を示す文献)。in-scope の 15〜25件への拡充は著者が
-`self_scale_references.csv` に in-scope 行を追加して行う(現 in-scope 13件は最低ライン)。
+`data/reference/self_scale_references.csv` に in-scope 行を追加して行う(現 in-scope 13件は最低ライン)。
 
 **整備した成果物(このタスクで追加、外部通信・step ファイル変更なし):**
 | 対象 | 成果物 | 実行 |
@@ -327,7 +327,7 @@ Rev.8 で3DB体制に確定した現在は**参考情報**として保存する(
   「参考記録」の位置づけ)。
 - 心理接合点 background 文献(#19 Botvinick & Cohen 1998、#20 Lenggenhager 2007)は、
   PsycINFO正当化ドラフトの「スノーボーリングで残余リスクを緩和する」主張と接続する
-  境界文献としても機能する(`self_scale_references.csv` に追加済み、`known_items.md` 参照)。
+  境界文献としても機能する(`data/reference/self_scale_references.csv` に追加済み、`known_items.md` 参照)。
 
 ### 2026-07-27 補足: Scopus scope の実測(TITLE-ABS vs TITLE-ABS-KEY)
 

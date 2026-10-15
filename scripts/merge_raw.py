@@ -6,11 +6,11 @@ merge_raw.py — raw/ の DB別エクスポートから統合生データを組�
 
 【何を】
 `raw/*.csv`(Zotero のコレクション別エクスポート)を連結し、
-**取得元DBを示す `Source_DB` 列を付与**した統合生データ(既定 `ResearchVR4.csv`)を作る。
+**取得元DBを示す `Source_DB` 列を付与**した統合生データ(既定 `data/merged/ResearchVR4.csv`)を作る。
 重複削除は**行わない**(それは `pipeline.py` の Phase 1 の責務)。
 
 【なぜ】
-現行の統合データ `ResearchVR2.csv` / `ResearchVR3.csv` が**どう作られたかの記録が無く**、
+現行の統合データ `data/merged/ResearchVR2.csv` / `data/merged/ResearchVR3.csv` が**どう作られたかの記録が無く**、
 再現できないことが Rev.7 の検証で問題になった。加えて `search_replication.md`
 「重複ID列の扱い(統合時)」が「取得元DB列を追加してから統合する(統合後は復元不能)」と
 要求しているのに、既存の統合CSVには取得元DB列が無く、URL/DOI からの**推定**に頼っていた
@@ -27,7 +27,7 @@ PubMed を含めてはならない。初回検索データ `raw/PubMed.csv` は�
   - raw/*.csv    Zotero コレクション別エクスポート(ファイル名が取得元DBの記録を兼ねる)
 
 【出力】
-  - ResearchVR4.csv (既定)   統合生データ + Source_DB 列
+  - data/merged/ResearchVR4.csv (既定)   統合生データ + Source_DB 列
     ※ `scripts/known_item_test.py` は `ResearchVR*.csv` の名前昇順で最後を step0 に使うため、
       このファイルを置くだけで Known-Item Test の対象が自動的に最新版に切り替わる。
 
@@ -37,7 +37,7 @@ PubMed を含めてはならない。初回検索データ `raw/PubMed.csv` は�
 
 実行例:
   python -X utf8 scripts/merge_raw.py --dry-run     # 件数の内訳だけ表示
-  python -X utf8 scripts/merge_raw.py               # ResearchVR4.csv を生成
+  python -X utf8 scripts/merge_raw.py               # data/merged/ResearchVR4.csv を生成
   python -X utf8 scripts/merge_raw.py --include-pubmed --out ResearchVR4_with_pubmed.csv
 """
 
@@ -84,7 +84,7 @@ def load(path: Path) -> tuple[list[str], list[dict]]:
 def main() -> None:
     ap = argparse.ArgumentParser(
         description="raw/*.csv を連結して統合生データを作る(重複削除はしない)")
-    ap.add_argument("--out", type=Path, default=ROOT / "ResearchVR4.csv")
+    ap.add_argument("--out", type=Path, default=ROOT / "data/merged/ResearchVR4.csv")
     ap.add_argument("--include-pubmed", action="store_true",
                     help="PubMed を含める(既定は Rev.8 により除外)")
     ap.add_argument("--dry-run", action="store_true",

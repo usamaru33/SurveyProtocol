@@ -8,7 +8,7 @@ raw_db_audit.py — DB別生データ(raw/)の監査と PRISMA 上段数値の�
 Zotero のDB別コレクションからエクスポートされた raw/*.csv について、
 (1) DB別レコード数(= PRISMA "Records identified from each database")、
 (2) 取り込み日(Date Added)の分布、
-(3) 統合エクスポート ResearchVR2.csv との整合(Key 照合)、
+(3) 統合エクスポート data/merged/ResearchVR2.csv との整合(Key 照合)、
 (4) DB間重複(DOI / 正規化タイトルの一致)
 を集計する。
 
@@ -18,7 +18,7 @@ PRISMA 2020 フロー図の上段(identification)を、再検索なしに Zotero
 
 【入力】
   - raw/*.csv           Zotero コレクション別エクスポート(ファイル名 = DB名)
-  - ResearchVR2.csv     統合エクスポート(14,385件)
+  - data/merged/ResearchVR2.csv     統合エクスポート(14,385件)
 
 【出力】
   - outputs/raw_db_audit.csv   DB別: レコード数・Date Added 内訳・統合CSVとのKey一致数
@@ -43,7 +43,7 @@ from pathlib import Path
 _HERE = Path(__file__).resolve().parent
 ROOT = _HERE.parent
 RAW_DIR = ROOT / "raw"
-MERGED = ROOT / "ResearchVR2.csv"
+MERGED = ROOT / "data/merged/ResearchVR2.csv"
 
 
 def norm_doi(raw: str) -> str:
