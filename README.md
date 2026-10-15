@@ -152,8 +152,8 @@ SurveyProtocol/
 │   │   ├── ResearchVR3.csv      #   旧入力（第1波4DB, 14,682件。経緯として保存）
 │   │   └── ResearchVR4.csv      #   ★ 現行入力（3DB × 第1波+第2波 = 26,434件、Source_DB列つき）
 │   ├── reference/               # 参照表
-│   │   ├── CORE.csv             #   CORE学会ランキング（1,955エントリ）
-│   │   ├── scimagojr 2025.csv   #   SJRジャーナルランキング（50,326エントリ）
+│   │   ├── CORE.csv             #   CORE学会ランキング（1,956エントリ。ファイル行数は 987）
+│   │   ├── scimagojr 2025.csv   #   SJRジャーナルランキング（50,327エントリ。ファイル行数は 32,193）
 │   │   ├── venue_aliases.csv    #   著者確認済みVenueエイリアス表（Phase 2 の最優先照合）
 │   │   └── self_scale_references.csv  # ★正式 gold set（SearchScope列: in-scope 17件 / background 8件）
 │   └── pipeline/                # pipeline.py の出力（公式 step ファイル。凍結中、再実行しない）
@@ -161,9 +161,9 @@ SurveyProtocol/
 │       ├── step1_5_filter_included.csv  # Phase 1.5 出力: フィルタ層 通過（6,317件）
 │       ├── step1_5_filter_excluded.csv  # Phase 1.5 出力: フィルタ層 除外（12,025件）
 │       ├── step2_rank_included.csv      # Phase 2 出力: 高ランクVenue通過（1,179件）
-│       ├── step2_rank_excluded.csv      # Phase 2 出力: 低ランクVenue除外（9,634件）
+│       ├── step2_rank_excluded.csv      # Phase 2 出力: 低ランクVenue除外（5,138件）
 │       ├── step3_kw_included.csv        # Phase 3a 出力: ★最終候補（795件）
-│       ├── step3_kw_excluded.csv        # Phase 3 出力: キーワード除外（1,082件）
+│       ├── step3_kw_excluded.csv        # Phase 3 出力: キーワード除外（384件）
 │       └── pipeline_log.txt             # パイプライン実行ログ（詳細・最新値はここ）
 ├── raw/                         # ZoteroのDB別コレクションエクスポート（PRISMA上段の根拠）
 │   ├── acm.csv / ieee.csv / IEEE_2025-2026.csv / PubMed.csv / Scopus.csv  # 初回検索（第1波）

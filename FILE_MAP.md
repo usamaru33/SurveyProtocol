@@ -49,8 +49,8 @@
 ### `data/reference/` 参照表
 | ファイル | 内容 |
 |---|---|
-| `CORE.csv` | CORE 学会ランキング(ヘッダなし、987 行) |
-| `scimagojr 2025.csv` | SJR ジャーナルランキング(セミコロン区切り、32,193 行) |
+| `CORE.csv` | CORE 学会ランキング(ヘッダなし。ファイル 987 行 / `pipeline.py` が読み込む正規化キーのエントリ数は 1,956) |
+| `scimagojr 2025.csv` | SJR ジャーナルランキング(セミコロン区切り。ファイル 32,193 行 / 読み込み後のエントリ数は 50,327) |
 | `venue_aliases.csv` | 著者確認済みの Venue エイリアス表(445 行)。Phase 2 の最優先照合 |
 | `self_scale_references.csv` | 正式 gold set(25 行)。`SearchScope` 列で in-scope / background を区別。Known-Item Test の基準 |
 
@@ -63,8 +63,7 @@
 | `step3_kw_included.csv` / `_excluded.csv` | 795 / 384 | Phase 3a: キーワード除外の通過(最終候補)/ 除外 |
 | `pipeline_log.txt` | — | 実行ログ(詳細・最新値はここ) |
 
-> `README.md` には、この表と食い違う古い件数(step2 除外 9,634 / step3 除外 1,082 など)が残っている。
-> 実ファイルの行数はこの表のとおり(6,317 − 1,179 = 5,138、1,179 − 795 = 384 とも整合する)。README 側が未更新。
+> 件数は `pipeline_log.txt` の最終実行値と一致する(6,317 − 1,179 = 5,138、1,179 − 795 = 384 とも整合する)。
 
 ## `raw/` DB 別エクスポート原本
 | ファイル | 件数 | 内容 |
