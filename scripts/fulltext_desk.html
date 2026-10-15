@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>全文取得デスク</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2330; --muted: #6a7282; --line: #e3e6eb;
+  --accent: #2f6fde; --accent-ink: #ffffff; --ok: #1f8a4c; --ok-bg: #e5f5ec;
+  --warn: #a86400; --warn-bg: #fff3dd; --skip: #7a5cc0; --skip-bg: #f0ebfb; --sel: #eaf1fd;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14171c; --panel: #1c2027; --ink: #e6e9ee; --muted: #9aa3b2; --line: #2c323c;
+    --accent: #5b92f0; --accent-ink: #0d1117; --ok: #4cc37f; --ok-bg: #173325;
+    --warn: #e8a640; --warn-bg: #3a2c14; --skip: #a88ef0; --skip-bg: #2a2340; --sel: #1f2a3d;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 14px/1.55 system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", sans-serif; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 20px 16px 60px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 20px; margin-bottom: 14px; }
+h1 { font-size: 20px; margin: 0; }
+.muted { color: var(--muted); }
+.bar { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; flex: 1 1 240px; align-self: center; }
+.bar > i { display: block; height: 100%; background: var(--ok); transition: width .4s; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-bottom: 14px; }
+.inbox { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; }
+code { background: var(--bg); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; font-size: 12.5px; word-break: break-all; }
+.current h2 { font-size: 17px; margin: 4px 0 6px; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+button, .btn { font: inherit; border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+  border-radius: 7px; padding: 7px 12px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+button:hover, .btn:hover { border-color: var(--accent); }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+kbd { font: 11px ui-monospace, monospace; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; opacity: .8; }
+button.primary kbd { border-color: currentColor; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.chip { border-radius: 99px; padding: 3px 11px; font-size: 13px; }
+.chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 10px; font-size: 13px; }
+input[type=search] { font: inherit; padding: 6px 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); color: var(--ink); flex: 1 1 220px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+td { padding: 7px 8px; border-top: 1px solid var(--line); vertical-align: top; }
+tr { cursor: pointer; }
+tr.sel td { background: var(--sel); }
+td.st { width: 74px; white-space: nowrap; }
+td.pub { width: 110px; color: var(--muted); }
+td.id { width: 104px; font-family: ui-monospace, monospace; font-size: 12px; color: var(--muted); }
+.tag { display: inline-block; border-radius: 5px; padding: 0 7px; font-size: 12px; }
+.t-ok { background: var(--ok-bg); color: var(--ok); }
+.t-open { background: var(--warn-bg); color: var(--warn); }
+.t-skip { background: var(--skip-bg); color: var(--skip); }
+.t-todo { color: var(--muted); }
+.left-item { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); }
+.left-item:first-of-type { border-top: 0; }
+.left-item .why { color: var(--warn); font-size: 13px; flex: 1 1 200px; }
+select { font: inherit; max-width: 100%; flex: 1 1 320px; padding: 6px; border-radius: 7px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+.log { font-size: 12.5px; max-height: 180px; overflow: auto; }
+.log div { padding: 2px 0; }
+.log .ok { color: var(--ok); } .log .warn { color: var(--warn); }
+.toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); background: var(--ok); color: #fff;
+  padding: 9px 16px; border-radius: 8px; font-weight: 600; opacity: 0; transition: opacity .3s; pointer-events: none; max-width: calc(100% - 32px); }
+.toast.show { opacity: 1; }
+.offline { color: var(--warn); font-weight: 600; }
+h3 { font-size: 14px; margin: 0 0 8px; }
+@media (max-width: 640px) { td.pub, td.id { display: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>全文取得デスク</h1>
+    <span id="count" class="muted">読み込み中…</span>
+    <div class="bar"><i id="bar" style="width:0"></i></div>
+    <span id="conn"></span>
+  </header>
+
+  <div class="panel inbox">
+    <span>PDF の保存先:</span><code id="inbox"></code>
+    <button id="copyInbox">パスをコピー</button>
+    <span class="muted">PDF がブラウザ内で開いたら Ctrl+S で保存。ファイル名はそのままで OK、数秒で自動で振り分けます。</span>
+  </div>
+
+  <div class="panel current" id="current"></div>
+
+  <div class="panel" id="leftPanel" hidden>
+    <h3>照合できなかった PDF(論文を選んで割り当て)</h3>
+    <div id="left"></div>
+  </div>
+
+  <div class="panel">
+    <div class="chips" id="chips"></div>
+    <div class="tools">
+      <input type="search" id="q" placeholder="タイトル・ID・DOI で絞り込み">
+      <label><input type="checkbox" id="showDone"> 取得済みも表示</label>
+      <label><input type="checkbox" id="showSkip" checked> 後回しも表示</label>
+    </div>
+    <table><tbody id="list"></tbody></table>
+  </div>
+
+  <div class="panel">
+    <h3>履歴</h3>
+    <div class="log" id="log"><span class="muted">まだありません</span></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const store = {
+  get(k) { try { return new Set(JSON.parse(localStorage.getItem(k) || "[]")); } catch { return new Set(); } },
+  put(k, s) { try { localStorage.setItem(k, JSON.stringify([...s])); } catch {} },
+};
+let opened = store.get("ftd-opened"), skipped = store.get("ftd-skipped");
+let records = [], left = [], events = [], pub = "すべて", selId = null, lastEvent = null, prevOk = new Set();
+
+const link = (r) => r.doi ? "https://doi.org/" + r.doi
+  : "https://scholar.google.com/scholar?q=" + encodeURIComponent(r.title);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+
+function visible() {
+  const q = $("q").value.trim().toLowerCase();
+  return records.filter((r) =>
+    (pub === "すべて" || r.publisher === pub) &&
+    ($("showDone").checked || !r.ok) &&
+    ($("showSkip").checked || !skipped.has(r.id)) &&
+    (!q || (r.title + " " + r.id + " " + r.doi).toLowerCase().includes(q)));
+}
+function todo() { return visible().filter((r) => !r.ok); }
+function nextTarget(fromId) {
+  const list = todo(), notSkipped = list.filter((r) => !skipped.has(r.id));
+  const pool = notSkipped.length ? notSkipped : list;
+  if (!pool.length) return null;
+  const i = fromId ? list.findIndex((r) => r.id === fromId) : -1;
+  return (pool.find((r) => list.indexOf(r) > i) || pool[0]).id;
+}
+function cur() { return records.find((r) => r.id === selId); }
+
+function render() {
+  const done = records.filter((r) => r.ok).length;
+  $("count").textContent = `取得 ${done} / ${records.length} 件(残り ${records.length - done})`;
+  $("bar").style.width = records.length ? (100 * done / records.length) + "%" : "0";
+
+  const counts = {};
+  records.forEach((r) => { if (!r.ok) counts[r.publisher] = (counts[r.publisher] || 0) + 1; });
+  const pubs = ["すべて", ...Object.keys(counts).sort((a, b) => counts[b] - counts[a])];
+  $("chips").innerHTML = pubs.map((p) =>
+    `<button class="chip" aria-pressed="${p === pub}" data-pub="${esc(p)}">${esc(p)} ${p === "すべて" ? records.length - done : counts[p]}</button>`).join("");
+
+  const c = cur();
+  if (!c) {
+    $("current").innerHTML = todo().length ? "<span class='muted'>一覧から論文を選んでください</span>"
+      : "<h2>🎉 この絞り込みの未取得はありません</h2>";
+  } else {
+    const st = c.ok ? "<span class='tag t-ok'>✅ 取得済み</span>" : skipped.has(c.id) ? "<span class='tag t-skip'>後回し</span>"
+      : opened.has(c.id) ? "<span class='tag t-open'>開いた・PDF 待ち</span>" : "";
+    $("current").innerHTML = `
+      <div class="muted">いまの論文 ${st}</div>
+      <h2>${esc(c.title)}</h2>
+      <div class="meta"><span>${esc(c.publisher)}</span><span>${c.doi ? "DOI " + esc(c.doi) : "DOI なし(Scholar で検索)"}</span>
+        <span>${esc(c.id)}</span><span>担当 ${esc(c.pair)}</span></div>
+      <div class="actions">
+        <button class="primary" id="open">${c.doi ? "出版社ページを開く" : "Scholar で探す"} <kbd>Enter</kbd></button>
+        <button id="next">次へ <kbd>→</kbd></button>
+        <button id="skip">${skipped.has(c.id) ? "後回しを解除" : "後回し"} <kbd>S</kbd></button>
+        <button id="copyTitle">タイトルをコピー <kbd>C</kbd></button>
+        ${c.doi ? `<a class="btn" target="_blank" rel="noopener" href="https://scholar.google.com/scholar?q=${encodeURIComponent(c.title)}">Scholar</a>` : ""}
+      </div>`;
+    $("open").onclick = openCur; $("next").onclick = goNext; $("skip").onclick = toggleSkip; $("copyTitle").onclick = copyTitle;
+  }
+
+  $("list").innerHTML = visible().map((r) => {
+    const tag = r.ok ? "<span class='tag t-ok'>✅ 取得</span>" : skipped.has(r.id) ? "<span class='tag t-skip'>後回し</span>"
+      : opened.has(r.id) ? "<span class='tag t-open'>開いた</span>" : "<span class='tag t-todo'>未取得</span>";
+    return `<tr data-id="${r.id}" class="${r.id === selId ? "sel" : ""}"><td class="st">${tag}</td>
+      <td>${esc(r.title)}</td><td class="pub">${esc(r.publisher)}</td><td class="id">${r.id}</td></tr>`;
+  }).join("") || "<tr><td class='muted'>該当なし</td></tr>";
+
+  $("leftPanel").hidden = !left.length;
+  const opts = records.filter((r) => !r.ok).sort((a, b) => a.title.localeCompare(b.title))
+    .map((r) => `<option value="${r.id}">${esc(r.title.slice(0, 90))} — ${r.id}</option>`).join("");
+  const keep = {};
+  document.querySelectorAll("#left select").forEach((s) => keep[s.dataset.file] = s.value);
+  $("left").innerHTML = left.map((f) => `<div class="left-item">
+      <code>${esc(f.file)}</code><span class="why">${esc(f.why)}</span>
+      <select data-file="${esc(f.file)}"><option value="">論文を選ぶ…</option>${opts}</select>
+      <button data-assign="${esc(f.file)}">割り当て</button></div>`).join("");
+  document.querySelectorAll("#left select").forEach((s) => {
+    if (keep[s.dataset.file]) s.value = keep[s.dataset.file];
+    else if (selId && records.find((r) => r.id === selId && !r.ok)) s.value = selId;  // いま開いている論文を既定に
+  });
+
+  $("log").innerHTML = events.length ? events.map((e) => `<div class="${e.kind}">${e.t} ${esc(e.text)}</div>`).join("")
+    : "<span class='muted'>まだありません</span>";
+}
+
+function select(id) { selId = id; render(); document.querySelector("tr.sel")?.scrollIntoView({block: "nearest"}); }
+function openCur() {
+  const c = cur(); if (!c) return;
+  window.open(link(c), "_blank", "noopener");
+  opened.add(c.id); store.put("ftd-opened", opened); render();
+}
+function goNext() { select(nextTarget(selId)); }
+function toggleSkip() {
+  const c = cur(); if (!c) return;
+  if (skipped.has(c.id)) skipped.delete(c.id); else { skipped.add(c.id); store.put("ftd-skipped", skipped); return goNext(); }
+  store.put("ftd-skipped", skipped); render();
+}
+function copyTitle() { const c = cur(); if (c) navigator.clipboard?.writeText(c.title).then(() => toast("タイトルをコピーしました")); }
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2600); }
+
+async function poll() {
+  try {
+    const s = await (await fetch("/api/state", {cache: "no-store"})).json();
+    $("conn").textContent = "";
+    $("inbox").textContent = s.inbox;
+    // 同じ出版社のサイトを続けて回れるよう出版社ごとにまとめる(件数は全件で数え、取得が進んでも順序を動かさない)
+    const n = {}; s.records.forEach((r) => { n[r.publisher] = (n[r.publisher] || 0) + 1; });
+    records = s.records.map((r, i) => [r, i]).sort((a, b) =>
+      ((n[b[0].publisher] || 0) - (n[a[0].publisher] || 0)) || a[0].publisher.localeCompare(b[0].publisher) || a[1] - b[1])
+      .map(([r]) => r);
+    left = s.left; events = s.events;
+    const okNow = new Set(records.filter((r) => r.ok).map((r) => r.id));
+    const fresh = [...okNow].filter((id) => prevOk.size && !prevOk.has(id));
+    prevOk = okNow;
+    if (fresh.length) toast(`✅ ${fresh.length} 件を振り分けました`);
+    if (!selId || (fresh.includes(selId))) selId = nextTarget(selId);  // いまの論文が届いたら次へ
+    render();
+  } catch {
+    $("conn").innerHTML = "<span class='offline'>ツールに接続できません(fulltext_desk.py が終了している?)</span>";
+  }
+}
+
+document.addEventListener("click", async (e) => {
+  const chip = e.target.closest("[data-pub]");
+  if (chip) { pub = chip.dataset.pub; if (!visible().some((r) => r.id === selId)) selId = nextTarget(null); return render(); }
+  const tr = e.target.closest("tr[data-id]");
+  if (tr) return select(tr.dataset.id);
+  const a = e.target.closest("[data-assign]");
+  if (a) {
+    const sel = document.querySelector(`#left select[data-file="${CSS.escape(a.dataset.assign)}"]`);
+    if (!sel.value) return toast("論文を選んでください");
+    const res = await fetch("/api/assign", {method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({file: a.dataset.assign, id: sel.value})});
+    const j = await res.json();
+    if (!j.ok) alert(j.error || "割り当てに失敗しました");
+    poll();
+  }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.target.matches("input, select, textarea") || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.key === "Enter") { e.preventDefault(); openCur(); }
+  else if (e.key === "ArrowRight" || e.key === "n") goNext();
+  else if (e.key === "s" || e.key === "S") toggleSkip();
+  else if (e.key === "c" || e.key === "C") copyTitle();
+  else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    e.preventDefault();
+    const v = visible(), i = v.findIndex((r) => r.id === selId);
+    const j = Math.max(0, Math.min(v.length - 1, i + (e.key === "ArrowDown" ? 1 : -1)));
+    if (v[j]) select(v[j].id);
+  }
+});
+["q", "showDone", "showSkip"].forEach((id) => $(id).addEventListener("input", () => {
+  if (!visible().some((r) => r.id === selId)) selId = nextTarget(null); render();
+}));
+$("copyInbox").onclick = () => navigator.clipboard?.writeText($("inbox").textContent).then(() => toast("保存先のパスをコピーしました"));
+poll(); setInterval(poll, 2000);
+</script>
+</body>
+</html>
