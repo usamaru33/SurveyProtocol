@@ -18,7 +18,7 @@ VR空間における自己スケール感覚のシステマティック・レビ
 
 ## 前提知識（要点）
 
-- 最終候補は `step3_kw_included.csv`（1,784件）。パイプラインは Phase 1(重複削除)→2(Venueランク)→3(キーワード除外) まで実行済み。
+- 最終候補は `data/pipeline/step3_kw_included.csv`（1,784件）。パイプラインは Phase 1(重複削除)→2(Venueランク)→3(キーワード除外) まで実行済み。
 - rule.md 本来の Phase 3（LLM要旨判定）と Phase 4（全文PICOS評価）は**未着手**。
 - 兄弟フォルダ `docs-system/` は Semantic Scholar ベースの文献ブラウザ（Next.js）。サーベイ本体とは未接続。`DocsSystem/` は空（廃棄跡）。
 - 作業終了時は必ず `/survey-log` で PROGRESS_LOG.md に追記する。

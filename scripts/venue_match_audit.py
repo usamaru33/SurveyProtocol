@@ -17,8 +17,8 @@ protocol_changelog.md Rev.6 に自己申告として記録)。本スクリプト
 全数監査し、Venue フィルタ全体の妥当性評価を完成させる。
 
 【入力】
-  - step2_rank_included.csv / step2_rank_excluded.csv(Matched_Venue 列を持つ)
-  - CORE.csv / scimagojr 2025.csv
+  - data/pipeline/step2_rank_included.csv / data/pipeline/step2_rank_excluded.csv(Matched_Venue 列を持つ)
+  - data/reference/CORE.csv / data/reference/scimagojr 2025.csv
 
 【出力】
   - outputs/venue_match_audit.csv     照合成功した全ユニークVenueの一覧
@@ -155,16 +155,16 @@ def assign_priorities(rows_suspect: list[dict], core: dict, sjr: dict) -> None:
 
 
 def main() -> None:
-    core = load_core(ROOT / "CORE.csv")
-    sjr = load_sjr(ROOT / "scimagojr 2025.csv")
+    core = load_core(ROOT / "data/reference/CORE.csv")
+    sjr = load_sjr(ROOT / "data/reference/scimagojr 2025.csv")
     outdir = ROOT / "outputs"
     outdir.mkdir(exist_ok=True)
 
     # (raw_venue, matched, source, rank, decision) -> record count
     groups: dict[tuple, int] = Counter()
     issn_by_venue: dict[str, str] = {}
-    for fname, decision in [("step2_rank_included.csv", "INCLUDED"),
-                            ("step2_rank_excluded.csv", "EXCLUDED")]:
+    for fname, decision in [("data/pipeline/step2_rank_included.csv", "INCLUDED"),
+                            ("data/pipeline/step2_rank_excluded.csv", "EXCLUDED")]:
         with (ROOT / fname).open(encoding="utf-8-sig", newline="",
                                  errors="replace") as f:
             for row in csv.DictReader(f):

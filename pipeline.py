@@ -20,11 +20,11 @@ import difflib
 # Paths
 # ---------------------------------------------------------------------------
 _HERE = Path(__file__).parent
-DEFAULT_INPUT   = _HERE / "ResearchVR2.csv"
-DEFAULT_CORE    = _HERE / "CORE.csv"
-DEFAULT_SJR     = _HERE / "scimagojr 2025.csv"
-DEFAULT_ALIASES = _HERE / "venue_aliases.csv"
-DEFAULT_OUTDIR  = _HERE
+DEFAULT_INPUT   = _HERE / "data" / "merged" / "ResearchVR2.csv"
+DEFAULT_CORE    = _HERE / "data" / "reference" / "CORE.csv"
+DEFAULT_SJR     = _HERE / "data" / "reference" / "scimagojr 2025.csv"
+DEFAULT_ALIASES = _HERE / "data" / "reference" / "venue_aliases.csv"
+DEFAULT_OUTDIR  = _HERE / "data" / "pipeline"
 
 # ---------------------------------------------------------------------------
 # Column aliases

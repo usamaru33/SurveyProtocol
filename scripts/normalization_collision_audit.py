@@ -8,7 +8,7 @@ normalization_collision_audit.py — 正規化同名衝突の全数検出
 CORE / SJR の全エントリに pipeline.py と同一の正規化を適用してキー空間を再構築し、
 **同一の正規化キーに2つ以上の異なる元エントリが対応する全ケース(=同名衝突)**を列挙する。
 衝突のうち「採否(A*/A/Q1 か圏外か)が変わる」ものを別ファイルに抽出し、
-venue_aliases.csv に「著者確認待ち」行として自動追記する。
+data/reference/venue_aliases.csv に「著者確認待ち」行として自動追記する。
 
 【なぜ】
 Presence 誌の誤照合(29件)・TAP 誌の誤照合(49件)は、ファジー照合ではなく
@@ -25,9 +25,9 @@ venue_match_audit.py の Task D 優先度付け(P2: 元文字列類似度が低�
 ※ TAP/SAP は SJR誌とCORE会議の**リスト間衝突**なので本監査で検出される。
 
 【入力】
-  - CORE.csv / scimagojr 2025.csv
-  - step1_dedup.csv(現行データでの出現件数の算出用)
-  - venue_aliases.csv(自動追記先)
+  - data/reference/CORE.csv / data/reference/scimagojr 2025.csv
+  - data/pipeline/step1_dedup.csv(現行データでの出現件数の算出用)
+  - data/reference/venue_aliases.csv(自動追記先)
 
 【出力】
   - outputs/normalization_collisions.csv
@@ -35,7 +35,7 @@ venue_match_audit.py の Task D 優先度付け(P2: 元文字列類似度が低�
       affected_records_in_our_data | data_venue_examples | current_match_target |
       priority_flag(データに出現するものを HIGH)
   - outputs/collisions_rank_conflict.csv(採否が変わる衝突のみ)
-  - venue_aliases.csv への自動追記(rank_conflict 全件、rank=MANUAL の文書化行。
+  - data/reference/venue_aliases.csv への自動追記(rank_conflict 全件、rank=MANUAL の文書化行。
     既に同じ衝突キーが記載済みの場合はスキップ = 冪等)
   - 標準出力: 件数サマリ
 
@@ -63,7 +63,7 @@ from pipeline import (  # noqa: E402
     normalize_venue,
 )
 
-ALIAS_PATH = ROOT / "venue_aliases.csv"
+ALIAS_PATH = ROOT / "data/reference/venue_aliases.csv"
 
 
 def adopted(source: str, rank: str) -> bool:
@@ -77,7 +77,7 @@ def build_keyspace():
     keyspace: dict[str, list[dict]] = defaultdict(list)
     order = 0
 
-    with (ROOT / "CORE.csv").open(encoding="utf-8-sig", newline="",
+    with (ROOT / "data/reference/CORE.csv").open(encoding="utf-8-sig", newline="",
                                   errors="replace") as f:
         for row in csv.reader(f):
             if len(row) < 5:
@@ -94,7 +94,7 @@ def build_keyspace():
                     {"source": "CORE", "kind": "acronym", "original": title,
                      "rank": rank, "order": order})
 
-    with (ROOT / "scimagojr 2025.csv").open(encoding="utf-8-sig", newline="",
+    with (ROOT / "data/reference/scimagojr 2025.csv").open(encoding="utf-8-sig", newline="",
                                             errors="replace") as f:
         reader = csv.reader(f, delimiter=";")
         header = next(reader, [])
@@ -117,11 +117,11 @@ def build_keyspace():
 
 
 def data_venue_index():
-    """現行データ(step1_dedup.csv)の Venue が pipeline の照合でどのキーに解決するかを数える。
+    """現行データ(data/pipeline/step1_dedup.csv)の Venue が pipeline の照合でどのキーに解決するかを数える。
     Returns: key -> Counter(raw_venue -> record count)"""
     hits: dict[str, Counter] = defaultdict(Counter)
     venues: Counter[str] = Counter()
-    with (ROOT / "step1_dedup.csv").open(encoding="utf-8-sig", newline="",
+    with (ROOT / "data/pipeline/step1_dedup.csv").open(encoding="utf-8-sig", newline="",
                                          errors="replace") as f:
         for row in csv.DictReader(f):
             venues[(row.get("Publication Title") or "").strip()] += 1
@@ -218,7 +218,7 @@ def main() -> None:
     print(f"  出力: outputs/normalization_collisions.csv / "
           f"collisions_rank_conflict.csv")
 
-    # --- venue_aliases.csv へ rank_conflict 全件を自動追記(冪等) ---
+    # --- data/reference/venue_aliases.csv へ rank_conflict 全件を自動追記(冪等) ---
     existing = ALIAS_PATH.read_text(encoding="utf-8-sig") if ALIAS_PATH.exists() \
         else "Raw venue string,Canonical name,CORE/SJR rank,Source of decision,Note\n"
     added = 0
@@ -243,7 +243,7 @@ def main() -> None:
     if lines_to_add:
         with ALIAS_PATH.open("a", encoding="utf-8-sig", newline="") as f:
             f.write("\n".join(lines_to_add) + "\n")
-    print(f"  venue_aliases.csv へ自動追記     : {added} 行(MANUAL・著者確認待ち)"
+    print(f"  data/reference/venue_aliases.csv へ自動追記     : {added} 行(MANUAL・著者確認待ち)"
           f"{' / 既存記載はスキップ' if added < len(rows_conflict) else ''}")
 
 

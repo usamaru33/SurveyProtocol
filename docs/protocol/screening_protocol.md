@@ -342,7 +342,7 @@ python -X utf8 scripts/make_screening_example.py
 
 見本の素材は**すべて判定対象1,052件の外**から採る。
 
-- **Phase 3a で機械的に除外済み**の文献（`step3_kw_excluded.csv`）
+- **Phase 3a で機械的に除外済み**の文献（`data/pipeline/step3_kw_excluded.csv`）
   … 除外理由が決定論的に記録済みなので、それを転記するだけで済む
 - **gold set のうち判定対象に含まれないもの**
   … 著者が既に分類済みなので、新たな判定を伴わない

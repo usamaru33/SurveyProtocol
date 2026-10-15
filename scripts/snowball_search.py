@@ -17,14 +17,14 @@ Graph API を Python から叩き、シード論文の被引用・引用文献�
 
 **PICOS採否・関連性の判断は自動化しない**(LLM不使用・決定論的の方針どおり)。
 本スクリプトが行うのは「取得」と「機械的に分かる情報の付与」まで:
-  - 既存コーパス(raw/*.csv・raw/*.ris・step3_kw_included.csv)に既出かどうか
+  - 既存コーパス(raw/*.csv・raw/*.ris・data/pipeline/step3_kw_included.csv)に既出かどうか
   - CORE/SJR ランキング照合(参考情報。Phase 2 基準を通るかの目安)
 著者はこの一覧を見て Title/採否/理由を判断し、`picos_decision` 列に記入する。
 
 【シードの既定】
 `docs/protocol/snowballing_protocol.md` §1.1 のとおり、既定シードは
 `outputs/venue_dropped_known_items.csv`(step2脱落6件)を
-`self_scale_references.csv`(# ↔ ID で結合)から DOI を引いて使う。
+`data/reference/self_scale_references.csv`(# ↔ ID で結合)から DOI を引いて使う。
 `--seeds-csv` で任意のCSV(Title/DOI列、エイリアス解決あり)に差し替え可能
 (例: 2ホップ目に著者が選んだ候補を再投入する場合)。
 
@@ -173,7 +173,7 @@ def extract_doi_from_field(raw: str) -> str:
 # ---------------------------------------------------------------------------
 
 def load_existing_keys() -> set[str]:
-    """raw/*.csv・raw/*.ris・step3_kw_included.csv から DOI/正規化タイトルのキー集合を作る。"""
+    """raw/*.csv・raw/*.ris・data/pipeline/step3_kw_included.csv から DOI/正規化タイトルのキー集合を作る。"""
     keys: set[str] = set()
 
     for csv_path in (ROOT / "raw").glob("*.csv"):
@@ -189,7 +189,7 @@ def load_existing_keys() -> set[str]:
     for ris_path in (ROOT / "raw").glob("*.ris"):
         keys |= _keys_from_ris(ris_path)
 
-    step3 = ROOT / "step3_kw_included.csv"
+    step3 = ROOT / "data/pipeline/step3_kw_included.csv"
     if step3.exists():
         with step3.open(encoding="utf-8-sig", newline="", errors="replace") as f:
             for row in csv.DictReader(f):
@@ -247,10 +247,10 @@ def _resolve(row: dict, aliases: list[str]) -> str:
 
 
 def load_default_seeds() -> list[dict]:
-    """venue_dropped_known_items.csv(#)を self_scale_references.csv(ID)と結合し、
+    """venue_dropped_known_items.csv(#)を data/reference/self_scale_references.csv(ID)と結合し、
     Title + DOI を持つシードのリストを作る。"""
     dropped_path = ROOT / "outputs" / "venue_dropped_known_items.csv"
-    refs_path = ROOT / "self_scale_references.csv"
+    refs_path = ROOT / "data/reference/self_scale_references.csv"
     if not dropped_path.exists() or not refs_path.exists():
         sys.exit(f"[ERROR] 既定シード読み込みに必要なファイルが見つかりません: "
                   f"{dropped_path.name} / {refs_path.name}")
@@ -264,7 +264,7 @@ def load_default_seeds() -> list[dict]:
             seed_id = (row.get("#") or "").strip()
             ref_row = refs_by_id.get(seed_id)
             if not ref_row:
-                print(f"[WARN] seed #{seed_id} が self_scale_references.csv に見つかりません。スキップ")
+                print(f"[WARN] seed #{seed_id} が data/reference/self_scale_references.csv に見つかりません。スキップ")
                 continue
             doi = extract_doi_from_field(ref_row.get("DOI_or_URL", ""))
             seeds.append({"id": seed_id, "title": ref_row.get("Title", "").strip(), "doi": doi})
@@ -282,7 +282,7 @@ def load_default_seeds() -> list[dict]:
             continue
         ref_row = refs_by_id.get(seed_id)
         if not ref_row:
-            print(f"[WARN] 定義シード #{seed_id} が self_scale_references.csv に見つかりません")
+            print(f"[WARN] 定義シード #{seed_id} が data/reference/self_scale_references.csv に見つかりません")
             continue
         seeds.append({"id": seed_id,
                       "title": ref_row.get("Title", "").strip(),
@@ -479,12 +479,12 @@ def main() -> None:
         sys.exit("[ERROR] シードが0件です。")
     print(f"[INFO] シード {len(seeds)} 件({'既定(venue脱落6件)' if not args.seeds_csv else args.seeds_csv.name})")
 
-    print("[INFO] 既存コーパス(raw/*.csv, raw/*.ris, step3_kw_included.csv)のキーを読み込み中...")
+    print("[INFO] 既存コーパス(raw/*.csv, raw/*.ris, data/pipeline/step3_kw_included.csv)のキーを読み込み中...")
     existing_keys = load_existing_keys()
     print(f"[INFO] 既存キー {len(existing_keys)} 件")
 
-    core = load_core(ROOT / "CORE.csv")
-    sjr = load_sjr(ROOT / "scimagojr 2025.csv")
+    core = load_core(ROOT / "data/reference/CORE.csv")
+    sjr = load_sjr(ROOT / "data/reference/scimagojr 2025.csv")
 
     rows: list[dict] = []
     for seed in seeds:

@@ -123,7 +123,7 @@
       （実測比較は `protocol_changelog.md` Rev.14）。これは**フィルタ層の欠陥ではなく
       検索クエリ自体の語彙的限界**であり、Threats to Validity で報告しスノーボーリングで回収する。
 - **Phase 2: 学会ランクスクリーニング（決定論的・実装済み）**
-    - **照合手順（Rev.6）:** ① 著者確認済み **Venue エイリアス表**（`venue_aliases.csv`）を最優先で参照
+    - **照合手順（Rev.6）:** ① 著者確認済み **Venue エイリアス表**（`data/reference/venue_aliases.csv`）を最優先で参照
       → ② CORE 正規化完全一致 → ③ SJR ISSN/完全一致 → ④ ファジー照合（最後の手段）。
       エイリアス表は誤照合（例: Presence誌→同名ワークショップ、TAP誌→SAPシンポジウムの
       正規化同名衝突）の防止が目的であり、**照合漏れによる除外とランク基準による除外を
@@ -161,7 +161,7 @@
     | Cat3 | `phobia` `ptsd` `post-traumatic stress` `autism spectrum` `dementia` `alzheimer` `psychosis` `schizophrenia` `neurological disorder...` `psychiatric ...` | 特定疾患集団を対象とするため（P基準: 健常成人） |
     | Cat3 | `chronic pain` `pain management` `pain relief` | 疼痛治療への応用研究のため（スコープ外） |
 
-    - 正確な正規表現の全文は `pipeline.py`（EXCLUSION_CATEGORIES）を正とし、パターン別ヒット件数は `pipeline_log.txt` に記録される。パターンを追加・削除した場合は本表・`protocol_changelog.md`・README を同時に更新する。
+    - 正確な正規表現の全文は `pipeline.py`（EXCLUSION_CATEGORIES）を正とし、パターン別ヒット件数は `data/pipeline/pipeline_log.txt` に記録される。パターンを追加・削除した場合は本表・`protocol_changelog.md`・README を同時に更新する。
 - **Phase 3b: Title/Abstract 二重スクリーニング（人手）**
     - **評価者3名**（著者 / Yuta Kataoka / Ryoichi WATANABE）。判定対象の全件について
       Title/Abstract を読み、適格性基準（§Phase 4 の PICOS を Title/Abstract レベルに
@@ -236,7 +236,7 @@
     - 判定シート（文献ID・**担当ペア**・両評価者の判定・最終判定・協議メモ・除外理由（任意・実施している場合））を成果物として保存し、監査可能性を担保する。
       Phase 4 と異なり除外理由の記録は必須ではないが、記録している場合はそのまま保存する
       （κ 算出時の不一致解釈や Phase 4 への引き継ぎに有用なため）。
-    - **補助（採否基準ではない）:** 読む順序のトリアージとして `simulate_screening.py` のキーワードスコア
+    - **補助（採否基準ではない）:** 読む順序のトリアージとして `scripts/simulate_screening.py` のキーワードスコア
       （3カテゴリ 0〜3点）を用いてよい。**スコアによる自動除外は行わない**
       （Abstract 欠損の影響を受けるため、低スコアが内容起因かデータ欠損起因かを区別できない）。
 

@@ -2024,3 +2024,30 @@ stage 2 シート（Kataoka 363件 / Watanabe 346件）を生成し配布して�
 - `.gitignore` の協議シート除外を `consensus_meeting*.xlsx` に広げた(`consensus_meeting_2.xlsx` を誤って追跡しないため)。
 - 「次回やること」3 の校正セットの記入済みシートはこのデバイスにある。校正セット分の最終判定は
   `screening/final/final_decisions.csv`(343 件・Include 144)として確定済み。
+
+---
+
+### 2026-10-15 — リポジトリ直下の整理(ファイル配置の変更)
+
+直下に散在していた入力・参照表・パイプライン出力を `data/` 配下に、初期プロトタイプを `legacy/` に集約した。
+`git mv` なので履歴は追える。**過去のエントリ(このログ・`protocol_changelog.md`・`consistency_audit_log.md`)の
+パス表記は当時のまま**で、以下の対応表で読み替える。
+
+| 旧(リポジトリ直下) | 新 |
+|---|---|
+| `ResearchVR2.csv` / `ResearchVR3.csv` / `ResearchVR4.csv` | `data/merged/` |
+| `CORE.csv` / `scimagojr 2025.csv` / `venue_aliases.csv` / `self_scale_references.csv` | `data/reference/` |
+| `step1_dedup.csv` / `step1_5_filter_*.csv` / `step2_rank_*.csv` / `step3_kw_*.csv` / `pipeline_log.txt` | `data/pipeline/` |
+| `prisma_screening.py` / `venue_screening.py` / `year_distribution.py` / `.png` | `legacy/` |
+| `simulate_screening.py` | `scripts/` |
+| `GradThesis_Maeno_2025.pdf` | `docs/reference/` |
+
+- コードの参照先(`scripts/` の 13 本・`pipeline.py` の既定値・`simulate_screening.py`・`legacy/year_distribution.py`)と、
+  現行文書(`README.md`・`docs/protocol/`・`docs/reference/`・`.claude/skills/`)のパスを同時に更新した。
+- `pipeline.py` の既定の出力先は `data/pipeline/`。**公式 step ファイルは凍結中で、再実行はしていない**
+  (README の再実行例の `--outdir` も `data/pipeline` に直した)。
+- 検証: 全スクリプトが `py_compile` を通る。`known_item_test.py` の STEPS と `pipeline.py` の既定パス、
+  コード中の `data/...` 文字列リテラルがすべて実在することを確認。`simulate_screening.py`(読み取り専用)は実行して
+  795 件を読めた。**`known_item_test.py` 本体や各監査スクリプトは出力を上書きするため実行していない。**
+- 未追跡のまま残したもの: 直下の `PROGRESS_LOG.md`(`docs/log/` 配下とは別の古い複製。未確認)、
+  `screening/` 直下の旧位置の判定シート類。

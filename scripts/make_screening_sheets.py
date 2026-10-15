@@ -5,7 +5,7 @@ make_screening_sheets.py — Phase 3b(Title/Abstract 二重スクリーニング
 ================================================================================
 
 【何を】
-`step3_kw_included.csv`(Phase 3a 通過の最終候補)から、評価者ごとの**独立した**
+`data/pipeline/step3_kw_included.csv`(Phase 3a 通過の最終候補)から、評価者ごとの**独立した**
 判定シートを生成する。あわせて、誰がどの文献を担当するかの割当表を出力する。
 
 【なぜ独立したファイルに分けるのか】
@@ -262,7 +262,7 @@ def rank_label(row: dict) -> str:
 def main() -> None:
     ap = argparse.ArgumentParser(
         description="Phase 3b 判定シートの生成(評価者ごとに独立したファイル)")
-    ap.add_argument("--input", type=Path, default=ROOT / "step3_kw_included.csv")
+    ap.add_argument("--input", type=Path, default=ROOT / "data/pipeline/step3_kw_included.csv")
     ap.add_argument("--snowball", type=Path,
                     default=ROOT / "outputs" / "snowballing_log.csv",
                     help="引用探索の結果(PRISMA 右カラム)。--no-snowball で無効化")

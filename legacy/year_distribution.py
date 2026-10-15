@@ -22,8 +22,8 @@ from pathlib import Path
 # --------------------------------------------------------------------------
 # 設定
 # --------------------------------------------------------------------------
-CSV_PATH   = Path("step3_kw_included.csv")
-OUTPUT_PNG = Path("year_distribution.png")
+CSV_PATH   = Path(__file__).resolve().parent.parent / "data" / "pipeline" / "step3_kw_included.csv"
+OUTPUT_PNG = Path(__file__).resolve().parent / "year_distribution.png"
 
 # フォント設定（英語フォントのみ使用してエラー回避）
 matplotlib.rcParams["font.family"] = "DejaVu Sans"

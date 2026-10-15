@@ -17,15 +17,15 @@ cf. Kitchenham & Charters 2007)で示すため。段階別の脱落理由を特�
 
 【入力】
   - 既知文献リスト(--items で指定。省略時は known_items.csv → known_items.md →
-    self_scale_references.csv の順に探す)。列名は柔軟に解決する
+    data/reference/self_scale_references.csv の順に探す)。列名は柔軟に解決する
     (DOI_or_URL / ID / Section / Role_in_Survey 等のエイリアス対応)
   - ResearchVR*.csv           step0: 統合生データ(最新版 = 名前の昇順で最後を自動選択)
-  - step1_dedup.csv           step1: 重複削除後 12,442件
-  - step2_rank_included.csv   step2: Venueランク通過 2,858件
-  - step2_rank_excluded.csv   step2 脱落理由の特定用(Excl_Reason_Phase2)
-  - step3_kw_included.csv     step3: キーワード除外後 1,784件(最終候補)
-  - step3_kw_excluded.csv     step3 脱落理由の特定用(KW_Excl_Category/Keywords)
-  - CORE.csv / scimagojr 2025.csv  step2脱落Venueのランク調査用
+  - data/pipeline/step1_dedup.csv           step1: 重複削除後 12,442件
+  - data/pipeline/step2_rank_included.csv   step2: Venueランク通過 2,858件
+  - data/pipeline/step2_rank_excluded.csv   step2 脱落理由の特定用(Excl_Reason_Phase2)
+  - data/pipeline/step3_kw_included.csv     step3: キーワード除外後 1,784件(最終候補)
+  - data/pipeline/step3_kw_excluded.csv     step3 脱落理由の特定用(KW_Excl_Category/Keywords)
+  - data/reference/CORE.csv / data/reference/scimagojr 2025.csv  step2脱落Venueのランク調査用
 
 【出力】
   - outputs/known_item_test.csv   既知文献 × 各step の生存フラグ・照合方法・脱落理由
@@ -39,7 +39,7 @@ cf. Kitchenham & Charters 2007)で示すため。段階別の脱落理由を特�
      曖昧マッチを自動で生存扱いにはしない(recall には数えない)。
 
 【step0 の判定単位】
-  step0 は「統合生データ ResearchVR2.csv に存在するか」の判定。
+  step0 は「統合生データ data/merged/ResearchVR2.csv に存在するか」の判定。
   raw/*.csv(ZoteroのDB別コレクションエクスポート、2026-07-17 追加)が存在する場合は、
   どのDBコレクションに含まれるかを step0_source_dbs 列に併記する
   (= どのDBの検索式がその文献を捕捉したかまで特定できる)。
@@ -99,22 +99,22 @@ TITLE_STOPWORDS = {
 }
 
 def _latest_merged_name() -> str:
-    """統合生データの最新版(ResearchVR2.csv, ResearchVR3.csv, ... の名前順で最後)。"""
-    cands = sorted(p.name for p in ROOT.glob("ResearchVR*.csv"))
+    """統合生データの最新版(data/merged/ResearchVR2.csv, data/merged/ResearchVR3.csv, ... の名前順で最後)。"""
+    cands = sorted(p.relative_to(ROOT).as_posix() for p in (ROOT / "data" / "merged").glob("ResearchVR*.csv"))
     if not cands:
-        sys.exit("[ERROR] ResearchVR*.csv が見つかりません")
+        sys.exit("[ERROR] data/merged/ResearchVR*.csv が見つかりません")
     return cands[-1]
 
 
 STEPS = [
     ("step0", _latest_merged_name(), "統合生データ(検索式で拾えたか)"),
-    ("step1", "step1_dedup.csv", "重複削除後"),
+    ("step1", "data/pipeline/step1_dedup.csv", "重複削除後"),
     # Rev.13 で追加された Phase 1.5(フィルタ層)。この段を STEPS に入れないと、
     # ここで落ちた文献が「step2 で脱落」と誤って報告される(実際に #24/#25 で発生した)。
     # 脱落段の帰属は Threats to Validity の記述に直結するので、段を省略してはいけない。
-    ("step1_5", "step1_5_filter_included.csv", "フィルタ層通過後(正規化クエリ再適用)"),
-    ("step2", "step2_rank_included.csv", "Venueランク通過後"),
-    ("step3", "step3_kw_included.csv", "キーワード除外通過後(最終候補)"),
+    ("step1_5", "data/pipeline/step1_5_filter_included.csv", "フィルタ層通過後(正規化クエリ再適用)"),
+    ("step2", "data/pipeline/step2_rank_included.csv", "Venueランク通過後"),
+    ("step3", "data/pipeline/step3_kw_included.csv", "キーワード除外通過後(最終候補)"),
 ]
 
 
@@ -299,13 +299,13 @@ def _canonicalize(row: dict) -> dict:
 
 def parse_known_items(root: Path, items_path: Path | None = None) -> list[dict]:
     """既知文献リストを読む。--items 指定 > known_items.csv > known_items.md >
-    self_scale_references.csv の順。列名はエイリアス解決する。"""
+    data/reference/self_scale_references.csv の順。列名はエイリアス解決する。"""
     if items_path is None:
         # 2026-08-20: 文書を docs/ 配下へ整理したため docs/reference/ も探す。
         # ルート直下の旧パスは、手元に残っている場合のために候補として残す。
         for cand in ("known_items.csv",
                      "docs/reference/known_items.md", "known_items.md",
-                     "self_scale_references.csv"):
+                     "data/reference/self_scale_references.csv"):
             p = root / cand
             if p.exists():
                 if cand.endswith("known_items.md"):
@@ -435,8 +435,8 @@ def main() -> None:
         print("[WARN] 10 件未満です。quasi-gold standard としては不足(Kitchenham 推奨最低 10 件)。")
 
     datasets = {key: Dataset(ROOT / fname) for key, fname, _ in STEPS}
-    excl2 = Dataset(ROOT / "step2_rank_excluded.csv")
-    excl3 = Dataset(ROOT / "step3_kw_excluded.csv")
+    excl2 = Dataset(ROOT / "data/pipeline/step2_rank_excluded.csv")
+    excl3 = Dataset(ROOT / "data/pipeline/step3_kw_excluded.csv")
     # DB別コレクション(あれば): どのDBの検索式が捕捉したかの特定用
     raw_datasets = {p.stem: Dataset(p) for p in sorted((ROOT / "raw").glob("*.csv"))}
     if raw_datasets:
@@ -581,8 +581,8 @@ def main() -> None:
 
 def write_analysis_md(out_md: Path, results: list[dict], n: int, datasets) -> None:
     """脱落分析レポートを生成する。段階ごとに証拠と決定論的な改善提案を付す。"""
-    core = load_core(ROOT / "CORE.csv")
-    sjr = load_sjr(ROOT / "scimagojr 2025.csv")
+    core = load_core(ROOT / "data/reference/CORE.csv")
+    sjr = load_sjr(ROOT / "data/reference/scimagojr 2025.csv")
 
     lines = [
         "# Known-Item 脱落分析レポート",
@@ -700,7 +700,7 @@ def write_analysis_md(out_md: Path, results: list[dict], n: int, datasets) -> No
             "",
             f"- {r['drop_reason']}",
             "- 提案: 命中した正規表現の単語境界・文脈条件を厳格化するか、当該パターンを"
-            "除外リストから外した場合の巻き添え件数(step3_kw_excluded.csv 内の同パターン"
+            "除外リストから外した場合の巻き添え件数(data/pipeline/step3_kw_excluded.csv 内の同パターン"
             "命中数)を確認して判断する。",
             "",
         ]
