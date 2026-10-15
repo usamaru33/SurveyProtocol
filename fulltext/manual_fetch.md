@@ -63,20 +63,6 @@ Enter で出版社ページを開く → PDF を受け箱に保存すると自�
 - [ ] `Rbfe52d034` Evaluation of the effect of a virtual avatar's representation on distance perception in immersive virtual environments — [10.1109/vr.2016.7504775](https://doi.org/10.1109/vr.2016.7504775)(author×kataoka)
 - [ ] `Rd94c9acae` Virtual hand realism affects object size perception in body-based scaling — [10.1109/vr.2019.8798040](https://doi.org/10.1109/vr.2019.8798040)(author×kataoka)
 
-## DOI なし(書誌の確認が先)(11 件)
-
-- [ ] `R2eb77ed99` The two-user seating buck: Enabling face-to-face discussions of novel car interface concepts — DOI なし(kataoka×watanabe)
-- [ ] `R4133f7f22` The effectiveness of training in virtual environments — DOI なし(author×watanabe)
-- [ ] `R5c8c33de9` Eye height scaling of absolute size in immersive and non-immersive displays — DOI なし(author×kataoka)
-- [ ] `R6a9ba9fa3` Distance: a framework for improving spatial cognition within digital architectural models — DOI なし(author×kataoka)
-- [ ] `R746b5156f` Gibson J. J. 1979. The ecological approach to visual perception. Houghton Mifflin.  Gibson J. J. 1979. The ecological approach to visual perception. Houghton Mifflin. — DOI なし(author×watanabe)
-- [ ] `R8e3a14279` University of Birmingham The effect of hand size and interaction modality on the virtual hand illusion — DOI なし(author×kataoka)
-- [ ] `R90145a337` Perception of Characters in VR: How a character’s height affects the perception of that character — DOI なし(kataoka×watanabe)
-- [ ] `Rb96bc1cf4` Compensating for distance compression in virtual audiovisual environments — DOI なし(author×watanabe)
-- [ ] `Rbd45fc72f` Proc. IEEE Virtual Reality, 275--276 — DOI なし(author×watanabe)
-- [ ] `Rbe2e9ecd2` MATEC Web of Conferences — DOI なし(author×kataoka)
-- [ ] `Rcfe9667f4` H5 - Users who spend more time in Giant mode will show a stronger under-estimation effect — DOI なし(author×kataoka)
-
 ## ACM(10 件)
 
 - [ ] `R045ace006` SkinHaptics: Exploring Skin Softness Perception and Virtual Body Embodiment Techniques to Enhance Self-Haptic Interactions — [10.1145/3706598.3713891](https://doi.org/10.1145/3706598.3713891)(author×watanabe)
@@ -90,17 +76,31 @@ Enter で出版社ページを開く → PDF を受け箱に保存すると自�
 - [ ] `Rf2dac71da` Imaginary Joint: Proprioceptive Feedback for Virtual Body Extensions via Skin Stretch — [10.1145/3746059.3747800](https://doi.org/10.1145/3746059.3747800)(author×kataoka)
 - [ ] `Rb60c64f56` Iteratively adapting avatars using task-integrated optimisation — [10.1145/3379337.3415832](https://doi.org/10.1145/3379337.3415832)(kataoka×watanabe)
 
-## その他(9 件)
+## その他(10 件)
 
 - [ ] `R1762e7c03` Illusory ownership of a virtual child body causes overestimation of object sizes and implicit attitude changes — [10.1073/pnas.1306779110](https://doi.org/10.1073/pnas.1306779110)(kataoka×watanabe)
 - [ ] `R25b5bab30` Impact of Body Size Match to an Avatar on the Body Ownership Illusion and User's Subjective Experience — [10.1089/cyber.2019.0136](https://doi.org/10.1089/cyber.2019.0136)(author×kataoka)
 - [ ] `R264653be2` Motion-Steered Noise Management in Hearing Aids Reduces Listening Effort and Stress Indexed by Pupil Size and Heart Rate — [10.1097/aud.0000000000001825](https://doi.org/10.1097/aud.0000000000001825)(author×watanabe)
 - [ ] `R272b2107d` Visual guidance of walking through apertures: body-scaled information for affordances. — [10.1037/0096-1523.13.3.371](https://doi.org/10.1037/0096-1523.13.3.371)(author×watanabe)
 - [ ] `R526151b55` Playing with Spatial Frames: Altering the Body Matrix Through Multisensory Egocentric and Allocentric Body Illusions — [10.1155/2024/7316063](https://doi.org/10.1155/2024/7316063)(author×watanabe)
+- [ ] `R5c8c33de9` Eye height scaling of absolute size in immersive and non-immersive displays — [10.1037/0096-1523.26.2.582](https://doi.org/10.1037/0096-1523.26.2.582)(author×kataoka)
 - [ ] `R83118528e` Using eye height in different postures to scale the heights of objects. — [10.1037/0096-1523.25.2.518](https://doi.org/10.1037/0096-1523.25.2.518)(author×kataoka)
 - [ ] `R97b2c9741` Egocentric biases in comparative volume judgments of rooms. — [10.1167/16.6.2](https://doi.org/10.1167/16.6.2)(author×kataoka)
 - [ ] `Rb8803da09` The Experimental Induction of Out-of-Body Experiences — [10.1126/science.1142175](https://doi.org/10.1126/science.1142175)(author×watanabe)
 - [ ] `Rd7aadd900` The proteus effect on human pain perception through avatar muscularity and gender factors — [10.1038/s41598-024-61409-4](https://doi.org/10.1038/s41598-024-61409-4)(author×kataoka)
+
+## DOI なし(書誌の確認が先)(10 件)
+
+- [ ] `R2eb77ed99` The two-user seating buck: Enabling face-to-face discussions of novel car interface concepts — DOI なし(kataoka×watanabe)
+- [ ] `R4133f7f22` The effectiveness of training in virtual environments — DOI なし(author×watanabe)
+- [ ] `R6a9ba9fa3` Distance: a framework for improving spatial cognition within digital architectural models — DOI なし(author×kataoka)
+- [ ] `R746b5156f` Gibson J. J. 1979. The ecological approach to visual perception. Houghton Mifflin.  Gibson J. J. 1979. The ecological approach to visual perception. Houghton Mifflin. — DOI なし(author×watanabe)
+- [ ] `R8e3a14279` University of Birmingham The effect of hand size and interaction modality on the virtual hand illusion — DOI なし(author×kataoka)
+- [ ] `R90145a337` Perception of Characters in VR: How a character’s height affects the perception of that character — DOI なし(kataoka×watanabe)
+- [ ] `Rb96bc1cf4` Compensating for distance compression in virtual audiovisual environments — DOI なし(author×watanabe)
+- [ ] `Rbd45fc72f` Proc. IEEE Virtual Reality, 275--276 — DOI なし(author×watanabe)
+- [ ] `Rbe2e9ecd2` MATEC Web of Conferences — DOI なし(author×kataoka)
+- [ ] `Rcfe9667f4` H5 - Users who spend more time in Giant mode will show a stronger under-estimation effect — DOI なし(author×kataoka)
 
 ## Elsevier(8 件)
 
