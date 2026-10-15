@@ -19,6 +19,7 @@ description: サーベイのスクリーニングパイプライン（pipeline.p
 >
 > 凍結解除は著者の明示的な指示があるときだけ。判定が全員完了し `final_decisions.csv`
 > が確定するまでは、このファイル群を読むことはあっても書いてはならない。
+> （2026-10-15 現在: stage 1・stage 2 とも回収済みで協議中。`final_decisions.csv` は未確定のため、凍結は解除されていない。） <!-- [2026-10-15 12:13 追加] 旧: (記載なし)。直前の行は変更していない -->
 > 詳細は `docs/protocol/screening_protocol.md` と `screening/README.md` の凍結告知を参照。
 
 ## コマンド（Windows では必ず `-X utf8` を付ける）

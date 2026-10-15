@@ -4,7 +4,7 @@
 > **`data/reference/self_scale_references.csv`(SearchScope 列)**である。`known_item_test.py` は
 > `known_items.csv` → `known_items.md`(**下表は有効行0のテンプレート**)→ `data/reference/self_scale_references.csv`
 > の順で探索するため、下表が空である限り自動的に `data/reference/self_scale_references.csv` が使われる。
-> **in-scope 12件 / background 8件**(非VR理論・心理接合点の古典2件を含む、
+> **in-scope 17件 / background 8件**(非VR理論・心理接合点の古典2件を含む、 <!-- [2026-10-15 12:13 更新] 旧: > **in-scope 12件 / background 8件**(非VR理論・心理接合点の古典2件を含む、 -->
 > recall 分母外)という構成。**このファイルの表は当面「拡充用の下書き」**であり、
 > 二重管理を避けるため gold set の本体は `data/reference/self_scale_references.csv` に一本化する
 > (`methodology_decision_Rev7.md` §A・§著者確認#7)。**【Rev.11】#3 Kilteni 2012 は用語定義論文(介入N/A・Theory)であり PICOS 上 Phase 4 で除外されるため background へ移した(recall 分母外)。**

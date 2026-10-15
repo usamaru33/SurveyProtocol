@@ -5,11 +5,16 @@
 
 - 手順の詳細: [`../docs/protocol/screening_protocol.md`](../docs/protocol/screening_protocol.md)
 - プロトコル本体: [`../docs/protocol/rule.md`](../docs/protocol/rule.md) §Phase 3b
-- 変更履歴: [`../docs/log/protocol_changelog.md`](../docs/log/protocol_changelog.md) Rev.17 / Rev.18
+- 変更履歴: [`../docs/log/protocol_changelog.md`](../docs/log/protocol_changelog.md) Rev.17 / Rev.18 / Rev.21 / Rev.22 / Rev.27 <!-- [2026-10-15 12:13 更新] 旧: - 変更履歴: [`../docs/log/protocol_changelog.md`](../docs/log/protocol_changelog.md) Rev.17 / Rev.18 -->
 
 > **判定に LLM は一切使用していません**（`rule.md` Rev.2）。
 > このフォルダの判定はすべて人間の評価者3名によるものです。
 > 生成スクリプトはシートの作成と集計のみを担当します。
+
+<!-- [2026-10-15 12:13 追加] 旧: (記載なし) -->
+> **現在地（2026-10-15）:** stage 1（著者1,052件・校正セット223件を3名）と stage 2（Kataoka 363件・Watanabe 346件）は回収済み。
+> κ（校正セット223件・3カテゴリ）は平均 0.502（moderate、Rev.27）で再算出しない。校正セット分の協議（77件）は確定済みで、
+> stage 2 由来の新規106件を協議して `final/final_decisions.csv` を確定する段階。
 
 > ## 🛑 凍結中（2026-08-19〜）— 判定シートは配布済み
 >
