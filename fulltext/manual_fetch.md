@@ -9,7 +9,7 @@ Enter で出版社ページを開く → PDF を受け箱に保存すると自�
 担当者フォルダへ配り、このリストを更新する。照合できなかったファイルは受け箱に残る
 (`--assign "ファイル名=record_id"` で手動指定)。出版社サイトの一括・自動ダウンロードは規約違反になるので行わない。
 
-未取得 15 件
+未取得 14 件
 
 ## DOI なし(書誌の確認が先)(6 件)
 
@@ -27,13 +27,12 @@ Enter で出版社ページを開く → PDF を受け箱に保存すると自�
 - [ ] `R5c8c33de9` Eye height scaling of absolute size in immersive and non-immersive displays — [10.1037/0096-1523.26.2.582](https://doi.org/10.1037/0096-1523.26.2.582)(author×kataoka)
 - [ ] `R83118528e` Using eye height in different postures to scale the heights of objects. — [10.1037/0096-1523.25.2.518](https://doi.org/10.1037/0096-1523.25.2.518)(author×kataoka)
 
-## Springer(3 件)
-
-- [ ] `R0ae21cf3e` Can Virtual Human Entourage Elements Facilitate Accurate Distance Judgments in VR? — [10.1007/978-3-319-72323-5_8](https://doi.org/10.1007/978-3-319-72323-5_8)(author×watanabe)
-- [ ] `R900efbdfe` Phenomenal regression to the real object in physical and virtual worlds — [10.1007/s10055-014-0257-x](https://doi.org/10.1007/s10055-014-0257-x)(kataoka×watanabe)
-- [ ] `Rf66443472` Body size illusions influence perceived size of objects: a validation of previous research in virtual reality — [10.1007/s10055-019-00402-z](https://doi.org/10.1007/s10055-019-00402-z)(author×kataoka)
-
 ## IEEE(2 件)
 
 - [ ] `R3d28d9842` Comparative Evaluation of Viewing and Self-Representation on Passability Affordances to a Realistic Sliding Doorway in Real and Immersive Virtual Environments — [10.1109/vr46266.2020.1581293987781](https://doi.org/10.1109/vr46266.2020.1581293987781)(kataoka×watanabe)
 - [ ] `Rb3c541a72` Comparative evaluation of viewing and self-representation on passability affordances to a realistic sliding doorway in real and immersive virtual environments — [10.1109/vr46266.2020.00073](https://doi.org/10.1109/vr46266.2020.00073)(author×watanabe)
+
+## Springer(2 件)
+
+- [ ] `R900efbdfe` Phenomenal regression to the real object in physical and virtual worlds — [10.1007/s10055-014-0257-x](https://doi.org/10.1007/s10055-014-0257-x)(kataoka×watanabe)
+- [ ] `Rf66443472` Body size illusions influence perceived size of objects: a validation of previous research in virtual reality — [10.1007/s10055-019-00402-z](https://doi.org/10.1007/s10055-019-00402-z)(author×kataoka)
