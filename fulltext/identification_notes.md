@@ -45,3 +45,27 @@ R90145a337・Rcfe9667f4 は協議2回目の空欄 24 件(#13・#24)にも入っ�
 2. もう片方の扱い(Phase 4 の対象から外す / 相互参照だけ残す)。
 3. B は、代表を決めてから `--assign` で PDF を割り当てる(未取得 14 → 12 になる)。
 4. `final_decisions.csv` の反映は、凍結解除後に著者の許可を得て行う。
+
+## 2026-10-17(未同定 4 件 + 博士論文の調査)
+
+読み取りのみ(Crossref・OpenAlex の公開 API、`outputs/snowballing_log.csv`、`data/pipeline/`)。`screening/` は変更していない。
+
+| record_id | 結果 | 確度・根拠 |
+|---|---|---|
+| Rbd45fc72f | **同定**。Willemsen & Gooch (2002), *Perceived egocentric distances in real, image-based, and traditional virtual environments*, IEEE VR 2002, pp.275–276。DOI `10.1109/vr.2002.996536`。OA 版なし(IEEE、学内ライセンスで取得)。コーパス内に別の record_id は無い | **高い**。seed 8(Leyrer ら 2011)の Crossref 参考文献に「Willemsen P., *Proc. IEEE Virtual Reality, 275--276*」があり、OpenAlex で著者 Willemsen・同ページの同論文が見つかった |
+| R90145a337 | **同定**。Sanna Marklund (2017), *Perception of Characters in VR: How a character's height affects the perception of that character*。学生論文(DiVA、`diva2:1113589`)。OpenAlex は OA 全文なしだが、DiVA は通常 OA | **高い**(題名一致・著者名あり)。DiVA はボット対策の確認ページを返したため自動取得せず、**ブラウザで開いて取得する**。本文を見れば要旨・全文が読める |
+| Rcfe9667f4 | **ほぼ同定**。Piumsomboon ら (2018), *Superman vs Giant: A Study on Spatial Perception for a Multi-Scale Mixed Reality Flying Telepresence Interface*, IEEE TVCG。DOI `10.1109/TVCG.2018.2868594`。OA 版なし | **中程度・未確認**。seed 13(Hartman ら 2020)の参考文献にこの論文があり、「Giant mode」の仮説文と整合する。ただし「H5 - …」の文が本文にあるかは未確認(全文が要る) |
+| R4133f7f22 | 元になった査読付き論文は**見つけられなかった**(OpenAlex で著者名・題名の検索)。UCL Discovery の「Request a copy」か ILL | 探索は網羅的でない |
+| Rbe2e9ecd2 | 変更なし(会議録の序文。全文取得は不要) | — |
+
+### Rcfe9667f4 に関する注意(Phase 3a の再現率)
+
+*Superman vs Giant* は `ResearchVR4.csv` にあり(IEEE、SJR Q1)、**Phase 3a(step 3)のキーワード除外で落ちている**
+(`KW_Excl_Category = Cat1 [Not VR / Out of Scope]`、該当語は `mixed reality` と `mr`)。
+文献追跡では seed 8・10・13 から 3 回見つかっているが、いずれも `in_db_already = Y`(コーパス内にある)扱いで、
+新規候補にはならなかった。つまり**スケール操作(Giant)を扱う論文が、MR を含む語で Phase 3a に落ち、
+文献追跡でも拾えていない**。
+
+- 同様の落ち方をした論文が他にもあるかは未確認(step3 除外 384 件のうち、`mixed reality`・`mr` だけで落ちたもの)。
+- 方針の変更はしていない(`screening/` は凍結中、プロトコルは rule.md の定義のまま)。
+  扱い(例: step3 除外の `mixed reality`/`mr` 単独該当を人手で再確認する)は、著者の判断が要る。
