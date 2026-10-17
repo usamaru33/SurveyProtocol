@@ -2066,3 +2066,8 @@ stage 2 シート（Kataoka 363件 / Watanabe 346件）を生成し配布して�
   R90145a337・Rcfe9667f4 は協議 2 回目の空欄 24 件(#13・#24)にも入っており、協議で判定が決まる可能性がある。
 - 照合が「タイトル語の一致」だった 7 件は、取り違えの有無を未確認(Reee198a85・R0340e93be・R420f1a894・R062a2965d・R7cf672a5d・R8e3a14279 ほか)。
 - `.gitignore` に `fulltext/manual/` を追加(出版社の PDF の置き場)。`screening/` は変更していない。
+
+- **訂正(2026-10-17)**: 10-13 の項と PR #34・#44 の「校正セットで 3 名全員が Include だった論文は対象に含まれていない」は誤り。
+  校正セット 223 件は `final_decisions.csv` に全件あり、最終 Include 144 件は全件が `fulltext/manifest.csv` にある。
+  Phase 4 の対象 152 件 = `final_decisions.csv` の Include 144 + 協議 2 回目の最新版で Include になった stage 2 由来 8 件
+  (詳細は `fulltext/identification_notes.md`)。
