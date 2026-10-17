@@ -3,7 +3,7 @@
 作成日: 2026-10-17
 
 対象は協議 2 回目の**最新版**(`consensus_meeting_2.xlsx`、OneDrive 直下、2026-10-13 17:59)で Exclude になった 17 件を除いた **152 件**。
-取得済み 139 件、**未取得 13 件**。一覧は `fulltext/manifest.csv` から作成した(手で編集しない)。
+取得済み 138 件、**未取得 14 件**。一覧は `fulltext/manifest.csv` から作成した(手で編集しない)。
 
 | 分類 | 件数 |
 |---|---|
@@ -14,8 +14,9 @@
 | 閲覧のみ(DL 不可) | 1 |
 | 重複(PDF 手元にあり) | 2 |
 | 取得不要の見込み | 1 |
+| 出版社ページで取得(取得済みの誤りを訂正) | 1 |
 
-**あなたの手が要るのは、学内ライセンス 8 件(うち 1 件は書誌が推定)、ブラウザ取得 1 件、UCL 博士論文 1 件。**重複 2 件は協議で代表を決めれば PDF を割り当てられる。
+**あなたの手が要るのは、学内ライセンス 8 件(うち 1 件は書誌が推定)、出版社ページで取得 1 件、ブラウザ取得 1 件、UCL 博士論文 1 件。**重複 2 件は協議で代表を決めれば PDF を割り当てられる。
 
 ## 学内ライセンス
 
@@ -58,6 +59,11 @@
   - Rb3c541a72 と同一論文(Bhargava ら VR 2020)。PDF は fulltext/manual/_hold/。協議で代表を決めて割り当てる
 - [ ] `Rb3c541a72` Comparative evaluation of viewing and self-representation on passability affordances to a realistic sliding doorway in real and immersive virtual environments — [10.1109/vr46266.2020.00073](https://doi.org/10.1109/vr46266.2020.00073)(担当 author×watanabe、協議 —)
   - R3d28d9842 と同一論文。DOI が正しい側。上に同じ
+
+## 出版社ページで取得(取得済みの誤りを訂正)
+
+- [ ] `R247a1be9c` Effects of Avatar Identity (AI or Human) and Conversation on Personal Space in Virtual Reality — [10.20668/adada.29.s1_29](https://doi.org/10.20668/adada.29.s1_29)(担当 kataoka×watanabe、協議 —)
+  - 「取得済み」だった PDF は**別の論文**(arXiv 2603.06030 *Is it Me? Toward Self-Extension to AI Avatars in VR*)だったため削除した。DOI の出版社ページから取得する
 
 ## 取得不要の見込み
 

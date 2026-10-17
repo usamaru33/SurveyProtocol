@@ -1,0 +1,18 @@
+﻿record_id,pair,status,doi,title,source,consensus_decision
+R0a68d4435,author×kataoka,ok,10.3758/bf03194886,"Large errors, but no depth compression, in walked indications of exocentric extent",https://link.springer.com/content/pdf/10.3758/BF03194886.pdf,Exclude
+R0ae21cf3e,author×watanabe,ok,10.1007/978-3-319-72323-5_8,Can Virtual Human Entourage Elements Facilitate Accurate Distance Judgments in VR?,manual: R0ae21cf3e_extracted_pp133-147.pdf,Exclude
+R12624d2c7,author×kataoka,ok,10.1109/vrw52623.2021.00114,Effects of virtual environments and self-representations on redirected jumping,manual: Effects_of_Virtual_Environments_and_Self-representations_on_Redirected_Jumping (1).pdf,Exclude
+R1907f1152,kataoka×watanabe,ok,10.1145/120782.120784,On temporal-spatial realism in the virtual reality environment,manual: 120782.120784.pdf,Exclude
+R4525cca6b,author×kataoka,ok,10.1109/vrw55335.2022.00019,Asymmetric normalization in social virtual reality studies,manual: Asymmetric_Normalization_in_Social_Virtual_Reality_Studies.pdf,Exclude
+R6a9ba9fa3,author×kataoka,ok,,Distance: a framework for improving spatial cognition within digital architectural models,manual: Pelosi.pdf,Exclude
+R746b5156f,author×watanabe,missing,,Gibson J. J. 1979. The ecological approach to visual perception. Houghton Mifflin.  Gibson J. J. 1979. The ecological approach to visual perception. Houghton Mifflin.,,Exclude
+R8d07df5d9,author×watanabe,ok,10.1109/vrw70859.2026.00139,Real-time dynamic digital twin generation using multiple first-person views,manual: Real-Time_Dynamic_Digital_Twin_Generation_Using_Multiple_First-Person_Views.pdf,Exclude
+R900bf8c85,kataoka×watanabe,ok,10.3758/s13414-020-02037-8,Human and machine: Evaluating whether action automation influences visual perception,https://link.springer.com/content/pdf/10.3758/s13414-020-02037-8.pdf,Exclude
+Ra3f61e703,author×watanabe,ok,10.1038/s41598-018-33961-3,Peri-personal space as a prior in coupling visual and proprioceptive signals,https://www.nature.com/articles/s41598-018-33961-3.pdf,Exclude
+Ra4db28b47,kataoka×watanabe,ok,10.1109/vrw70859.2026.00133,Exploring proprioception and spatial awareness during auditory and visual feet guidance in bouldering,manual: Exploring_Proprioception_and_Spatial_Awareness_During_Auditory_and_Visual_Feet_Guidance_in_Bouldering.pdf,Exclude
+Rc2efa32b5,author×watanabe,ok,10.1371/journal.pone.0048331,Beaming into the Rat World: Enabling Real-Time Interaction between Rat and Human Each at Their Own Scale,https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0048331&type=printable,Exclude
+Rd3085f2d6,kataoka×watanabe,ok,10.1016/j.jcde.2018.05.006,"Navigation modes, operation methods, observation scales and background options in UI design for high learning performance in VR-based architectural applications",manual: j.jcde.2018.05.006.pdf,Exclude
+Rd716a5d10,author×watanabe,ok,10.1109/vr.2010.5444801,Can you help me concentrate room?,manual: Can_you_help_me_concentrate_room.pdf,Exclude
+Rdc8e0d552,author×watanabe,ok,10.3389/frvir.2025.1718198,“Did she just tap me?“: qualifying multisensory feedback for social touch during human-agent interaction in virtual reality,https://public-pages-files-2025.frontiersin.org/journals/virtual-reality/articles/10.3389/frvir.2025.1718198/pdf,Exclude
+Rf568c011a,kataoka×watanabe,ok,10.1016/j.cag.2023.10.001,Perceptual thresholds of visual size discrimination in augmented and virtual reality,https://hal.science/hal-04357737/document,Exclude
+Rfb4b73910,author×kataoka,ok,10.1109/ismar-adjunct64951.2024.00136,Inner child: The role of VR child avatars in improving adult language learning,manual: Inner_Child_The_Role_of_VR_Child_Avatars_in_Improving_Adult_Language_Learning.pdf,Exclude
