@@ -2071,3 +2071,15 @@ stage 2 シート（Kataoka 363件 / Watanabe 346件）を生成し配布して�
   校正セット 223 件は `final_decisions.csv` に全件あり、最終 Include 144 件は全件が `fulltext/manifest.csv` にある。
   Phase 4 の対象 152 件 = `final_decisions.csv` の Include 144 + 協議 2 回目の最新版で Include になった stage 2 由来 8 件
   (詳細は `fulltext/identification_notes.md`)。
+
+### 2026-10-17(追記) — 協議 2 回目の結果を転記し、最終判定を確定
+
+- 最新版の `consensus_meeting_2.xlsx`(OneDrive 直下、10-13 17:59)で、最終判定の空欄は 0 件(Exclude 158 / Include 25)。
+  10-13 時点の版(空欄 24 件)は古かった(24 件の内訳: Include 7 / Exclude 17)。
+- `screening/consensus/consensus_worklist.csv`: 183 件すべての最終判定・協議メモを記入(stage 2 由来 106 件を追記。既存の 77 件は最新版と食い違い 0 件)。
+- `screening/final/final_decisions.csv`: stage 2 由来の 106 件(Include 8 / Exclude 98)を追加して **449 件(Include 152 / Exclude 297)** に確定。
+  Include 152 件は `fulltext/manifest.csv` の対象 152 件と**完全に一致**(差 0)。
+- 転記は `score_screening.py` を使わずスクリプトで直接行った(同スクリプトの入力である記入済みシートがリポジトリに無いため)。
+  `screening/` のシート再生成・pipeline 再実行はしていない(凍結中のまま)。変更前の 2 ファイルはスクラッチパッドに退避した。
+- 協議メモの無い行は「協議2回目で確定(consensus_meeting_2.xlsx 最新版、2026-10-13 17:59 更新)」を記入。
+- 未実施: 協議シート「はじめに」の件数説明(校正77 + stage 2 由来106)の修正、Phase 4 の判定シート設計、担当ペアの確定。

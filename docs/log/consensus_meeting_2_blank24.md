@@ -1,3 +1,7 @@
+> **【解決済み・2026-10-17】** この一覧は古い版(`consensus_meeting_2.xlsx` デスクトップ版 11:19)に基づく。同日 17:59 の最新版
+> (OneDrive 直下)では 24 件とも最終判定が記入済み(Include 7 / Exclude 17)で、`screening/consensus/consensus_worklist.csv`・
+> `screening/final/final_decisions.csv` に反映した。以下は経緯の記録として残す。
+
 # 協議ミーティング2: 最終判定が空欄の 24 件
 
 作成日: 2026-10-13
