@@ -69,3 +69,12 @@ R90145a337・Rcfe9667f4 は協議2回目の空欄 24 件(#13・#24)にも入っ�
 - 同様の落ち方をした論文が他にもあるかは未確認(step3 除外 384 件のうち、`mixed reality`・`mr` だけで落ちたもの)。
 - 方針の変更はしていない(`screening/` は凍結中、プロトコルは rule.md の定義のまま)。
   扱い(例: step3 除外の `mixed reality`/`mr` 単独該当を人手で再確認する)は、著者の判断が要る。
+
+## 2026-10-17(対象を 152 件に変更)
+
+協議 2 回目の最新版(OneDrive 直下、10-13 17:59)で Exclude になった 17 件を `manifest.csv` から外し、対象を 169 → **152 件**にした
+(取得済み 139、未取得 13)。外した 17 件は `fulltext/excluded_by_consensus.csv` に、行をそのまま残してある(取得済み 16 件、未取得 1 件 = Gibson 1979)。
+PDF 本体(`fulltext/pdf/`・`fulltext/by_reviewer/`)は削除していない。
+
+- **`fetch_fulltext.py` を `--targets` 付きで再実行すると、対象 ID の一覧次第で manifest が上書きされる。** 再実行する場合は 152 件の ID 一覧を渡すこと。
+- 対象の最終確定は `final_decisions.csv` の確定後(転記は著者の許可待ち)。校正セットで 3 名全員が Include だった論文は、まだ対象に入っていない。

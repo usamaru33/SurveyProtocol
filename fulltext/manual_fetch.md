@@ -9,12 +9,11 @@ Enter で出版社ページを開く → PDF を受け箱に保存すると自�
 担当者フォルダへ配り、このリストを更新する。照合できなかったファイルは受け箱に残る
 (`--assign "ファイル名=record_id"` で手動指定)。出版社サイトの一括・自動ダウンロードは規約違反になるので行わない。
 
-未取得 14 件
+未取得 13 件
 
-## DOI なし(書誌の確認が先)(6 件)
+## DOI なし(書誌の確認が先)(5 件)
 
 - [ ] `R4133f7f22` The effectiveness of training in virtual environments — DOI なし(author×watanabe)
-- [ ] `R746b5156f` Gibson J. J. 1979. The ecological approach to visual perception. Houghton Mifflin.  Gibson J. J. 1979. The ecological approach to visual perception. Houghton Mifflin. — DOI なし(author×watanabe)
 - [ ] `R90145a337` Perception of Characters in VR: How a character’s height affects the perception of that character — DOI なし(kataoka×watanabe)
 - [ ] `Rbd45fc72f` Proc. IEEE Virtual Reality, 275--276 — DOI なし(author×watanabe)
 - [ ] `Rbe2e9ecd2` MATEC Web of Conferences — DOI なし(author×kataoka)
