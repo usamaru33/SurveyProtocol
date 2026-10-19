@@ -2108,5 +2108,6 @@ stage 2 シート（Kataoka 363件 / Watanabe 346件）を生成し配布して�
   1. 変更のコミットと PR(PR #47 は MTG 資料のみ。`final_decisions.csv` を含む今回の変更は別ブランチにするのが筋)。
   2. MTG: 分類の論点(`taxonomy_coding_definition.md` §8・§10)、`6X75UZKY` を戻すか。
   3. `R25b5bab30` の取得、Phase 4 の判定シート設計の承認(次の Rev.)。
-  4. 利益相反の確認(`phase4_sheet_design.md` §3。残りの文献追跡由来の記録は書誌が未確認)。
+  4. ~~利益相反の確認~~ **完了(同日)**: 149 件で、ResearchVR4 の著者欄(96 件)と全文 PDF の 1〜2 ページ目(147 件)の両方で、評価者名の該当は 0 件
+     (`Rbe2e9ecd2` のみ未確認)。詳細は `phase4_sheet_design.md` §3。
   5. 判定シート `sheet_*` は追跡対象外のまま(独立性のため)。
