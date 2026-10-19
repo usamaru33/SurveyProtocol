@@ -6,6 +6,48 @@
 
 ---
 
+## 2026-10-19 — Rev.28: Phase 4 の対象を 149 件に確定(`Rcfe9667f4` を Exclude に変更、重複 2 組を代表に統合)
+
+### 変更内容
+
+1. **`Rcfe9667f4` の最終判定を Include → Exclude に変更。** 記録は「H5 - Users who spend more time in Giant mode will show a stronger under-estimation effect」。
+   協議 2 回目では Include だったが、全文の元になる論文を同定できなかった。
+2. **同一論文の重複記録 2 組を代表に統合し、統合した記録は Phase 4 で評価しない。**
+   - `Rb3c541a72`(代表。DB 由来、DOI 10.1109/vr46266.2020.00073)← `R3d28d9842`(文献追跡由来、DOI が不正な形式)
+   - `Rdf3e2d120`(代表。DOI 10.1109/vr.2019.8797787)← `R8e3a14279`(DOI なし、題名に機関名が付いた記録)
+   - 代表の基準: **DB 由来で DOI が正しい側**。
+3. `rule.md` §3.2 Phase 4 に、上の 2 つの扱いを一般則として追記した。
+
+### 変更理由
+
+- **同定不能の記録を Include のままにしない理由:** Phase 4 は全文を読んで判定する段階で、全文が無い記録は判定できない。
+  `phase4_sheet_design.md` §6 は「全文が無いものを Title/Abstract だけで判定しない」としており、Include のまま残すと
+  PRISMA 上「全文を入手できない」記録が 1 件残るが、これは論文を探しても存在しない記録であり、取得の努力で解消しない。
+  確認の経過: 同定していた Superman vs Giant(Piumsomboon ら 2018、IEEE TVCG)の全文に、記録の文は無かった(同論文の H5 は別の内容)。
+  seed 13 の参考文献リストが壊れて取り込まれた断片とみられる(`fulltext/identification_notes.md`)。
+- **代表を DB 由来で DOI が正しい側とする理由:** 同じ基準を両組に適用でき、恣意性を避けられる。
+  文献追跡由来の記録は DOI の形式が不正、または DOI が無く、書誌が不完全。重複は同一論文が 2 回評価されることを避けるために統合する。
+  統合した記録は評価しないだけで、`final_decisions.csv` の行と PDF は残してある(監査のため)。
+
+### 影響範囲
+
+| 項目 | 変更前 | 変更後 |
+|---|---|---|
+| `final_decisions.csv` の最終判定 | 449 件: Include 152 / Exclude 297 | **449 件: Include 151 / Exclude 298** |
+| Phase 4 の対象(`manifest.csv`) | 152 件 | **149 件**(Include 151 − 重複 2) |
+| 全文の取得状況 | 取得済み 138 / 未取得 14 | 取得済み 147 / 未取得 2 |
+| 担当ペア(仮割当・149 件で再集計) | 56 / 53 / 43 | 56 / 52 / 41(評価回数 97 / 93 / 108) |
+
+- 変更したファイル: `screening/final/final_decisions.csv`(3 行。`screening/` の凍結は、この 3 行の判定・メモ以外を変えていない)、`fulltext/manifest.csv`・
+  `excluded_by_consensus.csv`・`duplicates_merged.csv`(新規)・`manual_fetch.md`・`missing_list.md/.xlsx`・`identification_notes.md`、
+  `README.md`・`screening/README.md`・`docs/protocol/screening_protocol.md`・`rule.md`・`phase4_sheet_design.md`・`FILE_MAP.md`・`docs/reference/taxonomy_coding_definition.md`。
+- **κ・判定シートへの影響:** Phase 3b の κ(校正セット 223 件、平均 0.502)は変えていない。判定シートの再生成・配布済みの評価者の記入は変えていない。
+- **時期の整理:** Phase 4 の判定は未着手。判定前の変更であり、データを見た後の基準変更ではない。
+- **別件で見つけた誤り:** `fulltext/pdf/Rbd45fc72f.pdf` は別の論文(高齢者向け AR/VR の scoping review)だった。正しい論文(Willemsen & Gooch 2002)に差し替えた。
+- **未了:** Phase 4 の判定シート設計(`phase4_sheet_design.md`)の承認。次の Rev. で記録する。`6X75UZKY`(Superman vs Giant)を除外から戻すかは、MTG で協議する案件。
+
+---
+
 ## 2026-09-12 — Rev.27: Watanabe 再提出後の κ 再算出（moderate, 平均0.502）。不一致は「I: スケール操作/多感覚刺激が無い」に集中、Rev.21 step 3 の適用を判断（プロトコル変更なし）
 
 ### 経緯

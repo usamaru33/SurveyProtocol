@@ -41,6 +41,7 @@
 | 2026-08-19 | **Rev.18: 除外理由を統制語彙（9択）に**。**Rev.19: 判定シートを配布し設計を凍結**。評価者向け説明資料を作成 |
 | 2026-08-20 | **Rev.20: 語彙と Rev.14 の S基準運用の矛盾を、語彙を変えず解釈の明示で解消**。事前配布資料を作成・PDF組版。説明会（評価者2名） |
 | 2026-08-24 | **Rev.24: 除外理由が複数該当する場合の優先順位を定める**（語彙・判定基準は不変更）。`reviewer_briefing.md` §3.3 を新設し `.tex`/`.pdf` を作成（判定に不要な節を削減し全6章に再構成）。**複数該当時の併記要求を取り下げ**（1つに絞るだけ）。**締切を 08-26 → 08-31 へ延長**（曜日の誤記も訂正: 08-26 は火ではなく水）。補足説明（評価者2名） |
+| 2026-10-19 | **Rev.28: Phase 4 の対象を 149 件に確定**（`Rcfe9667f4` を Exclude、重複 2 組を代表に統合）。全文 147 件取得 |
 
 ---
 
@@ -2083,3 +2084,29 @@ stage 2 シート（Kataoka 363件 / Watanabe 346件）を生成し配布して�
   `screening/` のシート再生成・pipeline 再実行はしていない(凍結中のまま)。変更前の 2 ファイルはスクラッチパッドに退避した。
 - 協議メモの無い行は「協議2回目で確定(consensus_meeting_2.xlsx 最新版、2026-10-13 17:59 更新)」を記入。
 - 未実施: 協議シート「はじめに」の件数説明(校正77 + stage 2 由来106)の修正、Phase 4 の判定シート設計、担当ペアの確定。
+
+### 2026-10-19 — 論文分類の定義整理、全文の追加取得、Phase 4 の対象を 149 件に確定(Rev.28)
+
+- **MTG 用資料を作成:** `docs/reference/taxonomy_coding_definition.md`(PR #47)。論文(`SelfScaleSurvey/main.tex`)の分類 3 軸の定義・判定基準・手続き、
+  未定の論点、コントリビューション候補、Superman vs Giant(`6X75UZKY`)を Phase 3a の除外から戻すかの案件(§10)をまとめた。【論文】【読み取り】【未定】のラベルで区別。
+- **全文の追加取得:** 手動取得した 10 件を `sort_fulltext_inbox.py` で仕分け(取得済み 138 → **147 件**、未取得 14 → **2 件**)。
+  未取得の 2 件は `R25b5bab30`(リクエスト中)と `Rbe2e9ecd2`(取得不要の見込み)。
+  `Rbd45fc72f` は **`pdf/` に入っていた PDF が別の論文**(高齢者向け AR/VR の scoping review)だったので、Willemsen & Gooch 2002 に差し替えた(旧ファイルは退避)。
+  Excel(`missing_list.xlsx`)は開かれていて上書きできず、別名保存→置き換えを 3 回行った。
+- **Superman vs Giant の確認:** `Rcfe9667f4` と推定していた論文の全文を読んだが、記録の文は無かった(同論文の H5 は別の内容)。同定が外れていた。
+  同論文はコーパスに `6X75UZKY` としてあり、Phase 3a で `mixed reality`/`mr` により除外されていた(ルールどおり)。MTG で協議する(著者が戻したい意向)。
+- **Rev.28(`protocol_changelog.md`):**
+  - `Rcfe9667f4` を **Include → Exclude**(元の論文を同定できず全文を判定できない)。`final_decisions.csv` は **449 件: Include 151 / Exclude 298**。
+  - 重複 2 組を代表に統合: `Rb3c541a72`←`R3d28d9842`、`Rdf3e2d120`←`R8e3a14279`(基準: DB 由来で DOI が正しい側)。
+  - Phase 4 の対象 = 152 − 1 − 2 = **149 件**。担当ペアの仮割当は 56 / 52 / 41(評価回数 97 / 93 / 108)。
+  - 新規ファイル: `fulltext/duplicates_merged.csv`。`excluded_by_consensus.csv` に `Rcfe9667f4` を追加(18 行)。
+- **更新した文書:** `README.md`・`screening/README.md`・`screening_protocol.md`・`rule.md`(Phase 4 に一般則 2 点)・`phase4_sheet_design.md`(件数・割当・重複)・
+  `FILE_MAP.md`・`fulltext/identification_notes.md`・`fulltext/missing_list.md/.xlsx`・`manual_fetch.md`(スクリプトで再生成)・`taxonomy_coding_definition.md`。
+  旧記載は README・screening/README では `<!-- 旧: -->` で保持。変更履歴・進捗ログの過去の記載は書き換えていない。
+- **判断・決定:** 重複の「古い方」は、日付に差が無かったため「DB 由来で DOI が正しい側」と解釈して著者が確認(Rb3c541a72)。もう 1 組も同じ基準。
+- **未了・次回やること(優先度順):**
+  1. 変更のコミットと PR(PR #47 は MTG 資料のみ。`final_decisions.csv` を含む今回の変更は別ブランチにするのが筋)。
+  2. MTG: 分類の論点(`taxonomy_coding_definition.md` §8・§10)、`6X75UZKY` を戻すか。
+  3. `R25b5bab30` の取得、Phase 4 の判定シート設計の承認(次の Rev.)。
+  4. 利益相反の確認(`phase4_sheet_design.md` §3。残りの文献追跡由来の記録は書誌が未確認)。
+  5. 判定シート `sheet_*` は追跡対象外のまま(独立性のため)。

@@ -127,7 +127,10 @@ git 管理されているのは `README.md`、`stage1/assignment.csv`・`abstrac
 ## `fulltext/` Phase 4 の全文
 | パス | 内容 |
 |---|---|
-| `manifest.csv` | 対象 169 件の取得状況・出所・担当ペア・DOI(git 管理) |
+| `manifest.csv` | 対象 149 件の取得状況・出所・担当ペア・DOI(git 管理。2026-10-19 に 152→149。旧: 169 件) |
+| `excluded_by_consensus.csv` | 協議で Exclude になり対象から外れた記録(18 行。`Rcfe9667f4` を 2026-10-19 に追加) |
+| `duplicates_merged.csv` | 重複で代表に統合した記録と代表(2 行、2026-10-19) |
+| `missing_list.md` / `missing_list.xlsx` | 未取得の一覧(`manifest.csv` から作成) |
 | `manual_fetch.md` | 自動取得できなかった論文の手動取得リスト(`fetch_fulltext.py` が自動生成。手で編集しない) |
 | `pdf/<record_id>.pdf` | 全文 PDF の原本(git 管理外) |
 | `by_reviewer/{author,kataoka,watanabe}/` | 担当者ごとのコピー(git 管理外) |

@@ -18,16 +18,19 @@
 >    `docs/protocol/search_strings.md` が一次情報。本 README と食い違う場合は **docs/ 側が正**。
 -->
 > **⚠️ 本ドキュメントを読むときの前提（2026-10-15 時点）:**
-> 1. **プロトコルは Rev.27 まで確定。** `data/pipeline/step*.csv` は 2026-08 に再実行して確定済みで、
+> 1. **プロトコルは Rev.28 まで確定。** `data/pipeline/step*.csv` は 2026-08 に再実行して確定済みで、
 >    Phase 3b の判定シート配布（2026-08-19）以降は**凍結中**（解除は著者の明示的な指示があるときだけ）。
 > 2. **§7 の追加分析の表は 2026-08-20 に現行データ（795件）で再実行済み**（旧版は 2026-05-25・1,784件時点だった）。
-> 3. プロトコルの決定経緯・最新方針は `docs/log/protocol_changelog.md`（〜Rev.27）と
+> 3. プロトコルの決定経緯・最新方針は `docs/log/protocol_changelog.md`（〜Rev.28）と
 >    `docs/protocol/search_strings.md` が一次情報。本 README と食い違う場合は **docs/ 側が正**。
 <!-- [2026-10-17 更新] 旧: 4. **現在地（2026-10-15）:** Phase 3b は stage 1・stage 2 とも判定を回収済みで、協議による最終判定
 >    （`screening/final/final_decisions.csv`）を確定する段階。Phase 4 は全文 PDF の取得に着手（`fulltext/`）。 -->
 > 4. **現在地（2026-10-17）:** Phase 3b は完了。協議 2 回目の結果を転記し、最終判定
 >    （`screening/final/final_decisions.csv`、449 件: Include 152 / Exclude 297）を確定した。Phase 4 の対象は Include の 152 件で、
->    全文 PDF は 138 件取得済み・14 件未取得（`fulltext/missing_list.md`）。
+>    全文 PDF は 138 件取得済み・14 件未取得（`fulltext/missing_list.md`）。 <!-- [2026-10-19 更新] 旧: この行。下の 5. に更新 -->
+> 5. **現在地（2026-10-19、Rev.28）:** 協議 2 回目の最終判定のうち `Rcfe9667f4` を Include → Exclude に変更し（元の論文を同定できないため）、
+>    **449 件: Include 151 / Exclude 298** とした。重複 2 組を代表に統合し（`Rb3c541a72`・`Rdf3e2d120`）、Phase 4 の対象は **149 件**。
+>    全文 PDF は **147 件取得済み・2 件未取得**（`fulltext/missing_list.md`）。上の 4. の「152 件」「138 件取得済み」は 10-17 時点の値。
 
 ---
 
