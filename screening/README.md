@@ -18,7 +18,10 @@
 > **現在地（2026-10-17）:** stage 1（著者1,052件・校正セット223件を3名）と stage 2（Kataoka 363件・Watanabe 346件）は回収済み。
 > κ（校正セット223件・3カテゴリ）は平均 0.502（moderate、Rev.27）で再算出しない。**協議 2 回目の結果（183件、最終判定の空欄 0 件:
 > Exclude 158 / Include 25）を `consensus/consensus_worklist.csv` に転記し、stage 2 由来の 106 件を `final/final_decisions.csv` に追加して確定した。**
-> 最終判定は 449 件（Include 152 / Exclude 297）。Include の 152 件が Phase 4(全文評価)の対象。
+> 最終判定は 449 件（Include 152 / Exclude 297）。Include の 152 件が Phase 4(全文評価)の対象。 <!-- [2026-10-19 更新] 下の 2026-10-19 の注記で Include 151 / Exclude 298、Phase 4 の対象 149 件に変更 -->
+> **[2026-10-19 更新、Rev.28]** 著者が `Rcfe9667f4`（参考文献リストの断片で元の論文を同定できない）を Include → Exclude に変更し、
+> 最終判定は **449 件（Include 151 / Exclude 298）**。Include のうち重複 2 件（`R3d28d9842`→`Rb3c541a72`、`R8e3a14279`→`Rdf3e2d120`）は代表に統合し、
+> **Phase 4 の対象は 149 件**。重複の記録は `final_decisions.csv` の `consensus_note` と `fulltext/duplicates_merged.csv`。
 > 転記は `score_screening.py` を使わず直接行った(記入済みの判定シートがリポジトリに無いため。シートの再生成・再実行は凍結中のまま)。
 
 > ## 🛑 凍結中（2026-08-19〜）— 判定シートは配布済み
@@ -49,13 +52,20 @@
 ```
 screening/
 ├── README.md
-├── stage1/                  # 割当・stage 1 判定シート・記入見本・閲覧アプリ関連
-├── calibration_supplement/  # 校正セット 15%→20% 引き上げ分の補足シート(Rev.22)
-├── stage2/                  # stage 2(著者の Exclude/Unsure を確認するシート)
-├── consensus/               # 協議リスト・協議ミーティング用シート
-├── final/                   # 最終判定(final_decisions.csv)
+├── stage1/                  # [Phase 3b] 割当・stage 1 判定シート・記入見本・閲覧アプリ関連
+├── calibration_supplement/  # [Phase 3b] 校正セット 15%→20% 引き上げ分の補足シート(Rev.22)
+├── stage2/                  # [Phase 3b] stage 2(著者の Exclude/Unsure を確認するシート)
+├── consensus/               # [Phase 3b] 協議リスト・協議ミーティング用シート
+├── final/                   # [Phase 3b] 最終判定(final_decisions.csv)。Include が Phase 4 の対象
+├── phase4/                  # [Phase 4]  全文評価の割当・判定シート・協議・最終判定(2026-10-19 追加、Rev.29)
 └── _archive/                # バックアップ・取り込み済みの提出コピー・旧日付版(追跡しない)
 ```
+
+**どのフォルダがどの Phase か(2026-10-19):** `stage1`・`calibration_supplement`・`stage2`・`consensus`・`final` は **Phase 3b(Title/Abstract)**、
+`phase4` だけが **Phase 4(全文評価)**。各フォルダの `README.md` の1行目にも Phase を書いた。
+2026-10-19 に、この PC の `screening/` 直下に残っていた旧配置のファイル(`sheet_*`・`supplement_sheet_*`・`consensus_meeting*.xlsx`・`review_author.html`)を
+上の置き場へ移した(内容・ファイル名は変更なし。`stage2_sheet_*_submit/_copy_*.xlsx` は提出コピーなので `_archive/stage2/` へ)。
+スクリプトのパスは変えていない(文書化されていた構成に実ファイルを合わせただけ)。
 
 `_archive/` はフェーズ別のサブフォルダ(`stage1/` 等)を持つが、`.gitignore` で
 まとめて追跡除外している(監査目的でローカルには残すが、公開物ではない)。

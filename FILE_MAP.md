@@ -6,6 +6,16 @@
 
 行数・件数は 2026-10-15 に CSV を実際に数えた値(ヘッダ行を除く)。
 
+## Phase とフォルダの対応(2026-10-19)
+
+| Phase | 内容 | フォルダ・主なファイル |
+|---|---|---|
+| 0 同定(Identification) | DB 検索と生データ | `raw/`、`data/merged/ResearchVR4.csv`、`docs/protocol/search_*.md` |
+| 1〜3a 自動処理 | 重複削除 → 検索式の再適用 → Venue ランク → キーワード除外 | `pipeline.py`、`data/pipeline/step*.csv`(**凍結中**) |
+| 3b Title/Abstract(人手) | 二重スクリーニング・協議・最終判定 | `screening/stage1`・`calibration_supplement`・`stage2`・`consensus`・`final`(**凍結中**) |
+| 4 全文評価 | 全文の取得 → 全文での適格性判定・協議・最終判定 | 取得: `fulltext/`。判定: `screening/phase4/` |
+| 分類(Taxonomy) | Include 論文の 3 軸コーディング | `docs/reference/taxonomy_coding_definition.md`(まだファイルは無い) |
+
 ## まずここを見る
 
 | 知りたいこと | 見る場所 |
@@ -122,12 +132,15 @@ git 管理されているのは `README.md`、`stage1/assignment.csv`・`abstrac
 > **配置のずれに注意:** この作業コピーでは、評価者ごとの判定シート(`sheet_*.{csv,xlsx}`・`supplement_sheet_*`・
 > `stage2_sheet_*`)と `consensus_meeting*.xlsx`、`review_author.html` が **`screening/` 直下**にあり、未追跡である。
 > README と `.gitignore` が想定する `stage1/`・`stage2/`・`calibration_supplement/`・`consensus/` の下ではない。
-> `screening/` は凍結中のため、移動はしていない。
+> `screening/` は凍結中のため、リポジトリ直下の整理(10-15)では動かしていない。2026-10-19 に、この PC の `screening/` 直下に残っていた旧配置のファイルだけを、文書化済みのフェーズ別サブフォルダへ移した(`screening/README.md` §0)。
 
 ## `fulltext/` Phase 4 の全文
 | パス | 内容 |
 |---|---|
-| `manifest.csv` | 対象 169 件の取得状況・出所・担当ペア・DOI(git 管理) |
+| `manifest.csv` | 対象 149 件の取得状況・出所・担当ペア・DOI(git 管理。2026-10-19 に 152→149。旧: 169 件) |
+| `excluded_by_consensus.csv` | 協議で Exclude になり対象から外れた記録(18 行。`Rcfe9667f4` を 2026-10-19 に追加) |
+| `duplicates_merged.csv` | 重複で代表に統合した記録と代表(2 行、2026-10-19) |
+| `missing_list.md` / `missing_list.xlsx` | 未取得の一覧(`manifest.csv` から作成) |
 | `manual_fetch.md` | 自動取得できなかった論文の手動取得リスト(`fetch_fulltext.py` が自動生成。手で編集しない) |
 | `pdf/<record_id>.pdf` | 全文 PDF の原本(git 管理外) |
 | `by_reviewer/{author,kataoka,watanabe}/` | 担当者ごとのコピー(git 管理外) |
@@ -167,6 +180,7 @@ Python の実行は `python -X utf8 scripts/<name>.py`。出力を上書きす�
 | `make_consensus_sheet.py` | 協議ミーティング用シートの生成 |
 | `make_review_app.py` / `apply_review_decisions.py` | 判定用のローカル閲覧アプリの生成 / その判定の反映 |
 | `score_screening.py` | 集計(Cohen's κ・不一致抽出・`final_decisions.csv` の確定) |
+| `make_fulltext_sheets.py` / `score_fulltext.py` / `test_phase4_pipeline.py` | Phase 4: 割当表と判定シート(Excel、プルダウン)の生成 / 記入の検査・κ・協議リスト・最終判定・抽出表 / 合成データでの検証(2026-10-19、Rev.29) |
 
 ### Phase 4(全文)
 | ファイル | 内容 |

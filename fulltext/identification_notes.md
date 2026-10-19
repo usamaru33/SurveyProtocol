@@ -98,3 +98,14 @@ PDF 本体(`fulltext/pdf/`・`fulltext/by_reviewer/`)は削除していない。
 **全件が `manifest.csv` にある**。全員 Include の論文は最終判定も Include なので、この 144 件に含まれる(著者と評価者の両方が Include の 7 件も全件 manifest にある)。
 対象 152 件 = `final_decisions.csv` の Include 144 + 協議 2 回目(最新版)で Include になった stage 2 由来 8 件。
 誤りの原因は、記入済みの校正シートが手元に無く、一覧を直接作れなかったことで、`final_decisions.csv` を確認していなかった。
+
+## 2026-10-19(対象を 149 件に変更、Rev.28)
+
+- **取得:** 手動取得の 10 件を `pdf/` と担当者フォルダへ配置し、取得済み 138 → **147 件**、未取得 14 → **2 件**(`R25b5bab30` はリクエスト中、`Rbe2e9ecd2` は取得不要の見込み)。
+- **`Rbd45fc72f` の PDF は別の論文だった**(高齢者向け AR/VR の scoping review。Frontiers in Virtual Reality 2021)。10-13 に別デバイスで取得されたものとみられ、
+  取得済みの検証(10-17)では、このレコードは `missing` のためコピーが残っていた。正しい論文(Willemsen & Gooch 2002、2 ページ)に差し替えた。旧ファイルは退避。
+- **`Rcfe9667f4` は Exclude に変更。** 同定していた Superman vs Giant(Piumsomboon ら 2018)の本文を確認したが、記録の文(「H5 - Giant mode で長く過ごすほど…」)は無かった。
+  seed 13 の参考文献リストが壊れて取り込まれた断片とみられ、元の論文を同定できない。`excluded_by_consensus.csv` へ移した。
+- **重複 2 組の代表を決めた:** Rb3c541a72(R3d28d9842 を統合)、Rdf3e2d120(R8e3a14279 を統合)。基準は DB 由来で DOI が正しい側。`duplicates_merged.csv` に記録。
+  R8e3a14279 の担当者フォルダのコピーは外した(`pdf/` の原本は残してある)。
+- 対象 = 152 − `Rcfe9667f4` − 重複 2 = **149 件**。`final_decisions.csv` は Include 151 / Exclude 298。

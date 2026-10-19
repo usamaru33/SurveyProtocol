@@ -64,3 +64,9 @@ fulltext/pdf/
 fulltext/by_reviewer/
 fulltext/inbox/
 fulltext/manual/
+
+# Phase 4 の記入中の判定シートと評価者への配布物(独立性のため追跡しない。完了後に `git add -f screening/phase4/*/phase4_sheet_*.xlsx`)
+# 割当表 assignment.csv・consensus_worklist.csv・final_decisions.csv は追跡する
+screening/phase4/*/phase4_sheet_*.xlsx
+screening/phase4/*/phase4_sheet_*.csv
+screening/phase4/*/pdf/
