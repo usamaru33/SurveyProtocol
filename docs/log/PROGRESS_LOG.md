@@ -22,6 +22,7 @@
 |---|---|
 | 2026-05-19 | リポジトリ作成・初回コミット（プロトコル文書、生データ、パイプライン一式） |
 | 2026-05-25 | README.md 作成。Phase 1〜3 実行済み（ResearchVR2.csv, 14,385件 → 1,784件） |
+| 2026-05-25以降 | `year_distribution.py` / `year_distribution.png` 追加（当時は未コミット） |
 | 2026-05-27 | 別プロジェクト `../docs-system`（Next.js 文献ブラウザ）を作業 |
 | 2026-07-16 | 約1.5ヶ月ぶりに再開。本ログと Claude Code skills を整備。**Rev.2: AI判定を全面廃止** |
 | 2026-07-17 | Rev.3〜Rev.6。IEEE更新検索の統合（→ ResearchVR3.csv, 14,682件 → 1,827件）、SJR Q1確定、実行クエリの判明、G1拡張と Venue照合の再設計 |
