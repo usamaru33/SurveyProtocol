@@ -7,8 +7,9 @@ make_fulltext_sheets.py — Phase 4(全文評価)の割当表と判定シート(
 【何を】
   1. 担当の割当表 `assignment.csv`(均等化 案 B。Rev.29)
   2. 評価者ごとの判定シート `<who>/phase4_sheet_<who>.xlsx`
-     (判定の6列・判定・除外理由・根拠・メモ + 事実の抽出列17列。すべて Excel のプルダウンで選べる)
-  3. `--copy-pdfs` を付けると、評価者ごとのフォルダ `<who>/pdf/` に担当分の全文 PDF をコピーする
+     (判定の6列 → 判定と除外理由は自動 + 根拠・メモ + 事実の抽出列17列。選択式の列はすべてプルダウン)
+  3. `--copy-pdfs` を付けると、評価者ごとのフォルダ `<who>/pdf/` に担当分の全文 PDF を
+     **論文名のファイル名で**コピーする(古いコピーは消す。シートのリンクも論文名)
 
 【割当(Rev.29: 均等化 案 B)】
   対象 = fulltext/manifest.csv の全件(未取得も含む。未取得は配布しないだけで割当は決める)。
@@ -21,6 +22,9 @@ make_fulltext_sheets.py — Phase 4(全文評価)の割当表と判定シート(
   - 担当分のうち**全文 PDF を取得済み**の記録だけを載せる(未取得は取得後に追加配布する)。
   - 他の評価者の判定列は存在しない(独立性)。担当ペアの相手の名前だけが載る。
   - 記入列以外はロック。判定の 6 列は Y / N / ? のプルダウン。
+  - 「判定(自動)」は 6 列から自動で出る(Include / Exclude / Unsure)。1 列だけで、手入力しない。
+  - 「除外理由」は、判定が Exclude のとき N の付いた基準から自動で入る(優先順位は Rev.24)。
+    重複・スコープ外・「S: 原著論文でない」など自動で決まらないときだけ、プルダウンで選び直す。
 
 【入力】 fulltext/manifest.csv / screening/final/final_decisions.csv(題名・DOI の補完)/ data/merged/ResearchVR4.csv と screening/**/sheet_*.csv(掲載先・年。照合できた分だけ)
 【出力】 screening/phase4/assignment.csv と screening/phase4/<who>/phase4_sheet_<who>.xlsx
@@ -78,6 +82,49 @@ CRITERIA = [
 CRIT_KEYS = [k for k, _, _ in CRITERIA]
 CRIT_LABEL = {k: l for k, l, _ in CRITERIA}
 
+# 除外理由の自動入力: N の付いた基準 → 理由。優先順位は Rev.24(S → P → I_hmd → I_scale → O → C)。
+# S が N のときは「S: ユーザー実験が無い」を入れる(「S: 原著論文でない」・重複・スコープ外は選び直す)。
+# C が N のときは「その他」(メモは不要。C の N は語彙が無いための扱い)。
+AUTO_REASON_ORDER = [
+    ("S", "S: ユーザー実験が無い"), ("P", "P: 対象者が不適合"), ("I_hmd", "I: HMD-VR でない"),
+    ("I_scale", "I: スケール操作/多感覚刺激が無い"), ("O", "O: スケール知覚の測定が無い"), ("C", REASON_OTHER),
+]
+
+
+def expected_decision(v: dict) -> str:
+    """6 列(Y/N/?)から判定。N があれば Exclude / 空欄があれば未確定('') / ? があれば Unsure / すべて Y なら Include。"""
+    vals = [(v.get(k) or "").strip() for k in CRIT_KEYS]
+    if "N" in vals:
+        return "Exclude"
+    if "" in vals:
+        return ""
+    return "Unsure" if "?" in vals else "Include"
+
+
+def auto_reason(v: dict) -> str:
+    """判定が Exclude のとき、N の付いた基準から除外理由を自動で決める(Excel の式と同じ規則)。"""
+    if expected_decision(v) != "Exclude":
+        return ""
+    for k, reason in AUTO_REASON_ORDER:
+        if (v.get(k) or "").strip() == "N":
+            return reason
+    return ""
+
+
+_BAD_FILENAME = re.compile(r'[\\/:*?"<>|#%\[\]\x00-\x1f]+')
+
+
+def pdf_filename(title: str, rid: str, used: set[str], max_len: int = 90) -> str:
+    """論文名から PDF のファイル名を作る(Windows で使えない文字・Excel のリンクを壊す文字を除く)。
+    題名が無い・他と重なるときは record_id を添える。"""
+    base = re.sub(r"\s+", " ", _BAD_FILENAME.sub(" ", title or "")).strip(" .")
+    base = base[:max_len].rstrip(" .") or rid
+    name = f"{base}.pdf"
+    if name.lower() in used:
+        name = f"{base[:max_len - 13].rstrip(' .')} ({rid}).pdf"
+    used.add(name.lower())
+    return name
+
 # --- 事実の抽出列(Rev.29。形式の正は docs/reference/phase4_reviewer_guide.md §3.5) -------------
 # kind: text(自由) / int(整数 or 記載なし) / vocab(1 つ選ぶ) / multi(語彙から複数。`;` 区切りで入力可) / ynq
 SCALE_TARGET = ["身体全体", "身体部位", "視点の高さ", "IPD", "環境", "物体", "なし(操作せず測定のみ)"]
@@ -119,6 +166,7 @@ C_HEADER_BG = "1F3864"
 C_HEADER_FG = "FFFFFF"
 C_INPUT_BG = "FFF7E6"      # 判定の記入列(淡い橙)
 C_EXTRACT_BG = "E8F1FB"    # 抽出列(淡い青)
+C_AUTO_BG = "EDEDED"       # 自動で入る列(灰)
 C_BORDER = "BFBFBF"
 C_WARN_BG = "FFC7CE"
 
@@ -133,11 +181,11 @@ FIXED = [
     ("year", "年", 7),
     ("venue", "掲載先", 30),
     ("doi", "DOI", 26),
-    ("pdf", "全文 PDF", 20),
+    ("pdf", "全文 PDF(クリックで開く)", 34),
 ]
 INPUT_TAIL = [
-    ("decision", "判定 ★", 12),
-    ("reason", "除外理由 ★", 34),
+    ("decision", "判定(自動)", 13),
+    ("reason", "除外理由(自動・変更可)", 34),
     ("evidence", "根拠(頁・引用)", 40),
     ("memo", "メモ", 30),
 ]
@@ -146,8 +194,7 @@ INPUT_TAIL = [
 def column_plan() -> list[tuple[str, str, int, str]]:
     cols = [(k, h, w, "fixed") for k, h, w in FIXED]
     cols += [(k, f"{CRIT_LABEL[k]} ★", 14, "input") for k in CRIT_KEYS]
-    cols += [("rule_decision", "規則の判定(自動)", 14, "formula")]
-    cols += [(k, h, w, "input") for k, h, w in INPUT_TAIL]
+    cols += [(k, h, w, "formula" if k == "decision" else "input") for k, h, w in INPUT_TAIL]
     cols += [(k, f"{h}{' ●' if req else ''}", w, "extract") for k, h, req, _kd, _v, w, _d in EXTRACT]
     return cols
 
@@ -250,9 +297,9 @@ INTRO = [
     ("■ やること(1 件ごと)", "h"),
     ("1. 「全文 PDF」列のリンクを開き、全文を読む(抄録だけで判定しない)", ""),
     ("2. 「判定」シートの ★ の 6 列(P・I-1・I-2・C・O・S)を Y / N / ? から選ぶ。すべてプルダウンです", ""),
-    ("3. 「判定」を選ぶ: 6 列がすべて Y → Include / 1 つでも N → Exclude / N が無く ? がある → Unsure", ""),
-    ("   「規則の判定(自動)」列に、規則どおりの判定が出ます。食い違うと「判定」が赤くなります", ""),
-    ("4. Exclude のときは「除外理由」(プルダウン)と「根拠(頁・引用)」を必ず書く", ""),
+    ("3. 「判定(自動)」は 6 列から自動で出ます(手入力しない): すべて Y → Include / 1 つでも N → Exclude / N が無く ? がある → Unsure", ""),
+    ("4. 「除外理由」も、Exclude のとき N の付いた基準から自動で入ります。別の理由にしたいときだけプルダウンで選び直す", ""),
+    ("   Exclude のときは「根拠(頁・引用)」を必ず書く(空だと赤くなります)", ""),
     ("5. 迷った点は「メモ」に書く。基準の解釈に迷ったら、その基準を ? にして協議に回す", ""),
     ("6. 「抽出担当」が Y の論文で、自分の判定が Include か Unsure のときは、青い列(事実の抽出)を書く", ""),
     ("   ●が付いた列は必須です。論文に書かれていない事実は「記載なし」と書く(空欄にしない)", ""),
@@ -267,7 +314,7 @@ INTRO = [
     ("", ""),
     ("■ 除外理由(1 件につき 1 つ。複数当てはまるときは上のものを選ぶ)", "h"),
     ("__REASONS__", ""),
-    ("C(比較対象)が N のときは「その他」を選び、メモに「C: 比較対象が無い」と書く。", "lead"),
+    ("C(比較対象)だけが N のときは、除外理由が自動で「その他」になります(メモは不要)。", "lead"),
     ("", ""),
     ("■ 事実の抽出列", "h"),
     ("論文に書かれた事実だけを書く。Visual-Global や Self-scale などの分類の語彙は使わない。", ""),
@@ -343,17 +390,24 @@ def build_sheet(ws, rows: list[dict], refs: dict[str, str]) -> None:
     # --- 本体 ---
     in_fill = PatternFill("solid", fgColor=C_INPUT_BG)
     ex_fill = PatternFill("solid", fgColor=C_EXTRACT_BG)
+    auto_fill = PatternFill("solid", fgColor=C_AUTO_BG)
     wrap_keys = {"title", "venue", "evidence", "memo", "population", "scale_factor", "non_visual_detail",
-                 "outcome_measures", "main_finding", "attribution_quote", "reason", "device"}
-    center_keys = {"year", "extractor", *CRIT_KEYS, "rule_decision", "decision",
+                 "outcome_measures", "main_finding", "attribution_quote", "reason", "device", "pdf"}
+    center_keys = {"year", "extractor", *CRIT_KEYS, "decision",
                    "action_contingent", "null_effect", "scale_direction", "n_total", "n_analyzed"}
     crit_first, crit_last = col_letter(CRIT_KEYS[0]), col_letter(CRIT_KEYS[-1])
     for i, row in enumerate(rows, start=2):
         for j, (key, _l, _w, typ) in enumerate(COLS, start=1):
-            if key == "rule_decision":
+            if key == "decision":
                 rng = f"{crit_first}{i}:{crit_last}{i}"
                 val = (f'=IF(COUNTIF({rng},"N")>0,"Exclude",IF(COUNTBLANK({rng})>0,"",'
                        f'IF(COUNTIF({rng},"~?")>0,"Unsure","Include")))')
+            elif key == "reason":
+                dcell = f"{col_letter('decision')}{i}"
+                inner = '""'
+                for k, reason in reversed(AUTO_REASON_ORDER):
+                    inner = f'IF({col_letter(k)}{i}="N","{reason}",{inner})'
+                val = f'=IF({dcell}="Exclude",{inner},"")'
             elif key == "year":
                 try:
                     val = int(row.get("year", ""))
@@ -366,7 +420,10 @@ def build_sheet(ws, rows: list[dict], refs: dict[str, str]) -> None:
             c.font = Font(size=11)
             c.alignment = Alignment(vertical="top", wrap_text=key in wrap_keys,
                                     horizontal="center" if key in center_keys else "left")
-            if typ == "input":
+            if key == "reason":          # 自動で入るが、選び直せるよう入力列と同じく解錠する
+                c.fill = auto_fill
+                c.protection = Protection(locked=False)
+            elif typ == "input":
                 c.fill = in_fill
                 c.protection = Protection(locked=False)
             elif typ == "extract":
@@ -376,6 +433,7 @@ def build_sheet(ws, rows: list[dict], refs: dict[str, str]) -> None:
                 c.protection = Protection(locked=True)
         if row.get("pdf"):
             pc = ws.cell(row=i, column=COL_INDEX["pdf"])
+            pc.value = row["pdf"]
             pc.hyperlink = f"pdf/{row['pdf']}"
             pc.font = Font(size=11, color="0563C1", underline="single")
         ws.row_dimensions[i].height = 60
@@ -399,10 +457,16 @@ def build_sheet(ws, rows: list[dict], refs: dict[str, str]) -> None:
 
     for k in CRIT_KEYS:
         add_list(k, refs["ynq"], title=CRIT_LABEL[k], prompt="Y / N / ?(迷い・記載なし)")
-    add_list("decision", refs["decision"], title="判定",
-             prompt="6 列すべて Y=Include / 1 つでも N=Exclude / N が無く ? がある=Unsure")
-    add_list("reason", refs["reason"], title="除外理由",
-             prompt="Exclude のときは必須。複数当てはまるときは優先順位の上のもの1つ")
+    add_list("reason", refs["reason"], title="除外理由(自動)",
+             prompt="N の付いた基準から自動で入ります。重複・スコープ外・「S: 原著論文でない」など別の理由にしたいときだけ、選び直す")
+    for key in ("n_total", "n_analyzed"):          # 整数か「記載なし」だけ
+        L = col_letter(key)
+        dv = DataValidation(type="custom", formula1=f'=OR(ISNUMBER({L}2),{L}2="記載なし")', allow_blank=True)
+        dv.errorStyle, dv.showErrorMessage, dv.showInputMessage = "stop", True, True
+        dv.errorTitle, dv.error = "入力できない値です", "整数、または「記載なし」を入力してください。"
+        dv.promptTitle, dv.prompt = dict((e[0], e[1]) for e in EXTRACT)[key], "整数。書かれていなければ「記載なし」"
+        ws.add_data_validation(dv)
+        dv.add(f"{L}2:{L}{last}")
     for key, kind, vkey in (("scale_target", "multi", "scale_target"), ("non_visual", "multi", "non_visual"),
                             ("task", "multi", "task"), ("scale_direction", "vocab", "scale_direction"),
                             ("social_context", "vocab", "social_context"),
@@ -416,19 +480,20 @@ def build_sheet(ws, rows: list[dict], refs: dict[str, str]) -> None:
     # ※ COUNTIF の条件 "?" はワイルドカード(任意の 1 文字)なので、文字としての ? は "~?" と書く
     # --- 条件付き書式(提出前の自己チェック。色は補助で、文字でも分かる) ---------------------
     D, R, E, M = col_letter("decision"), col_letter("reason"), col_letter("evidence"), col_letter("memo")
-    RD, X = col_letter("rule_decision"), col_letter("extractor")
+    X, Cc = col_letter("extractor"), col_letter("C")
     red = dict(fill=PatternFill("solid", fgColor=C_WARN_BG), font=Font(color="9C0006", bold=True))
-    # (1) 判定が規則と食い違う
-    ws.conditional_formatting.add(f"{D}2:{D}{last}", FormulaRule(
-        formula=[f'AND({D}2<>"",{RD}2<>"",{D}2<>{RD}2)'], stopIfTrue=False, **red))
+    # (1) 判定(自動)に色を付ける
+    for word, color in (("Include", "C6EFCE"), ("Exclude", "F8CBAD"), ("Unsure", "FFEB9C")):
+        ws.conditional_formatting.add(f"{D}2:{D}{last}", FormulaRule(
+            formula=[f'{D}2="{word}"'], fill=PatternFill("solid", fgColor=color), stopIfTrue=False))
     # (2) Exclude なのに理由 / 根拠が空
     ws.conditional_formatting.add(f"{R}2:{R}{last}", FormulaRule(
         formula=[f'AND({D}2="Exclude",LEN(TRIM({R}2))=0)'], stopIfTrue=False, **red))
     ws.conditional_formatting.add(f"{E}2:{E}{last}", FormulaRule(
         formula=[f'AND({D}2="Exclude",LEN(TRIM({E}2))=0)'], stopIfTrue=False, **red))
-    # (3) 理由が「その他」なのにメモが空
+    # (3) 理由が「その他」なのにメモが空(C が N のときの自動の「その他」は、メモ不要)
     ws.conditional_formatting.add(f"{M}2:{M}{last}", FormulaRule(
-        formula=[f'AND({R}2="{REASON_OTHER}",LEN(TRIM({M}2))=0)'], stopIfTrue=False, **red))
+        formula=[f'AND({R}2="{REASON_OTHER}",{Cc}2<>"N",LEN(TRIM({M}2))=0)'], stopIfTrue=False, **red))
     # (4) 抽出担当で、自分の判定が Include / Unsure なのに必須の抽出列が空
     for key in EXTRACT_REQUIRED:
         L = col_letter(key)
@@ -470,7 +535,8 @@ def main() -> None:
     by_rid = load_screening_meta(ROOT / "screening")
 
     info: dict[str, dict] = {}
-    for m in manifest:
+    used_names: set[str] = set()
+    for m in sorted(manifest, key=lambda r: r["record_id"]):
         rid = m["record_id"]
         title = m["title"] or final.get(rid, {}).get("title", "")
         doi = m["doi"] or final.get(rid, {}).get("doi", "")
@@ -478,7 +544,8 @@ def main() -> None:
                        or by_rid.get(rid) or ("", ""))
         has_pdf = m["status"] == "ok" and (args.pdf_dir / f"{rid}.pdf").exists()
         info[rid] = {"record_id": rid, "title": title, "doi": doi, "venue": venue, "year": year,
-                     "pdf": f"{rid}.pdf" if has_pdf else "", "status": m["status"], "has_pdf": has_pdf}
+                     "pdf": pdf_filename(title, rid, used_names) if has_pdf else "",
+                     "status": m["status"], "has_pdf": has_pdf}
 
     # --- 割当表 ---
     args.out.mkdir(parents=True, exist_ok=True)
@@ -531,9 +598,13 @@ def main() -> None:
         if args.copy_pdfs:
             pdir = d / "pdf"
             pdir.mkdir(exist_ok=True)
+            keep = {info[rid]["pdf"] for rid in dist}
+            for old in pdir.glob("*.pdf"):          # このフォルダは生成物のコピー。古い名前(record_id など)は消す
+                if old.name not in keep:
+                    old.unlink()
             for rid in dist:
-                shutil.copyfile(args.pdf_dir / f"{rid}.pdf", pdir / f"{rid}.pdf")
-            print(f"[INFO] PDF {len(dist)} 件を {pdir} にコピー")
+                shutil.copyfile(args.pdf_dir / f"{rid}.pdf", pdir / info[rid]["pdf"])
+            print(f"[INFO] PDF {len(dist)} 件を {pdir} にコピー(論文名のファイル名)")
 
     print("\n[NEXT] 記入中のシート(phase4_sheet_*)は .gitignore 対象。各評価者に自分のフォルダだけを渡す。"
           "\n       返却後は score_fulltext.py で検査・集計する。")

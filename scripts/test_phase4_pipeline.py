@@ -5,8 +5,8 @@ test_phase4_pipeline.py — Phase 4 のシート生成と集計を、合成デ�
 ================================================================================
 本物の判定シートには触れない(一時フォルダに生成する)。次を確認する:
   1. 割当が均等化 案 B(50/50/49、評価回数 100/99/99)で、決定論的である
-  2. 生成したシートに、注入した記入ミス(規則との食い違い・理由なしの Exclude・語彙外・n_total が非整数)を
-     score_fulltext.check_sheet が検出する
+  2. 生成したシートに、注入した記入ミス(根拠なしの Exclude・語彙外の除外理由)を score_fulltext.check_sheet が
+     検出する。判定と除外理由は式で自動に出る(Excel で保存していないファイルでも 6 列から計算される)
   3. 合成の判定から κ・協議リスト・最終判定・抽出表が書き出せる
 実行:  python -X utf8 scripts/test_phase4_pipeline.py
 """
@@ -47,9 +47,8 @@ def fill(base: Path) -> None:
             d = "Exclude" if "N" in vs else ("Unsure" if "?" in vs else "Include")
             for k in CRIT_KEYS:
                 ws.cell(r, COL_INDEX[k]).value = vals[k]
-            ws.cell(r, COL_INDEX["decision"]).value = d
+            # 判定と除外理由は式(自動)なので書かない。Exclude の根拠だけ書く
             if d == "Exclude":
-                ws.cell(r, COL_INDEX["reason"]).value = REASON[[k for k in CRIT_KEYS if vals[k] == "N"][0]]
                 ws.cell(r, COL_INDEX["evidence"]).value = 'p.3 "..."'
             if ws.cell(r, COL_INDEX["extractor"]).value == "Y" and d in ("Include", "Unsure"):
                 for k, v in {"n_total": "24", "population": "大学生", "device": "HTC Vive", "scale_target": "身体全体",
@@ -80,17 +79,22 @@ def main() -> None:
         ws = wb["判定"]
         for k, v in (("P", "Y"), ("I_hmd", "Y"), ("I_scale", "N"), ("C", "Y"), ("O", "Y"), ("S", "Y")):
             ws.cell(2, COL_INDEX[k]).value = v
-        ws.cell(2, COL_INDEX["decision"]).value = "Include"          # 規則(Exclude)と食い違う
-        ws.cell(3, COL_INDEX["decision"]).value = "Exclude"
-        ws.cell(3, COL_INDEX["reason"]).value = None                 # 理由なし
-        ws.cell(4, COL_INDEX["reason"]).value = "患者対象"             # 語彙外
+        ws.cell(2, COL_INDEX["evidence"]).value = None               # Exclude なのに根拠なし
+        for k, v in (("P", "Y"), ("I_hmd", "Y"), ("I_scale", "Y"), ("C", "Y"), ("O", "N"), ("S", "Y")):
+            ws.cell(4, COL_INDEX[k]).value = v
+        ws.cell(4, COL_INDEX["reason"]).value = "患者対象"             # 語彙外(式を手入力で上書き)
+        ws.cell(4, COL_INDEX["evidence"]).value = "p.1"
         wb.save(p)
         sheets = {w: sf.load_sheet(base / w / f"phase4_sheet_{w}.xlsx") for w in ("author", "kataoka", "watanabe")}
         assigned = {a["record_id"]: a for a in sf.load_assignment(base)}
         err, _warn = sf.check_sheet("author", sheets["author"], assigned)
         text = "\n".join(err)
-        assert "規則(Exclude)と食い違う" in text and "除外理由が空" in text and "語彙外" in text, text
-        print(f"OK 検査: 注入した 3 種のミスをエラーとして検出({len(err)} 件)")
+        assert "根拠(頁・引用)が空" in text and "除外理由が語彙外" in text, text
+        r2 = sheets["author"][ws.cell(2, 1).value]
+        assert r2["decision"] == "Exclude" and r2["reason"] == REASON["I_scale"], r2   # 自動の判定・理由
+        r3 = sheets["author"][ws.cell(3, 1).value]
+        assert r3["decision"] == sf.expected_decision(r3)
+        print(f"OK 検査: 注入した 2 種のミスをエラーとして検出({len(err)} 件)。判定・除外理由は自動で入る")
 
         # 注入ミスを直して、集計・協議・最終判定まで
         subprocess.run(PY + [str(HERE / "make_fulltext_sheets.py"), "--out", str(base), "--force"], check=True, capture_output=True)

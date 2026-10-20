@@ -6,7 +6,7 @@
 |---|---|---|
 | `assignment.csv` | 割当表(担当ペア・抽出担当・配布の有無)。均等化 50/50/49 | する |
 | `<who>/phase4_sheet_<who>.xlsx` | 各評価者の判定シート(プルダウン)。**他の評価者に見せない** | しない(独立性) |
-| `<who>/pdf/` | 担当分の全文 PDF | しない |
+| `<who>/pdf/` | 担当分の全文 PDF(ファイル名は**論文名**。シートの「全文 PDF」列のリンクから開く) | しない |
 | `consensus_worklist.csv` | 協議リスト(`score_fulltext.py` が生成) | する |
 | `final_decisions.csv` / `extraction_table.csv` | 最終判定 / Include の事実の抽出表(`score_fulltext.py --final`) | する |
 

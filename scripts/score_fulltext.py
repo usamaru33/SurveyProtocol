@@ -50,7 +50,7 @@ except ImportError:
 
 from make_fulltext_sheets import (  # noqa: E402
     COLS, CRIT_KEYS, CRIT_LABEL, DECISIONS, EXTRACT, EXTRACT_KEYS, EXTRACT_REQUIRED,
-    REASON_OTHER, REASON_VALUES, YNQ,
+    REASON_OTHER, REASON_VALUES, YNQ, auto_reason, expected_decision,
 )
 from make_screening_sheets import REVIEWERS  # noqa: E402
 from score_screening import cohen_kappa, landis_koch  # noqa: E402
@@ -103,6 +103,10 @@ def load_sheet(path: Path) -> dict[str, dict]:
         d = {k: cell(v) for k, v in zip(keys, r)}
         rid = d.get("record_id", "")
         if rid:
+            # 「判定」は式の列。Excel で保存されていないファイル(式のキャッシュ値が無い)でも読めるよう、6 列から計算する。
+            d["decision"] = expected_decision(d)
+            if d["decision"] == "Exclude" and not d.get("reason"):
+                d["reason"] = auto_reason(d)         # 自動の理由(式の値が無いとき)。手で選び直した理由はそのまま
             out[rid] = d
     return out
 
@@ -121,15 +125,6 @@ def load_assignment(base: Path) -> list[dict]:
 
 
 # --- 検査 -------------------------------------------------------------------
-def expected_decision(r: dict) -> str:
-    v = [r.get(k, "") for k in CRIT_KEYS]
-    if "N" in v:
-        return "Exclude"
-    if any(x == "" for x in v):
-        return ""
-    return "Unsure" if "?" in v else "Include"
-
-
 def split_multi(s: str) -> list[str]:
     return [t.strip() for t in s.replace("；", ";").split(";") if t.strip()]
 
@@ -146,21 +141,13 @@ def check_sheet(who: str, rows: dict[str, dict], assigned: dict[str, dict]) -> t
         for k in CRIT_KEYS:
             if r.get(k) and r[k] not in YNQ:
                 err.append(f"{tag} {CRIT_LABEL[k]} が Y/N/? でない: 「{r[k]}」")
-        d = r.get("decision", "")
-        if d and d not in DECISIONS:
-            err.append(f"{tag} 判定が語彙外: 「{d}」")
+        d = r.get("decision", "")          # load_sheet が 6 列から計算した値
         reason = r.get("reason", "")
         if reason and reason not in REASON_VALUES:
             err.append(f"{tag} 除外理由が語彙外: 「{reason}」")
         if not d:
-            warn.append(f"{tag} 判定が未記入")
+            warn.append(f"{tag} 基準の 6 列に未記入がある(判定が出ない)")
             continue
-        exp = expected_decision(r)
-        if exp == "":
-            warn.append(f"{tag} 基準の 6 列に空欄がある(判定 {d})")
-        elif d != exp:
-            err.append(f"{tag} 判定 {d} が規則({exp})と食い違う: "
-                       + "/".join(f"{k}={r.get(k, '')}" for k in CRIT_KEYS))
         if d == "Exclude":
             if not reason:
                 err.append(f"{tag} Exclude なのに除外理由が空")
@@ -168,11 +155,8 @@ def check_sheet(who: str, rows: dict[str, dict], assigned: dict[str, dict]) -> t
                 err.append(f"{tag} Exclude なのに根拠(頁・引用)が空")
         elif reason:
             warn.append(f"{tag} {d} なのに除外理由が入っている: 「{reason}」")
-        if reason == REASON_OTHER and not r.get("memo"):
-            err.append(f"{tag} 除外理由が「その他」なのにメモが空")
-        if r.get("C") == "N" and d == "Exclude" and reason not in (REASON_OTHER, "") and r.get("S") != "N" \
-                and r.get("P") != "N" and r.get("I_hmd") != "N" and r.get("I_scale") != "N" and r.get("O") != "N":
-            warn.append(f"{tag} C だけが N なのに除外理由が「{reason}」(C は「その他」+メモ「C: 比較対象が無い」)")
+        if reason == REASON_OTHER and r.get("C") != "N" and not r.get("memo"):
+            err.append(f"{tag} 除外理由が「その他」なのにメモが空(C が N の自動の「その他」は不要)")
         # 抽出列
         if assigned[rid]["extractor"] == who and d in ("Include", "Unsure"):
             for k in EXTRACT_REQUIRED:
