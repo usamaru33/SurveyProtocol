@@ -1,21 +1,15 @@
 # Phase 4 全文: 未取得リスト(最新版)
 
-作成日: 2026-10-17 / 更新: 2026-10-19(Rev.28 を反映)
+作成日: 2026-10-17 / 更新: 2026-10-19(Rev.28 を反映、`R25b5bab30` 取得を反映)
 
 対象は **149 件**(協議 2 回目の最終判定で Include の 151 件から、重複 2 件を代表に統合)。
-取得済み 147 件、**未取得 2 件**。一覧は `fulltext/manifest.csv` から作成した(手で編集しない)。
+取得済み 148 件、**未取得 1 件**。一覧は `fulltext/manifest.csv` から作成した(手で編集しない)。
 
 | 分類 | 件数 |
 |---|---|
-| 学内ライセンス(取得をリクエスト中) | 1 |
 | 取得不要の見込み | 1 |
 
-**あなたの手が要るのは、`R25b5bab30` のリクエスト結果の受け取りだけ。**
-
-## 学内ライセンス(取得をリクエスト中)
-
-- [ ] `R25b5bab30` Impact of Body Size Match to an Avatar on the Body Ownership Illusion and User's Subjective Experience — [10.1089/cyber.2019.0136](https://doi.org/10.1089/cyber.2019.0136)(担当 author×kataoka、協議 —)
-  - Cyberpsychology, Behavior, and Social Networking(Mary Ann Liebert)。2026-10-19 にリクエスト中
+**あなたの手が要る取得は無い。** 残る `Rbe2e9ecd2` は書誌の確認だけ。
 
 ## 取得不要の見込み
 
@@ -24,8 +18,9 @@
 
 ---
 
-## 2026-10-19 に取得済みへ移した 10 件
+## 2026-10-19 に取得済みへ移した 11 件
 
+- [x] `R25b5bab30` Kim ら, Impact of Body Size Match to an Avatar(担当 author×watanabe)— `manual/Impactofbodysizematchtoanavataronthebodyownershipillusionanduserssubjectiveexperience.pdf`(8 ページ、書誌を照合済み)
 - [x] `R83118528e` Wraga 1999, JEP:HPP 25(2)(担当 author×kataoka)— `manual/1999-10532-014.pdf`
 - [x] `R5c8c33de9` Dixon ら 2000, JEP:HPP 26(2)(担当 author×kataoka)— `manual/2000-08159-009.pdf`
 - [x] `R247a1be9c` Yamamoto ら 2025, Avatar Identity and Conversation on Personal Space(担当 kataoka×watanabe)— `manual/29_29.pdf`。取得済みと誤っていた件(arXiv 2603.06030 は別論文)の訂正済み

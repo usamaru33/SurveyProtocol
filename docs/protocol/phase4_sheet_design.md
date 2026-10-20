@@ -13,7 +13,7 @@
 | 項目 | 現状 |
 |---|---|
 | 対象 | `final_decisions.csv` の Include 151 件から重複 2 件を代表に統合した **149 件**(= `fulltext/manifest.csv` と一致。Rev.28、2026-10-19。旧: 152 件) |
-| 全文の状態 | 取得済み 147 件、**未取得 2 件**(`R25b5bab30` はリクエスト中、`Rbe2e9ecd2` は取得不要の見込み。`fulltext/missing_list.md`) |
+| 全文の状態 | 取得済み 148 件、**未取得 1 件**(`Rbe2e9ecd2` は取得不要の見込み。`R25b5bab30` は 2026-10-19 に取得し配布分に追加。`fulltext/missing_list.md`) |
 | 評価体制 | 3 名のうち 2 名が独立に全文評価(Rev.9・Rev.17)。ブロック分担 著者×Kataoka / 著者×Watanabe / Kataoka×Watanabe |
 | 不一致の解決 | 担当ペアの協議。決着しなければ 3 人目を加えて多数決(rule.md) |
 | 報告するもの | ペアごとの Cohen's κ と平均、除外理由(PICOS のどれに抵触したか)を 1 件ずつ |

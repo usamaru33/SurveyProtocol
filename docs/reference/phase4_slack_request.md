@@ -20,7 +20,7 @@ Kataoka さん、Watanabe さん
 
 【今回の対象】
 ・Phase 3b で Include になった論文のうち、重複を統合した149件
-・全文PDFは147件を取得済みで、シートの「pdf」列にパスがあります
+・全文PDFは148件を取得済みで、シートの「pdf」列にパスがあります
 
 【判定のしかた】
 ・PICOS の5基準(P/I/C/O/S)を、それぞれ Y / N / ? で記入 → 判定(Include / Exclude / Unsure)

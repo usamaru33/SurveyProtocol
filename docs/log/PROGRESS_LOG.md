@@ -2124,3 +2124,6 @@ stage 2 シート（Kataoka 363件 / Watanabe 346件）を生成し配布して�
   `sheet_*` と `review_author.html` → `stage1/`、`supplement_sheet_*` → `calibration_supplement/`、`consensus_meeting*.xlsx` → `consensus/`、`stage2_sheet_*_submit/_copy_*.xlsx`（提出コピー）→ `_archive/stage2/`。
   移動後は `.gitignore` のパターンに該当して追跡対象から外れた（独立性の保護）。各フォルダに `README.md` を追加して Phase を明記（stage1・calibration_supplement・consensus・final = **Phase 3b**、phase4 = **Phase 4**）。
   `FILE_MAP.md` に「Phase とフォルダの対応」表、`fulltext/README.md`（Phase 4 の準備）を追加。ルートの `PROGRESS_LOG.md`（未追跡・docs/log のものとは別物）とスクリーンショットは動かしていない。
+- **`R25b5bab30` を取得**（Kim ら, Impact of Body Size Match to an Avatar。8 ページ、冒頭で書誌を照合）。`fulltext/pdf/R25b5bab30.pdf` に配置し `manifest.csv` を ok に更新（取得済み 147 → **148 件**、未取得は `Rbe2e9ecd2` の 1 件）。
+  担当は author×watanabe。`make_fulltext_sheets.py --only author|watanabe --force --copy-pdfs` で両シートを再生成した（記入 0 件を確認してから実施。配布数 147 → 148、担当 author 100 / watanabe 98 / kataoka 98）。
+  `missing_list.md`・`manual_fetch.md`・README・`phase4_sheet_design.md`・`phase4_reviewer_guide.md`・Slack 案の件数を更新。
