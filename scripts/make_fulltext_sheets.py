@@ -392,6 +392,8 @@ def build_sheet(ws, rows: list[dict], refs: dict[str, str]) -> None:
         dv.error = ("一覧から選んでください。" if strict else
                     "一覧から選ぶか、複数のときは「A; B」のように ; で区切って入力してください。")
         dv.promptTitle, dv.prompt = title, prompt
+        dv.showErrorMessage = strict  # 厳密な列は一覧外の入力を拒否(複数値の列は ; 区切りを許すので警告も出さない)
+        dv.showInputMessage = True
         ws.add_data_validation(dv)
         dv.add(f"{L}2:{L}{last}")
 
