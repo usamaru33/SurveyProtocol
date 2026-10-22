@@ -70,3 +70,6 @@ fulltext/manual/
 screening/phase4/*/phase4_sheet_*.xlsx
 screening/phase4/*/phase4_sheet_*.csv
 screening/phase4/*/pdf/
+screening/phase4/*/review_*.html
+screening/phase4/*/progress_*.json
+screening/phase4/*/backup/
