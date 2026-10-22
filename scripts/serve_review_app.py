@@ -5,7 +5,7 @@
   python -X utf8 scripts/serve_review_app.py --id author
 
 表示された URL(`http://<PC の IP>:8765/<合言葉>/review_author.html`)をスマホで開く。
-  - 配るのは、その評価者の review_<id>.html と pdf/ だけ。ほかのファイルは出さない。
+  - 配るのは、その評価者の review_<id>.html・ja_<id>.js(日本語要約)・pdf/ だけ。ほかのファイルは出さない。
   - URL に合言葉が入っている。知らない人は開けない(同じ Wi-Fi でも)。
   - アプリの入力は、変更のたびに PC の progress_<id>.json へ自動で保存される(スマホ側の保存操作は不要)。
     スマホのブラウザを替えても、同じ URL を開けば PC 側の保存が引き継がれる。
@@ -77,6 +77,8 @@ def make_handler(root: Path, who: str, token: str):
                 return self._send(404, "not found".encode())
             if rel in ("", html_name):
                 f, ct = root / html_name, "text/html; charset=utf-8"
+            elif rel == f"ja_{who}.js":                 # AI の日本語要約・本文(あれば)
+                f, ct = root / rel, "text/javascript; charset=utf-8"
             elif rel == "progress.json":
                 f, ct = prog, "application/json; charset=utf-8"
             elif rel.startswith("pdf/") and rel.lower().endswith(".pdf") and "/" not in rel[4:] and ".." not in rel:

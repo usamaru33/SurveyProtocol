@@ -127,9 +127,31 @@ def build_data(who: str, recs: list[dict], artifact: bool = False) -> dict:
     }
 
 
+FULLTEXT = ROOT / "fulltext"
+
+
+def build_ja(recs: list[dict]) -> str:
+    """AI の日本語要約(fulltext/ja/<id>.json)と抽出した本文(fulltext/txt/<id>.txt)を、ja_<id>.js にまとめる。
+    どちらも著作物の派生物なので、リポジトリには入れない(.gitignore)。無い論文は空のまま。"""
+    out = {}
+    for r in recs:
+        item = {}
+        jf, tf = FULLTEXT / "ja" / f"{r['id']}.json", FULLTEXT / "txt" / f"{r['id']}.txt"
+        if jf.exists():
+            try:
+                item["ja"] = json.loads(jf.read_text(encoding="utf-8"))
+            except ValueError:
+                print(f"[WARN] {jf.name} が JSON として読めない。無視する")
+        if tf.exists():
+            item["text"] = tf.read_text(encoding="utf-8")
+        if item:
+            out[r["id"]] = item
+    return "window.JA=" + json.dumps(out, ensure_ascii=False).replace("</", "<\\/") + ";"
+
+
 def render(data: dict) -> str:
     blob = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
-    return TEMPLATE.replace("__DATA__", blob).replace("__WHO__", data["reviewer"])
+    return TEMPLATE.replace("__DATA__", blob).replace("__WHO__", data["reviewer"]).replace("__WHOID__", data["sheet"])
 
 
 def main() -> None:
@@ -148,6 +170,10 @@ def main() -> None:
             add_links(recs, args.pdf_base)
         out = args.dir / who / (f"review_{who}_artifact.html" if args.artifact else f"review_{who}.html")
         out.write_text(render(build_data(who, recs, args.artifact)), encoding="utf-8")
+        if not args.artifact:
+            (args.dir / who / f"ja_{who}.js").write_text(build_ja(recs), encoding="utf-8")
+            nja = sum(1 for r in recs if (FULLTEXT / "ja" / f"{r['id']}.json").exists())
+            print(f"      日本語要約 {nja}/{len(recs)} 本")
         done = sum(1 for r in recs if r["init"])
         print(f"[OK] {out}  {len(recs)} 件(うち記入あり {done} 件)")
 
@@ -196,6 +222,12 @@ textarea{min-height:54px;resize:vertical}
 #probs{color:var(--bad);font-size:12px;margin-top:4px}
 #probs.okay{color:var(--ok)}
 .dim{opacity:.55}
+details.ja{border:1px solid #c9b458;background:#fffbe6;border-radius:6px;padding:4px 10px;margin:8px 0}
+details.ja>summary{cursor:pointer;font-weight:700;color:#7a5d00;padding:4px 0}
+.ja dl{margin:4px 0}.ja dt{font-weight:700;font-size:12px;color:#7a5d00;margin-top:6px}.ja dd{margin:0 0 0 0}
+.ja .pg{color:#1f3864;font-weight:700;cursor:pointer;text-decoration:underline}
+.ja .warn{font-size:11px;color:#7a5d00}
+.ja pre{white-space:pre-wrap;word-break:break-word;font:13px/1.6 sans-serif;max-height:60vh;overflow:auto;background:#fff;border:1px solid var(--line);padding:6px}
 #legend{font-size:11px;color:var(--mut);margin-top:10px;line-height:1.7}
 #list{position:fixed;inset:44px 0 0 0;background:rgba(255,255,255,.97);overflow:auto;padding:12px;display:none;z-index:5}
 #list.on{display:block}
@@ -255,6 +287,7 @@ textarea{min-height:54px;resize:vertical}
 <input type="file" id="file" accept=".json,application/json" style="display:none">
 <div id="selftest"></div>
 <div id="jbox"><div><b id="jtitle"></b><textarea id="jtext"></textarea><p><button id="jgo"></button> <button id="jclose">閉じる</button></p></div></div>
+<script src="ja___WHOID__.js"></script>
 <script type="application/json" id="data">__DATA__</script>
 <script>
 "use strict";
@@ -325,6 +358,7 @@ function draw(){
    +'<select id="flt">'+fltOpts()+'</select></div>'
    +'<h1>'+esc(r.title)+'</h1><div class="meta">'+esc(r.id)+' ・ '+esc(r.year)+' ・ '+esc(r.venue)+' ・ DOI '+esc(r.doi||"—")+'<br>担当ペアの相手: '+esc(r.partner)
    +' ・ 抽出担当: <b>'+(r.extractor==="Y"?"あなた":"相手")+'</b>'+(link?' ・ <a href="'+esc(link)+'" target="_blank" rel="noopener">'+(D.artifact?(r.oa==="pdf"?"PDF を開く":r.oa?"論文を開く(OA)":"論文を開く(DOI)"):"PDF を別タブで開く")+'</a>':'')+'</div>'
+   +jaHtml(r)
    +'<div class="sec"><h2>① 基準の判定(Y / N / ?)</h2>'+crit
    +'<div style="margin-top:8px">判定(自動): <span id="decision"></span> <span class="meta" id="rn"></span></div></div>'
    +'<div class="sec"><h2>② 除外理由・根拠・メモ</h2>'
@@ -343,6 +377,21 @@ function draw(){
   else{$("pdf").style.display="none";$("nopdf").style.display="";$("nopdf").textContent=link?"(PDF 非表示。G で表示)":"この論文の PDF がありません。record_id と一緒に著者へ連絡してください。"}
   refresh();
 }
+function jaHtml(r){
+  const J=(window.JA||{})[r.id];if(!J)return"";
+  const ja=J.ja,warn='<div class="warn">AI が作った補助です。判定の根拠にしない。必ず PDF の原文で確認する(誤訳・取り違えがありうる)。</div>';
+  let h='<details class="ja" id="jaBox"'+(jaOpen?" open":"")+'><summary>日本語要約(AI・補助)'+(ja?"":"(この論文は未作成)")+'</summary>'+warn;
+  if(ja){const s=ja.summary||{},L=[["purpose","目的"],["method","手法"],["participants","参加者"],["conditions","条件"],["measures","指標"],["results","結果"]];
+    h+='<dl>'+L.filter(([k])=>s[k]).map(([k,l])=>'<dt>'+l+'</dt><dd>'+esc(s[k])+'</dd>').join("")+'</dl>';
+    if(s.limits)h+='<div class="warn">要約者の不確かな点: '+esc(s.limits)+'</div>';
+    const c=ja.cues||{};
+    h+='<dt style="font-weight:700;font-size:12px;color:#7a5d00;margin-top:8px">基準ごとの手がかり(判定ではなく、見る場所の案内)</dt><dl>'
+      +CR.filter(x=>c[x.k]&&c[x.k].note).map(x=>'<dt>'+esc(x.label)+(c[x.k].page?' <span class="pg" data-pg="'+esc(c[x.k].page)+'">'+esc(c[x.k].page)+'</span>':"")+'</dt><dd>'+esc(c[x.k].note)+'</dd>').join("")+'</dl>';
+    if(ja.abstract_ja)h+='<details><summary>要旨の日本語訳</summary><p>'+esc(ja.abstract_ja)+'</p></details>'}
+  if(J.text)h+='<details><summary>本文(英語の抽出テキスト。ブラウザの翻訳機能で日本語にできる)</summary><div class="warn">PDF から機械的に取り出した文字です。表・図・数式は崩れます。</div><pre lang="en" translate="yes">'+esc(J.text)+'</pre></details>';
+  return h+'</details>'}
+let jaOpen=false;
+document.addEventListener("toggle",ev=>{if(ev.target.id==="jaBox")jaOpen=ev.target.open},true);
 function fltOpts(){return [["all","すべて"],["todo","判定が未了"],["Include","Include"],["Exclude","Exclude"],["Unsure","Unsure"],["ext","抽出が未了"],["prob","要修正あり"]]
   .map(([v,l])=>'<option value="'+v+'"'+(filter===v?" selected":"")+'>'+l+'</option>').join("")}
 function bindFlt(){const f=$("flt");if(f)f.onchange=()=>{filter=f.value;cur=0;draw()}}
@@ -389,6 +438,8 @@ document.addEventListener("click",ev=>{
   const c=t.closest(".crit");if(c&&!t.closest("button")){fc=+c.dataset.i;refresh();return}
   if(t.dataset&&t.dataset.fill){const e=E(D.records[view[cur]].id);e.ext[t.dataset.fill]=t.dataset.v;
     const inp=document.querySelector('[data-ext="'+t.dataset.fill+'"]');if(inp)inp.value=t.dataset.v;changed();return}
+  if(t.dataset&&t.dataset.pg){const m=/(\d+)/.exec(t.dataset.pg),r=D.records[view[cur]];
+    if(m&&r.pdf&&!D.artifact){const u="pdf/"+encodeURIComponent(r.pdf)+"#page="+m[1];$("pdf").dataset.src=u;$("pdf").src=u;$("pdfopen").href=u;toast("PDF を "+m[1]+" 頁へ移動しました(PDF 表示側)")}return}
   if(t.id==="prev"||t.id==="mPrev")go(-1);if(t.id==="next"||t.id==="mNext")go(1);
   if(t.id==="mTabF")setTab("form");if(t.id==="mTabP")setTab("pdf");
   const row=t.closest("tr.row");if(row){filter="all";cur=0;rebuild();cur=view.findIndex(i=>D.records[i].id===row.dataset.id);$("list").classList.remove("on");draw()}
@@ -420,6 +471,7 @@ document.addEventListener("keydown",ev=>{
   else if(k==="m"){ev.preventDefault();$("memo").focus()}
   else if(k==="s"){saveJSON()}else if(k==="l"){D.artifact?sheetBox("load"):$("file").click()}
   else if(k==="g"){togglePdf()}
+  else if(k==="a"){const b=$("jaBox");if(b)b.open=!b.open}
 });
 function setTab(v){document.body.classList.toggle("m-pdf",v==="pdf");document.body.classList.toggle("m-form",v!=="pdf");
   $("mTabF").classList.toggle("on",v!=="pdf");$("mTabP").classList.toggle("on",v==="pdf")}
