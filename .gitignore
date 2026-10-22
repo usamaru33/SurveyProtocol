@@ -77,3 +77,5 @@ fulltext/txt/
 fulltext/ja/
 screening/phase4/*/ja_*.js
 fulltext/method/
+fulltext/method_ja/
+screening/phase4/*/translate_requests.json

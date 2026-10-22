@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import secrets
 import socket
 import sys
@@ -31,6 +32,8 @@ from make_screening_sheets import REVIEWERS  # noqa: E402
 
 PHASE4 = _HERE.parent / "screening" / "phase4"
 MAX_BODY = 8 * 1024 * 1024
+FULLTEXT = _HERE.parent / "fulltext"
+RID = re.compile(r"^R[0-9a-f]{6,12}$")
 
 
 def lan_ip() -> str:
@@ -47,6 +50,20 @@ def lan_ip() -> str:
 def make_handler(root: Path, who: str, token: str):
     html_name = f"review_{who}.html"
     prog = root / f"progress_{who}.json"
+    reqf = root / "translate_requests.json"           # 手法の和訳依頼(Claude が処理して fulltext/method_ja/ に書く)
+
+    def read_json(f: Path):
+        try:
+            return json.loads(f.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return None
+
+    def mstate(rid: str) -> dict:
+        m = read_json(FULLTEXT / "method" / f"{rid}.json")
+        ja = read_json(FULLTEXT / "method_ja" / f"{rid}.json")
+        reqs = read_json(reqf) or []
+        return {"has_sections": bool(m and m.get("sections")), "chars": (m or {}).get("chars", 0),
+                "ja": ja, "requested": rid in reqs}
 
     class H(BaseHTTPRequestHandler):
         server_version = "review"
@@ -79,6 +96,8 @@ def make_handler(root: Path, who: str, token: str):
                 f, ct = root / html_name, "text/html; charset=utf-8"
             elif rel == f"ja_{who}.js":                 # AI の日本語要約・本文(あれば)
                 f, ct = root / rel, "text/javascript; charset=utf-8"
+            elif rel.startswith("mstate/") and RID.match(rel[7:]):   # 手法の和訳の状態(和訳があれば本文も)
+                return self._send(200, json.dumps(mstate(rel[7:]), ensure_ascii=False).encode(), "application/json; charset=utf-8")
             elif rel == "progress.json":
                 f, ct = prog, "application/json; charset=utf-8"
             elif rel.startswith("pdf/") and rel.lower().endswith(".pdf") and "/" not in rel[4:] and ".." not in rel:
@@ -92,6 +111,20 @@ def make_handler(root: Path, who: str, token: str):
         do_HEAD = do_GET
 
         def do_POST(self):
+            if self._rel() == "mrequest":
+                n = int(self.headers.get("Content-Length") or 0)
+                try:
+                    rid = json.loads(self.rfile.read(min(n, 1024)).decode("utf-8")).get("id", "")
+                except ValueError:
+                    return self._send(400, "json".encode())
+                if not RID.match(str(rid)):
+                    return self._send(400, "id".encode())
+                reqs = read_json(reqf) or []
+                if rid not in reqs:
+                    reqs.append(rid)
+                    reqf.write_text(json.dumps(reqs, ensure_ascii=False, indent=1), encoding="utf-8")
+                self.log_message("和訳依頼 %s(待ち %s 件)", rid, len(reqs))
+                return self._send(200, b"ok")
             if self._rel() != "save":
                 return self._send(404, "not found".encode())
             n = int(self.headers.get("Content-Length") or 0)

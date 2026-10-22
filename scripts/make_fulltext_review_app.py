@@ -227,6 +227,7 @@ details.ja>summary{cursor:pointer;font-weight:700;color:#7a5d00;padding:4px 0}
 .ja dl{margin:4px 0}.ja dt{font-weight:700;font-size:12px;color:#7a5d00;margin-top:6px}.ja dd{margin:0 0 0 0}
 .ja .pg{color:#1f3864;font-weight:700;cursor:pointer;text-decoration:underline}
 .ja .warn{font-size:11px;color:#7a5d00}
+.ja .mj h4{margin:8px 0 2px;font-size:13px}.ja .mjt{white-space:pre-wrap;font:13px/1.7 sans-serif}.ja .mj button{margin:4px 0;padding:4px 10px}
 .ja pre{white-space:pre-wrap;word-break:break-word;font:13px/1.6 sans-serif;max-height:60vh;overflow:auto;background:#fff;border:1px solid var(--line);padding:6px}
 #legend{font-size:11px;color:var(--mut);margin-top:10px;line-height:1.7}
 #list{position:fixed;inset:44px 0 0 0;background:rgba(255,255,255,.97);overflow:auto;padding:12px;display:none;z-index:5}
@@ -388,8 +389,25 @@ function jaHtml(r){
     h+='<dt style="font-weight:700;font-size:12px;color:#7a5d00;margin-top:8px">基準ごとの手がかり(判定ではなく、見る場所の案内)</dt><dl>'
       +CR.filter(x=>c[x.k]&&c[x.k].note).map(x=>'<dt>'+esc(x.label)+(c[x.k].page?' <span class="pg" data-pg="'+esc(c[x.k].page)+'">'+esc(c[x.k].page)+'</span>':"")+'</dt><dd>'+esc(c[x.k].note)+'</dd>').join("")+'</dl>';
     if(ja.abstract_ja)h+='<details><summary>要旨の日本語訳</summary><p>'+esc(ja.abstract_ja)+'</p></details>'}
+  h+='<details id="mjBox"><summary>手法・実験の和訳(AI・補助。ボタンで論文ごとに依頼)</summary><div id="mjBody" class="mj">読み込み中…</div></details>';
+  setTimeout(()=>loadMj(r.id),0);
   if(J.text)h+='<details><summary>本文(英語の抽出テキスト。ブラウザの翻訳機能で日本語にできる)</summary><div class="warn">PDF から機械的に取り出した文字です。表・図・数式は崩れます。</div><pre lang="en" translate="yes">'+esc(J.text)+'</pre></details>';
   return h+'</details>'}
+let mjTimer=null;
+async function loadMj(id){
+  const b=$("mjBody");if(!b)return;
+  const base=location.pathname.replace(/[^/]*$/,"");
+  let S=null;try{const x=await fetch(base+"mstate/"+id,{cache:"no-store"});if(x.ok)S=await x.json()}catch(e){}
+  if($("mjBody")!==b||D.records[view[cur]].id!==id)return;
+  if(!S){b.innerHTML='<div class="warn">この表示では和訳を呼び出せません(PC の serve_review_app.py 経由で開いたときだけ使えます)。</div>';return}
+  if(S.ja&&S.ja.sections&&S.ja.sections.length){
+    b.innerHTML='<div class="warn">AI 和訳(補助)。判定の根拠にしない。PDF の原文で確認する。</div>'
+      +S.ja.sections.map(x=>'<h4>'+esc(x.heading)+(x.page?' <span class="pg" data-pg="'+esc(x.page)+'">p.'+esc(x.page)+'</span>':"")+'</h4><div class="mjt">'+esc(x.ja)+'</div>').join("");
+    return}
+  if(!S.has_sections){b.innerHTML='<div class="warn">この論文は手法の節を自動で切り出せませんでした。PDF の原文を見てください。</div>';return}
+  if(S.requested){b.innerHTML='<div>和訳を依頼済みです(約 '+Math.round(S.chars/1000)+' 千字)。Claude に「和訳依頼を処理して」と伝えてください。</div><button id="mjRe">再読込</button>';$("mjRe").onclick=()=>loadMj(id);return}
+  b.innerHTML='<div>手法・実験の節を和訳します(約 '+Math.round(S.chars/1000)+' 千字)。</div><button id="mjGo">この論文の手法を和訳する</button>';
+  $("mjGo").onclick=async()=>{$("mjGo").disabled=true;try{await fetch(base+"mrequest",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id})})}catch(e){}loadMj(id)}}
 let jaOpen=false;
 document.addEventListener("toggle",ev=>{if(ev.target.id==="jaBox")jaOpen=ev.target.open},true);
 function fltOpts(){return [["all","すべて"],["todo","判定が未了"],["Include","Include"],["Exclude","Exclude"],["Unsure","Unsure"],["ext","抽出が未了"],["prob","要修正あり"]]
