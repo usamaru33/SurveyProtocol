@@ -15,6 +15,7 @@ Phase 3b の `make_review_app.py` の全文版。**判定は人が下す。** �
     python -X utf8 scripts/make_fulltext_review_app.py                 # 3 人分すべて
     python -X utf8 scripts/make_fulltext_review_app.py --id author     # 1 人分
     python -X utf8 scripts/make_fulltext_review_app.py --id author --artifact   # スマホ単体用
+    python -X utf8 scripts/make_fulltext_review_app.py --id author --artifact --pdf-base <OneDrive の pdf/ の URL>
 
 `--artifact` は PDF を同梱しない 1 ファイル版(`review_<id>_artifact.html`)。PC もサーバーも要らず、
 Claude のアーティファクトやスマホのブラウザでそのまま開ける。論文は オープンアクセスの URL
@@ -93,8 +94,9 @@ def load_records(who: str, base: Path) -> list[dict]:
     return recs
 
 
-def add_links(recs: list[dict]) -> None:
-    """--artifact 用: PDF の代わりに開くリンク(OA の URL > DOI > Google Scholar のタイトル検索)。"""
+def add_links(recs: list[dict], pdf_base: str = "") -> None:
+    """--artifact 用: 開くリンク。pdf_base(OneDrive 上の pdf/ の URL)があればその PDF、
+    無ければ OA の URL > DOI > Google Scholar のタイトル検索。"""
     import csv
     from urllib.parse import quote
     src = {}
@@ -107,6 +109,10 @@ def add_links(recs: list[dict]) -> None:
                     f"https://doi.org/{r['doi']}" if r["doi"] else
                     "https://scholar.google.com/scholar?q=" + quote(str(r["title"])))
         r["oa"] = oa.startswith("http")
+        r["web"] = r["url"]
+        if pdf_base and r["pdf"]:
+            r["url"] = pdf_base.rstrip("/") + "/" + quote(str(r["pdf"]))
+            r["oa"] = "pdf"
 
 
 def build_data(who: str, recs: list[dict], artifact: bool = False) -> dict:
@@ -131,6 +137,7 @@ def main() -> None:
     ap.add_argument("--id", default="", help="author / kataoka / watanabe(省略で 3 人分)")
     ap.add_argument("--dir", type=Path, default=PHASE4)
     ap.add_argument("--artifact", action="store_true", help="PDF を同梱しないスマホ単体版を作る")
+    ap.add_argument("--pdf-base", default="", help="--artifact で PDF を開く URL(pdf/ を置いた OneDrive などのフォルダ)")
     args = ap.parse_args()
     targets = [args.id] if args.id else list(REVIEWERS)
     for who in targets:
@@ -138,7 +145,7 @@ def main() -> None:
             sys.exit(f"[ERROR] 未知の評価者: {who}(有効: {', '.join(REVIEWERS)})")
         recs = load_records(who, args.dir)
         if args.artifact:
-            add_links(recs)
+            add_links(recs, args.pdf_base)
         out = args.dir / who / (f"review_{who}_artifact.html" if args.artifact else f"review_{who}.html")
         out.write_text(render(build_data(who, recs, args.artifact)), encoding="utf-8")
         done = sum(1 for r in recs if r["init"])
@@ -317,7 +324,7 @@ function draw(){
    '<div class="nav"><button id="prev">◀ 前 (←/k)</button><b>'+(cur+1)+' / '+view.length+'</b><button id="next">次 ▶ (→/j)</button>'
    +'<select id="flt">'+fltOpts()+'</select></div>'
    +'<h1>'+esc(r.title)+'</h1><div class="meta">'+esc(r.id)+' ・ '+esc(r.year)+' ・ '+esc(r.venue)+' ・ DOI '+esc(r.doi||"—")+'<br>担当ペアの相手: '+esc(r.partner)
-   +' ・ 抽出担当: <b>'+(r.extractor==="Y"?"あなた":"相手")+'</b>'+(link?' ・ <a href="'+esc(link)+'" target="_blank" rel="noopener">'+(D.artifact?(r.oa?"論文を開く(OA)":"論文を開く(DOI)"):"PDF を別タブで開く")+'</a>':'')+'</div>'
+   +' ・ 抽出担当: <b>'+(r.extractor==="Y"?"あなた":"相手")+'</b>'+(link?' ・ <a href="'+esc(link)+'" target="_blank" rel="noopener">'+(D.artifact?(r.oa==="pdf"?"PDF を開く":r.oa?"論文を開く(OA)":"論文を開く(DOI)"):"PDF を別タブで開く")+'</a>':'')+'</div>'
    +'<div class="sec"><h2>① 基準の判定(Y / N / ?)</h2>'+crit
    +'<div style="margin-top:8px">判定(自動): <span id="decision"></span> <span class="meta" id="rn"></span></div></div>'
    +'<div class="sec"><h2>② 除外理由・根拠・メモ</h2>'
@@ -330,8 +337,8 @@ function draw(){
   const opt=$("reason");opt.innerHTML='<option value="">(自動)</option>'+D.reasons.map(o=>'<option'+(e.reason===o?" selected":"")+'>'+esc(o)+'</option>').join("");
   bindFlt();
   $("pdfopen").style.display="";if(link){$("pdfopen").href=link}else{$("pdfopen").removeAttribute("href")}
-  if(D.artifact){$("pdf").style.display="none";$("nopdf").style.display="";$("pdfopen").textContent=r.oa?"論文を開く(オープンアクセス)":"論文を開く(DOI・学外では読めないことがあります)";
-    $("nopdf").innerHTML='<b>'+esc(r.title)+'</b><br>'+esc(r.venue)+' ('+esc(r.year)+')<br><br>上のボタンで別タブに開きます。読めないときは大学の VPN か、PC の pdf/ フォルダの「'+esc(r.pdf||"—")+'」を見てください。'}
+  if(D.artifact){$("pdf").style.display="none";$("nopdf").style.display="";$("pdfopen").textContent=r.oa==="pdf"?"PDF を開く(OneDrive)":r.oa?"論文を開く(オープンアクセス)":"論文を開く(DOI・学外では読めないことがあります)";
+    $("nopdf").innerHTML='<b>'+esc(r.title)+'</b><br>'+esc(r.venue)+' ('+esc(r.year)+')<br><br>上のボタンで別タブに開きます。'+(r.web&&r.web!==link?'開けないときは <a target="_blank" rel="noopener" href="'+esc(r.web)+'">出版社のページ</a>。':'読めないときは大学の VPN か、PC の pdf/ フォルダの「'+esc(r.pdf||"—")+'」を見てください。')}
   else if(pdfOn&&link){$("pdf").style.display="";$("nopdf").style.display="none";if($("pdf").dataset.src!==link){$("pdf").dataset.src=link;$("pdf").src=link}}
   else{$("pdf").style.display="none";$("nopdf").style.display="";$("nopdf").textContent=link?"(PDF 非表示。G で表示)":"この論文の PDF がありません。record_id と一緒に著者へ連絡してください。"}
   refresh();
