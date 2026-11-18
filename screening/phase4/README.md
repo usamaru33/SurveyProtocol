@@ -11,17 +11,18 @@
 | (スマホ) | `serve_review_app.py --id <who>` で同じ Wi-Fi 内に配信。画面は縦 1 列、進捗は PC の `progress_<who>.json` へ自動保存 | しない |
 | `<who>/pdf/` | 担当分の全文 PDF(ファイル名は**論文名**。シートの「全文 PDF」列のリンクから開く) | しない |
 | `result/` | 3 人が記入して返した判定シート(2026-11-04 に確認。148 件、全文未取得の 1 件を除く) | 未決(判定の独立性の監査証跡。`.gitignore` の方針に従う) |
-| `consensus_worklist.csv` | 協議リスト 66 件(判定の不一致・Unsure・基準に ? のどれか)。`score_fulltext.py` が生成 | する |
+| `consensus_worklist.csv` | 協議リスト 67 件(判定の不一致・Unsure・基準に ? のどれか)。`score_fulltext.py` が生成 | する |
 | `final_decisions.csv` / `extraction_table.csv` | 最終判定 / Include の事実の抽出表(`score_fulltext.py --final`)。**協議と抽出が済むまで未作成** | する |
 | `ai_extraction/` | 該当箇所の抜き出しのテスト(下の節)。**テスト中。出力は抽出の記録に使わない(Rev.31 は承認済み)** | 未決(`runs/` は 2.8 MB) |
 
 手順と基準: `docs/reference/phase4_reviewer_guide.md`。生成・集計: `scripts/make_fulltext_sheets.py` / `score_fulltext.py`。
 Phase 3b(Title/Abstract)のファイルは `../stage1/` など。
 
-## 現在地(2026-11-14)
+## 現在地(2026-11-18)
 
-- 判定: 3 人とも記入済み。評価者ペアごとの κ は 0.35(著者×kataoka)/ 0.64(著者×watanabe)/ 0.54(kataoka×watanabe)、平均 0.51。
-- 両者 Include は 33 件、判定が割れた 29 件、どちらかが Unsure 20 件、両者 Exclude 66 件。協議リストは 66 件。
+- 判定: 3 人とも記入済み。評価者ペアごとの κ は 0.35(著者×kataoka)/ 0.64(著者×watanabe)/ 0.52(kataoka×watanabe)、平均 0.50。watanabe の全角「？」2 件(P 列)は入力ミスとして「?」に読み替えた(2026-11-18)ため、2026-11-04 の値(0.54、平均 0.51、協議リスト 66 件)から変わった。`result/` の元ファイルは変更していない。
+- 両者 Include は 32 件、判定が割れた 29 件、どちらかが Unsure 21 件、両者 Exclude 66 件(計 148 件)。協議リストは 67 件。
+- `ai_extraction/` のテストは、読み替え前の「両者 Include 33 件」で行った(うち `Ra25fcb8cd` は、読み替え後は Unsure を含む)。
 - 抽出(17 列): 3 人とも未記入。協議後に Include が確定した論文から、`assignment.csv` の `extractor` が書く。
 
 ## ai_extraction/ — 該当箇所の抜き出しのテスト
