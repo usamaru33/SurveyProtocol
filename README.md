@@ -63,7 +63,7 @@
 
 ## 1. 研究概要・目的
 
-本システマティック・レビューの主たる目的は、**VR空間における自己スケール感覚（Self-scale perception）の形成に関わる諸要因を網羅的に体系化**し、現在の研究領域における「視覚情報の支配的影響」と「非視覚的情報の構造的欠落」を定量的な事実として提示することである。
+本システマティック・レビューの主たる目的は、**VR空間における自己スケール感覚（Self-scale perception）の形成に関わる諸要因を網羅的に体系化**し、スケール操作がどの感覚の手がかりで行われ、何を対象に操作・評価され、その結果がどう帰属されてきたかを、定量的な事実として提示することである（Rev.30 で改訂。対象は HMD を用いた VR 研究で、すべて視覚を含む）。
 
 具体的には、既存の実証研究を以下の三軸で構造化する:
 
@@ -79,9 +79,11 @@
 
 | RQ | 内容 |
 |---|---|
-| **RQ1** | 自己スケール感覚の形成において、これまでにどのような感覚モダリティが検討されてきたか？（視覚以外の非視覚的要因の定量的把握） |
-| **RQ2** | 介入手法（独立変数）と評価指標（従属変数）の間にどのような構造的乖離が存在するか？（World-scale依存の評価系の問題） |
-| **RQ3** | 研究は知覚の帰属について何を報告しているか？（第3軸で計数）そのうえで視覚単独のスケーリングの限界・錯誤とミニチュア効果等の境界条件を整理する |
+| **RQ1** | HMD を用いた VR で、視覚によるスケール操作と並べて、どの感覚の手がかりが検討されてきたか。その研究の割合は（軸 1）。*What sensory cues have been investigated alongside visual scale manipulation in HMD-based VR, and in what proportion of studies?* |
+| **RQ2** | スケールの操作対象（自己アバタ／環境）と、評価対象（自己／世界）は、これまでどう組み合わされてきたか（軸 2 × 抽出列 `scale_target`）。*How have the manipulated target (self-avatar or environment scale) and the evaluated referent (self or world) been paired in the literature?* |
+| **RQ3** | 知覚されたスケール変化を、自己と世界のどちらに帰属すると報告してきたか。判定できる研究は何件か（軸 3）。*What do studies report about the attribution of the perceived scale change, to the self or to the world, and for how many studies can this be determined?* |
+
+RQ の文言は Rev.30 で記述的な形に改めた（変更理由は `docs/log/protocol_changelog.md` Rev.30）。
 
 旧 RQ4（多感覚統合モデルの理論的考察）は Rev.25 で RQ 一覧から外し、本レビューの理論的貢献として
 原稿 §7 で提示する扱いに変更した。詳細は `docs/log/protocol_changelog.md` Rev.25。

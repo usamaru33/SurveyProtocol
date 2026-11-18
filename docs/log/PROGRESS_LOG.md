@@ -2280,3 +2280,38 @@ stage 2 シート（Kataoka 363件 / Watanabe 346件）を生成し配布して�
 - **2026-10-22: Phase 4 閲覧アプリに日本語要約(AI・補助)を組み込み、取得済み 148 本ぶんの要約を作成した。** 手順は `fulltext/ja_spec.md`(目的・限界・JSON 形式)。本文は `fulltext/txt/`(PDF から抽出、`[p.N]` 付き)、要約は `fulltext/ja/<record_id>.json`(いずれも著作物の派生物なので `.gitignore`)。アプリは「A」キーで開閉、基準ごとの手がかり(頁へのリンク付き)・要旨の日本語訳・抽出本文(ブラウザ翻訳用)を出す。**判定の材料にしない**(アプリ上にも明記)。要約はサブエージェントを使わず 1 本ずつ本文を読んで書いた(長大な学位論文 4 本〔`R4133f7f22`、`Rb96bc1cf4` など〕は要旨と章構成から)。`make_fulltext_review_app.py` で 3 人分を再生成し、`test_fulltext_review_app.py` 全通過。
   - **要確認:** `R85d2cc8f4` は冒頭の書誌ページが Longo & Haggard (2009) "Sense of agency primes manual motor responses" だが、本文は Longo ら "Self Awareness and the Body Image" で、**別の論文の PDF が付いている可能性**。`R8cfdc9389`・`R76846023f`・`R39146ea5f` は抽出テキストにタイトルかアブストラクトが欠けている(要約の `limits` に記載)。
   - 要約の各項目には、読み取れなかった点(人数・HMD 機種など)を「読み取れなかった」と明記してある。人数・機種は原文で確認すること。
+
+### 2026-10-29 — RQ の文言を記述的な形に改訂(Rev.30)
+
+- 小 MTG の指摘(RQ2 が読み取れない、「視覚 vs その他」の構図が誤り、RQ 以外の英文が混在)を受け、RQ を CSUR・HCI のレビューの型に合わせて書き直した。
+  詳細・理由・影響範囲は `protocol_changelog.md` Rev.30。`rule.md` §2.1・§2.2 と `README.md` §1・§2 を更新。RQ の数(3)と軸との1対1対応は不変。
+- RQ2 は 操作対象(`scale_target`) × 評価対象(軸 2) のクロス集計。**軸は増やさない。Phase 4 のシート・抽出列は変更なし(再配布不要)。**
+- 未反映: `main.tex` の RQ 節(承認ゲート待ち)。未決: ★2 Non-visual only、`rule.md` §2.1 第 2 段落の「理論的枠組み」。
+- MTG 資料(OneDrive `サーベイ_進捗報告_森さんMTG.pptx`)の RQ・目的・述べたいこと・件数グラフも同じ内容に更新。
+
+### 2026-11-04 — Phase 4 の記入結果 3 人分を確認(`screening/phase4/result/`)
+
+- 3 人分の記入済みシート(author 100 行 / kataoka 98 / watanabe 98)を `score_fulltext.py` で検査した。実シートは変更せず、`result/` のコピーを一時フォルダに置いて実行した。
+  ★6 列(P / I-1 / I-2 / C / O / S)は全行記入済み。判定の記入はほぼ完了。
+- **評価対象は 148 件。** 欠けた 1 件は `Rbe2e9ecd2`(MATEC Web of Conferences。全文未取得で、割当表では配布 N)。
+- **κ(Include/Exclude の 2 値、Unsure を含む記録は分母から除外)**: author×kataoka 0.352(fair、2 値で比べた 39 件) / author×watanabe 0.640(substantial、44 件) / kataoka×watanabe 0.537(moderate、45 件) / 平均 0.510。
+  基準別の不一致が多いのは I-2(スケール関係)と O(定量指標)。特に kataoka×watanabe の O は 22/48 件が不一致(一致率 0.542)。
+- **協議リスト 66 件**(判定不一致 / Unsure / 基準に ? のいずれか)を `screening/phase4/consensus_worklist.csv` に出力した。
+- **データの問題 2 件**: watanabe の `R4e0697c1a`・`Ra25fcb8cd` で P 列が全角の「？」(スクリプトは Y/N/? 以外としてエラー扱い)。半角「?」への修正は評価者本人に確認する。
+- **事実抽出(●列)は 3 人とも未記入**。抽出担当の Include 行(author 17 / kataoka 16 / watanabe 24)の必須列がすべて空欄。判定フェーズが先に終わり、抽出はこれから。
+- 注意: `result/` のファイル名は `phase4_sheet_author (1).xlsx` / `_kataoka_finalize` / `_watanabe_20261102` で、正規名(`<who>/phase4_sheet_<who>.xlsx`)の配布元シートとは別物。配布元は上書きしていない。
+
+### 2026-11-18 — Phase 4 の資料づくりと、抽出の「該当箇所の抜き出し」(Rev.31)
+
+- **Excel を 5 本作成(OneDrive `サーベイ_Phase4_*_1104.xlsx` 系)**: Include 一覧(両者 Include 33 件、抽出担当つき、17 列の記入欄、記入例)/ 担当を均等にした版 / 協議リスト 66 件 / 全員分の結果 / AI 抜き出しテスト結果。
+  Include 一覧の抽出担当は `assignment.csv` どおりで author 10 / kataoka 7 / watanabe 16。均等版は、同じペア内で 5 件を入れ替えて 11 / 11 / 11。`assignment.csv` 自体は未変更(割当表と均等版が食い違っている)。
+- **`main.tex` §3.1 を編集**(Rev.30 の RQ 言い換えを 2 文で追記、"twenty-four" → "twenty-nine")。コンパイル・コミットは未。§7.1 / §7.2 / §6 / L928 / L218 と §1.1 の RQ 節は未着手。
+- **抽出に LLM を使う方針(Rev.31、承認 2026-11-18)**: 共同評価者に確認し了承を得た。LLM は 17 列それぞれの該当箇所を**原文の引用と頁だけ**で返し、値の記入は抽出担当者が行う。判定・分類は LLM 不使用のまま。
+  `rule.md` §3.2 に注記と Phase 4 の条件、`protocol_changelog.md` に Rev.31 を追記。`main.tex` L252–254・L542–551(「every automated step … is deterministic」)は矛盾するので未反映(承認ゲートで節ごとに提案する)。
+- **テスト(`screening/phase4/ai_extraction/`)**: 両者 Include の 33 件 × 3 回、claude-sonnet-5-5、プロンプト v0.2。費用の目安 約 8.7 ドル(使用量の上限で 81 回が失敗し、翌日に回し直した)。
+  - 引用 4,470 個のうち 4,445 個(99.4%)が本文と一致。一致しなかった 21 個のうち、LLM が原文を変えたのは 14 個(数字の誤写 2、語の脱落・つなぎ合わせ 5、語の置き換え・語順変更 7)。残り 7 個は PDF 取り出しの本文の乱れ(頁の境目・ヘッダー・表の見出し)。
+  - 3 回に共通する箇所がある組は 546 組中 496(91%)。引用の集合が文字列として 3 回同じなのは 561 組中 123(22%)。**「3 回同じ出力」は成り立たない**ので、再現性は「出力の保存と機械的な照合」で担保し、3 回分を重ねて担当者に見せる運用にした。
+  - 3 回とも 0 件の組が 15。人が本文で確かめる。
+- **照合の規則**: NFKC、空白、行末ハイフン、ソフトハイフン(U+00AD)、曲がった引用符、大文字小文字を無視。最初の照合で 13 個が落ちたのは PDF の合字(ﬁ など)が原因で、AI の誤りではなかった。
+- `screening/phase4/README.md` を書き換えた(現在地、`result/`、`ai_extraction/` の節)。
+- **次回やること(優先度順)**: (1) 要確認の引用 21 個と、3 回とも 0 件の 15 組を人が確認(Excel の該当シート)。(2) 協議リスト 66 件の議論と、watanabe の全角「？」2 件(`R4e0697c1a`・`Ra25fcb8cd`)の確認。(3) `main.tex` の連動箇所を 1 節ずつ(§7.1 から)。(4) 未決: ★2 Non-visual only、`rule.md` §2.1 第 2 段落「理論的枠組み」、コミット(ブランチを切る。`fulltext/txt/`・zip は著作権のため外す)。(5) 抽出の本番(協議で Include が確定してから。値は担当者が書く)。
