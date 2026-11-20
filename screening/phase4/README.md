@@ -19,7 +19,21 @@
 手順と基準: `docs/reference/phase4_reviewer_guide.md`。生成・集計: `scripts/make_fulltext_sheets.py` / `score_fulltext.py`。
 Phase 3b(Title/Abstract)のファイルは `../stage1/` など。
 
-## 現在地(2026-11-18)
+## 現在地(2026-11-21): 協議の結果を転記(暫定。最終判定は保留)
+
+- 協議(2026-11-20、OneDrive `サーベイ_Phase4_協議リスト.xlsx`、66 件)の結果を `consensus_worklist.csv` の `final_decision`・`final_reason`・`consensus_note` に転記した。
+  理由の自由記述(「スケール操作なし」「VR-HMDでない」など)は統制語彙に直し、元の記載は `consensus_note` に残した。
+- **体形の変化を対象に含める方針になったため、最終判定は確定しない。** 次の 9 件は `final_decision` を空欄にし、`consensus_note` に【保留】と協議時の判定を書いた。
+  - 体形の扱い 7 件: `R581775bb4`・`R9244e981d`・`R995d82790`・`Rbf6ceaeaf`(協議では「サイズ操作なし(痩せ肥満系)」で Exclude)、`Ra5a5d6c99`(同「横にでかくなる」で Exclude)、`Re06bf4a0e`(両者 Unsure、協議で未決)、`Ra25fcb8cd`(Excel の協議リストに無い。全角「？」の読み替えで 11-18 に追加された行)
+  - AR/MR の扱い 2 件: `R36d0a0077`・`R52ad50380`(協議では「AR 系、いったん Exclude」。`R36d0a0077` は体形の論文でもある)
+- 暫定の結果(`provisional_decisions_20261121.csv`): 配布 148 件のうち **暫定確定 139 件 = Include 53 / Exclude 86**、保留 9 件、未配布 1 件(`Rbe2e9ecd2`)。
+  - Include 53 = 両者一致 32 + 協議 21。Exclude 86 = 両者一致 66 + 協議 20。
+  - 除外理由: I(スケール操作/多感覚刺激が無い)55、I(HMD-VR でない)17、O 5、S(ユーザー実験が無い)4、S(原著論文でない)3、P 1、スコープ外 1。
+  - 保留 9 件がすべて Include になれば Include は最大 62 件。
+- 体形の規則が決まったら: 保留 7 件を再判定し、P3b で Exclude にした体形の 61 件の再判定(`docs/reference/body_shape_scope_analysis.md` §4)を経てから `--final` で `final_decisions.csv` を作る。
+- 確認待ち: `R1738ef812` は協議で Include だが「arXiv 要確認」のメモあり。
+
+## 2026-11-18 時点
 
 - 判定: 3 人とも記入済み。評価者ペアごとの κ は 0.35(著者×kataoka)/ 0.64(著者×watanabe)/ 0.52(kataoka×watanabe)、平均 0.50。watanabe の全角「？」2 件(P 列)は入力ミスとして「?」に読み替えた(2026-11-18)ため、2026-11-04 の値(0.54、平均 0.51、協議リスト 66 件)から変わった。`result/` の元ファイルは変更していない。
 - 両者 Include は 32 件、判定が割れた 29 件、どちらかが Unsure 21 件、両者 Exclude 66 件(計 148 件)。協議リストは 67 件。
