@@ -171,6 +171,7 @@ Python の実行は `python -X utf8 scripts/<name>.py`。出力を上書きす�
 | `normalization_collision_audit.py` / `pubmed_unique_audit.py` | 正規化の同名衝突検出 / PubMed 固有件数の監査 |
 | `audit_manuscript_figures.py` | 原稿(`SelfScaleSurvey/main.tex`)の数値を実データと突合 |
 | `simulate_screening.py` | 足切りシミュレーション・DB 集計(読み取り専用) |
+| `make_bodyshape_rescreen.py` | 体形の論文 61 件だけの Phase 3b 再判定シート(Phase 3b と同じ書式)と対象リストを作る → `screening/rescreen_bodyshape/`(2026-11-21) |
 | `trace_body_shape.py` | 体形の語を含む記録が、どの段(P1.5〜Phase 4)で落ちたかを追跡(読み取り専用、2026-11-20) |
 
 ### Phase 3b(判定シートと集計)

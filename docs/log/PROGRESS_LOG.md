@@ -2345,3 +2345,9 @@ stage 2 シート（Kataoka 363件 / Watanabe 346件）を生成し配布して�
 - 暫定の結果 `screening/phase4/provisional_decisions_20261121.csv`: 暫定確定 139 件 = **Include 53 / Exclude 86**、保留 9、未配布 1。除外理由は I_scale 55 / I_hmd 17 / O 5 / S(実験なし)4 / S(原著でない)3 / P 1 / スコープ外 1。
 - ブランチ `feat/phase4-consensus-provisional-20261121` は PR #52 のブランチから切り、main を取り込んだ(進捗ログの衝突を、両方の記録を残して解消)。
 - **次にやること:** 体形の判定規則を決める(Rev.33)→ 保留 7 件の再判定と、P3b の体形 61 件の再判定 → AR/MR の扱い → `--final` で最終判定 → 抽出(Include 確定分)。`R1738ef812` の arXiv 版の確認。
+
+### 2026-11-21(続き)— 暫定結果の Excel と、体形の論文の Phase 3b 再判定シート
+- **暫定結果の Excel** を OneDrive 直下に置いた: `サーベイ_Phase4_暫定結果_1121.xlsx`(概要・一覧 149 件・Include 53 件・保留 9 件の 4 シート)。元は `screening/phase4/provisional_decisions_20261121.csv`。リポジトリには入れていない。
+- **体形の論文の Phase 3b 再判定シート**を作成(`scripts/make_bodyshape_rescreen.py` → `screening/rescreen_bodyshape/`)。対象は Phase 3b で落ちた体形の語を含む 61 件(協議リスト内 17 + 外 44)。
+  Phase 3b の `make_screening_xlsx.py` の書式をそのまま使い(判定・除外理由のプルダウン、条件付き書式、保護)、列は校正セット・ブロックなどを外した 12 列。「はじめに」に規則の**案**を載せた。前回の判定はシートに入れず `targets.csv` にだけ残した。3 人分を生成(記入 0 件)。Excel で開いて、プルダウン(判定 3 値・除外理由 9 値)と保護を確認した。
+- **次にやること:** MTG で規則(Rev.33)と担当 2 名を決める → 規則の文言が変わればシートを作り直す(`--force`、記入前に限る)→ 配布 → 回収後の集計スクリプト。
