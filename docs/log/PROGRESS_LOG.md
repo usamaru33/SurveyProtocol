@@ -2337,3 +2337,11 @@ stage 2 シート（Kataoka 363件 / Watanabe 346件）を生成し配布して�
 - PR #53(`docs/mtg-20261119-bodyshape-ai-review`、main から分岐。#52 とは独立)。README・FILE_MAP に上記ファイルを追記。
 - **未確認:** Phase 3b の著者の stage 1 判定(リポジトリ内の `sheet_author.xlsx` が空欄。記入済みの版は別の場所)。
 - **次回 MTG で決めること:** 体形の変化を I_scale = Y とするか・N のままにする範囲・P3b 61 件の再判定の担当・分類での位置づけ / AI 調査の不足 3 点(人だけの抽出との比較・温度とシードの記録・PRISMA-trAIce との照合)をテスト計画に入れるか・網羅的な調査を続けるか。
+
+### 2026-11-21 — Phase 4 の協議の結果を転記(暫定。体形の扱いが決まるまで最終判定は保留)
+- OneDrive `サーベイ_Phase4_協議リスト.xlsx`(2026-11-20 の協議、66 件)を `screening/phase4/consensus_worklist.csv`(67 件)に転記。理由の自由記述は統制語彙に直し、元の記載は `consensus_note` に残した。
+- **体形の変化を対象に含める方針になったため、最終判定は確定しない。** 保留 9 件(体形 7: `R581775bb4`・`R9244e981d`・`R995d82790`・`Rbf6ceaeaf`・`Ra5a5d6c99`・`Re06bf4a0e`・`Ra25fcb8cd` / AR/MR 2: `R36d0a0077`・`R52ad50380`)は `final_decision` を空欄にした。`Ra25fcb8cd` は Excel の協議リストに無かった(11-18 の全角「？」の読み替えで追加された行)。
+- `score_fulltext.py --final` は、`result/` のコピー(watanabe の全角「？」2 件を読み替え)を置いた一時フォルダで実行した。実行前に、同じコピーから協議リストが 67 件・κ 平均 0.504 で再現することを確認。`final_decisions.csv` は作っていない。
+- 暫定の結果 `screening/phase4/provisional_decisions_20261121.csv`: 暫定確定 139 件 = **Include 53 / Exclude 86**、保留 9、未配布 1。除外理由は I_scale 55 / I_hmd 17 / O 5 / S(実験なし)4 / S(原著でない)3 / P 1 / スコープ外 1。
+- ブランチ `feat/phase4-consensus-provisional-20261121` は PR #52 のブランチから切り、main を取り込んだ(進捗ログの衝突を、両方の記録を残して解消)。
+- **次にやること:** 体形の判定規則を決める(Rev.33)→ 保留 7 件の再判定と、P3b の体形 61 件の再判定 → AR/MR の扱い → `--final` で最終判定 → 抽出(Include 確定分)。`R1738ef812` の arXiv 版の確認。

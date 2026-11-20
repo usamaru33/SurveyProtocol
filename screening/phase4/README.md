@@ -12,6 +12,7 @@
 | `<who>/pdf/` | 担当分の全文 PDF(ファイル名は**論文名**。シートの「全文 PDF」列のリンクから開く) | しない |
 | `result/` | 3 人が記入して返した判定シート(2026-11-04 に確認。148 件、全文未取得の 1 件を除く) | 未決(判定の独立性の監査証跡。`.gitignore` の方針に従う) |
 | `consensus_worklist.csv` | 協議リスト 67 件(判定の不一致・Unsure・基準に ? のどれか)。`score_fulltext.py` が生成 | する |
+| `provisional_decisions_20261121.csv` | **暫定**の結果(149 行。`status` 列 = 暫定確定 139 / 保留 9 / 未配布 1)。協議の結果を `consensus_worklist.csv` に転記し、`score_fulltext.py --final` をコピーした場所で実行して作成。**最終判定ではない** | する |
 | `final_decisions.csv` / `extraction_table.csv` | 最終判定 / Include の事実の抽出表(`score_fulltext.py --final`)。**協議と抽出が済むまで未作成** | する |
 | `ai_extraction/` | 該当箇所の抜き出しのテスト(下の節)。**テスト中。出力は抽出の記録に使わない(Rev.31 は承認済み)** | 未決(`runs/` は 2.8 MB) |
 
