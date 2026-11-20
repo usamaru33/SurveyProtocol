@@ -76,3 +76,6 @@ screening/phase4/*/backup/
 fulltext/txt/
 fulltext/ja/
 screening/phase4/*/ja_*.js
+
+# 体形の論文の Phase 3b 再判定シート(独立性のため追跡しない。完了後に `git add -f screening/rescreen_bodyshape/rescreen_sheet_*.xlsx`)
+screening/rescreen_bodyshape/rescreen_sheet_*.xlsx

@@ -30,7 +30,7 @@ Phase 3b(Title/Abstract)のファイルは `../stage1/` など。
   - Include 53 = 両者一致 32 + 協議 21。Exclude 86 = 両者一致 66 + 協議 20。
   - 除外理由: I(スケール操作/多感覚刺激が無い)55、I(HMD-VR でない)17、O 5、S(ユーザー実験が無い)4、S(原著論文でない)3、P 1、スコープ外 1。
   - 保留 9 件がすべて Include になれば Include は最大 62 件。
-- 体形の規則が決まったら: 保留 7 件を再判定し、P3b で Exclude にした体形の 61 件の再判定(`docs/reference/body_shape_scope_analysis.md` §4)を経てから `--final` で `final_decisions.csv` を作る。
+- 体形の規則は Rev.33(2026-11-21)で決まった。保留 7 件を Rev.33 で協議し直し、P3b で Exclude にした体形の 61 件の再判定(`docs/reference/body_shape_scope_analysis.md` §4)を経てから `--final` で `final_decisions.csv` を作る。
 - 確認待ち: `R1738ef812` は協議で Include だが「arXiv 要確認」のメモあり。
 
 ## 2026-11-18 時点
