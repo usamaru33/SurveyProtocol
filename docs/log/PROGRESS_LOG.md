@@ -2324,3 +2324,16 @@ stage 2 シート（Kataoka 363件 / Watanabe 346件）を生成し配布して�
   - `R4e0697c1a` は S=N で Exclude のままで、判定は変わらない。
   - 未反映: OneDrive の Excel(Include 一覧とその均等版、協議リスト、全員分の結果)と、2026-11-04・2026-11-18(前の項)の件数(33、66)は読み替え前の値のまま。
   - `Ra25fcb8cd` は、成人のデータも報告しているので、Rev.29(混合サンプルは健常成人の部分で判断)に従うと P=Y になりうる。協議で決める。
+### 2026-11-20 — 11/19 MTG のタスク: 体形の変化の扱いと、AI を使ったレビューの調査(分析のみ)
+- **体形の変化(太る・痩せる)を I_scale に含めるか** → `docs/reference/body_shape_scope_analysis.md`。
+  - `scripts/trace_body_shape.py`(読み取り専用)で、重複削除後 18,342 件のうち題名・要旨に体形の語を含む **696 件**の行き先を追跡(`outputs/body_shape_trace.csv`)。
+    P1.5 372 / P2 170 / P3a 79 / P3b stage 1 空欄 44 / P3b 最終 Exclude 17 / **Phase 4 に残存 14**。
+  - 結論: I_scale の文言(「身体・身体部位・アバターの**サイズ**を操作」)のままで入れられる。やり直しが要るのは人の判定の段(P3b の再判定候補 61 件、Phase 4 の協議待ち 14 件)だけで、P1〜P3a は I の解釈に依存しない。検索式の第 3 群に weight / shape / width が無い穴は、引用の追跡で回収し限界として書く案。
+  - 判定規則の案・手順(Rev.33 として「明確化」+ 逸脱の報告)を記載。**プロトコル・判定シートは変えていない**(凍結中)。
+- **AI を使ったレビュー論文の信頼性・再現性の担保** → `docs/reference/ai_use_in_reviews_survey.md`(暫定)。
+  Haiku のサブエージェント 3 体で ACM / IEEE / arXiv を Web 検索(約 70 クエリ)。ACM DL は 403、IEEE Xplore は内容が取れず、網羅はできていない。
+  トップ venue で方法まで確認できたのは Kostikova(CSUR 2026)・Pang(CHI 2025)・Scherbakov(JAMIA 2025)の 3 本。使い方を A〜D の 4 型に分け、Rev.31 と比較。
+- MTG 資料(17 枚、2 セクション)を作成し OneDrive 直下に置いた(`前野_MTG資料_体形の扱いとAIサーベイ調査.pptx`。リポジトリには入れない)。
+- PR #53(`docs/mtg-20261119-bodyshape-ai-review`、main から分岐。#52 とは独立)。README・FILE_MAP に上記ファイルを追記。
+- **未確認:** Phase 3b の著者の stage 1 判定(リポジトリ内の `sheet_author.xlsx` が空欄。記入済みの版は別の場所)。
+- **次回 MTG で決めること:** 体形の変化を I_scale = Y とするか・N のままにする範囲・P3b 61 件の再判定の担当・分類での位置づけ / AI 調査の不足 3 点(人だけの抽出との比較・温度とシードの記録・PRISMA-trAIce との照合)をテスト計画に入れるか・網羅的な調査を続けるか。

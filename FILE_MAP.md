@@ -113,6 +113,8 @@
 | `known_items.md` / `known_item_analysis.md` | 既知文献リスト / Known-Item Test の自動生成レポート |
 | `reviewer_briefing*.{md,tex,pdf}` | 評価者向け説明資料(詳細版 / 事前配布版)。`.aux` `.log` `.out` は LaTeX の中間物 |
 | `screening_decision_card.md` | 判定中に手元に置く 1 枚(基準の写し。新しい基準は含まない) |
+| `body_shape_scope_analysis.md` | 体形の変化(太る・痩せる)を I_scale に含めるかの分析。段ごとの行き先・解釈・判定規則の案・手順(2026-11-20、11-19 MTG のタスク。分析のみ) |
+| `ai_use_in_reviews_survey.md` | AI を使ったレビュー論文の信頼性・再現性の担保の調査。使い方の 4 型と Rev.31 との比較(2026-11-20、暫定) |
 | `GradThesis_Maeno_2025.pdf` | 参考卒論(追跡対象。PDF の置き場はここ) |
 
 ## `screening/` Phase 3b の判定シートと集計
@@ -169,6 +171,7 @@ Python の実行は `python -X utf8 scripts/<name>.py`。出力を上書きす�
 | `normalization_collision_audit.py` / `pubmed_unique_audit.py` | 正規化の同名衝突検出 / PubMed 固有件数の監査 |
 | `audit_manuscript_figures.py` | 原稿(`SelfScaleSurvey/main.tex`)の数値を実データと突合 |
 | `simulate_screening.py` | 足切りシミュレーション・DB 集計(読み取り専用) |
+| `trace_body_shape.py` | 体形の語を含む記録が、どの段(P1.5〜Phase 4)で落ちたかを追跡(読み取り専用、2026-11-20) |
 
 ### Phase 3b(判定シートと集計)
 | ファイル | 内容 |
@@ -193,6 +196,7 @@ Python の実行は `python -X utf8 scripts/<name>.py`。出力を上書きす�
 | ファイル | 出力元 |
 |---|---|
 | `api_search_log.csv` | `db_search_*.py` |
+| `body_shape_trace.csv` | `trace_body_shape.py`(696 件) |
 | `enriched_abstracts.csv`、`enrich_abstracts_report.csv` | `enrich_*abstracts.py`(補完した要旨のキャッシュと報告) |
 | `export_completeness.csv` | `export_completeness_audit.py` |
 | `raw_db_audit.csv`、`pubmed_unique_175.csv` | `raw_db_audit.py`、`pubmed_unique_audit.py` |
