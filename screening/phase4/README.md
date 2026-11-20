@@ -10,8 +10,69 @@
 | `<who>/progress_<who>.json` | アプリの進捗(S キーで書き出し)。`apply_fulltext_review.py` でシートへ反映する | しない |
 | (スマホ) | `serve_review_app.py --id <who>` で同じ Wi-Fi 内に配信。画面は縦 1 列、進捗は PC の `progress_<who>.json` へ自動保存 | しない |
 | `<who>/pdf/` | 担当分の全文 PDF(ファイル名は**論文名**。シートの「全文 PDF」列のリンクから開く) | しない |
-| `consensus_worklist.csv` | 協議リスト(`score_fulltext.py` が生成) | する |
-| `final_decisions.csv` / `extraction_table.csv` | 最終判定 / Include の事実の抽出表(`score_fulltext.py --final`) | する |
+| `result/` | 3 人が記入して返した判定シート(2026-11-04 に確認。148 件、全文未取得の 1 件を除く) | 未決(判定の独立性の監査証跡。`.gitignore` の方針に従う) |
+| `consensus_worklist.csv` | 協議リスト 67 件(判定の不一致・Unsure・基準に ? のどれか)。`score_fulltext.py` が生成 | する |
+| `provisional_decisions_20261121.csv` | **暫定**の結果(149 行。`status` 列 = 暫定確定 139 / 保留 9 / 未配布 1)。協議の結果を `consensus_worklist.csv` に転記し、`score_fulltext.py --final` をコピーした場所で実行して作成。**最終判定ではない** | する |
+| `final_decisions.csv` / `extraction_table.csv` | 最終判定 / Include の事実の抽出表(`score_fulltext.py --final`)。**協議と抽出が済むまで未作成** | する |
+| `ai_extraction/` | 該当箇所の抜き出しのテスト(下の節)。**テスト中。出力は抽出の記録に使わない(Rev.31 は承認済み)** | 未決(`runs/` は 2.8 MB) |
 
 手順と基準: `docs/reference/phase4_reviewer_guide.md`。生成・集計: `scripts/make_fulltext_sheets.py` / `score_fulltext.py`。
 Phase 3b(Title/Abstract)のファイルは `../stage1/` など。
+
+## 現在地(2026-11-21): 協議の結果を転記(暫定。最終判定は保留)
+
+- 協議(2026-11-20、OneDrive `サーベイ_Phase4_協議リスト.xlsx`、66 件)の結果を `consensus_worklist.csv` の `final_decision`・`final_reason`・`consensus_note` に転記した。
+  理由の自由記述(「スケール操作なし」「VR-HMDでない」など)は統制語彙に直し、元の記載は `consensus_note` に残した。
+- **体形の変化を対象に含める方針になったため、最終判定は確定しない。** 次の 9 件は `final_decision` を空欄にし、`consensus_note` に【保留】と協議時の判定を書いた。
+  - 体形の扱い 7 件: `R581775bb4`・`R9244e981d`・`R995d82790`・`Rbf6ceaeaf`(協議では「サイズ操作なし(痩せ肥満系)」で Exclude)、`Ra5a5d6c99`(同「横にでかくなる」で Exclude)、`Re06bf4a0e`(両者 Unsure、協議で未決)、`Ra25fcb8cd`(Excel の協議リストに無い。全角「？」の読み替えで 11-18 に追加された行)
+  - AR/MR の扱い 2 件: `R36d0a0077`・`R52ad50380`(協議では「AR 系、いったん Exclude」。`R36d0a0077` は体形の論文でもある)
+- 暫定の結果(`provisional_decisions_20261121.csv`): 配布 148 件のうち **暫定確定 139 件 = Include 53 / Exclude 86**、保留 9 件、未配布 1 件(`Rbe2e9ecd2`)。
+  - Include 53 = 両者一致 32 + 協議 21。Exclude 86 = 両者一致 66 + 協議 20。
+  - 除外理由: I(スケール操作/多感覚刺激が無い)55、I(HMD-VR でない)17、O 5、S(ユーザー実験が無い)4、S(原著論文でない)3、P 1、スコープ外 1。
+  - 保留 9 件がすべて Include になれば Include は最大 62 件。
+- 体形の規則が決まったら: 保留 7 件を再判定し、P3b で Exclude にした体形の 61 件の再判定(`docs/reference/body_shape_scope_analysis.md` §4)を経てから `--final` で `final_decisions.csv` を作る。
+- 確認待ち: `R1738ef812` は協議で Include だが「arXiv 要確認」のメモあり。
+
+## 2026-11-18 時点
+
+- 判定: 3 人とも記入済み。評価者ペアごとの κ は 0.35(著者×kataoka)/ 0.64(著者×watanabe)/ 0.52(kataoka×watanabe)、平均 0.50。watanabe の全角「？」2 件(P 列)は入力ミスとして「?」に読み替えた(2026-11-18)ため、2026-11-04 の値(0.54、平均 0.51、協議リスト 66 件)から変わった。`result/` の元ファイルは変更していない。
+- 両者 Include は 32 件、判定が割れた 29 件、どちらかが Unsure 21 件、両者 Exclude 66 件(計 148 件)。協議リストは 67 件。
+- `ai_extraction/` のテストは、読み替え前の「両者 Include 33 件」で行った(うち `Ra25fcb8cd` は、読み替え後は Unsure を含む)。
+- 抽出(17 列): 3 人とも未記入。協議後に Include が確定した論文から、`assignment.csv` の `extractor` が書く。
+
+## ai_extraction/ — 該当箇所の抜き出しのテスト
+
+**状態: テスト中。** `rule.md` Rev.31(2026-11-18 承認。抽出で LLM に該当箇所を抜き出させてよい)が根拠。このフォルダの出力は、テストなので抽出の記録に使わない。本番は、協議で Include が確定してから。判定・分類には LLM を使わない(`rule.md` Rev.2)。
+
+**何をするか。** 全文テキスト 1 件を LLM に渡し、17 列それぞれについて、関係する箇所を**原文のまま頁つきで**抜き出させる。値は書かせない。値の記入は抽出担当者が、引用を読んで行う。
+
+| ファイル | 内容 |
+|---|---|
+| `prompt_v0.2.txt` | プロンプト本文(実行に使う)。`{record_id}` と `{full_text}` を差し込む |
+| `prompt_v0.2_notes.md` | プロンプトの設計メモ(役割分担、検査、未決の点) |
+| `run_locate.py` | 1 件ずつ LLM(`claude -p`)に渡して、応答をそのまま `runs/` に保存する。入力は `fulltext/txt/<record_id>.txt` |
+| `verify_locate.py` | 引用が本文にあるかの照合と、実行どうしの比較(決定論的) |
+| `build_result_xlsx.py` | 結果を Excel にまとめる(列別の集計・論文×列・引用一覧・要確認の引用・3 回とも 0 件) |
+| `diag36.py` | 本文と一致しなかった引用を、本文の最も近い箇所と並べて表示する(原因分けの下調べ) |
+| `runs/<model>/run<k>/` | 応答の生の出力(JSON)。モデル ID・実行日時・費用を含む |
+| `runs/<model>/cause_labels.csv` | 本文と一致しなかった 36 個の原因の分類(Claude が本文と見比べた。人の確認待ち) |
+| `runs/<model>/failed_20261112/` | 使用量の上限で失敗した 81 回分(中身はエラー文のみ) |
+
+使い方(テスト用):
+
+```
+python -X utf8 run_locate.py <ids.txt> <run 番号> [--workers N]
+python -X utf8 verify_locate.py <model> <run 番号...>
+python -X utf8 build_result_xlsx.py <出力.xlsx>
+```
+
+**テストの結果(両者 Include の 33 件 × 3 回、claude-sonnet-5-5、費用の目安 約 8.7 ドル):**
+
+- 引用 4,470 個のうち、本文と一致したのは 4,445 個(99.4%)。照合は、空白・PDF の合字・行末ハイフン・ソフトハイフン・曲がった引用符・大文字小文字の違いを無視する。
+- 一致しなかった 21 個のうち、AI が原文を変えたのは 14 個(0.3%)。数字の誤写 2、語の脱落・つなぎ合わせ 5、語の置き換え・語順変更 7。残りの 7 個は、PDF から取り出した本文の側で、頁の境目・ヘッダー・表の見出しが文の途中に挟まっていたもの。
+- 3 回すべてに共通する箇所がある組は、引用がある 546 組(33 件 × 17 列から 0 件の 15 組を除く)のうち 496 組(91%)。引用の集合が文字列として 3 回とも同じになったのは 123 組(22%)。**「3 回まったく同じ出力」は成り立たない。**
+- 3 回とも 0 件だった組が 15(`social_context` 7、`attribution_quote` 6、`scale_factor` と `scale_direction` が 1 ずつ)。本当に記載が無いのか、見落としなのかは、人が本文を読まないと分からない。
+
+**この結果から言えること。** 再現性は「同じ出力が出る」ではなく、「出力を保存して公開し、引用が本文にあることを誰でも機械的に照合できる」ことで担保する。引用が適切な箇所かどうかと、値の記入は人が行う。数字を AI が誤写した例があるので、人は引用ではなく原文の数字を確かめる。
+
+**未了。** 要確認の引用 21 個の人による確認 / 3 回とも 0 件の 15 組と一部の回だけ 0 件の組を人が読んで確かめる / 抜き出された引用が列の答えとして適切かの確認 / `main.tex` の矛盾する文(L252–254、L542–551)の改稿(承認ゲート)。3 回分の引用を重ねて担当者に見せる出力の整形(未実装)。
