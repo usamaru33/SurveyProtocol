@@ -31,6 +31,11 @@
 > 5. **現在地（2026-10-19、Rev.28）:** 協議 2 回目の最終判定のうち `Rcfe9667f4` を Include → Exclude に変更し（元の論文を同定できないため）、
 >    **449 件: Include 151 / Exclude 298** とした。重複 2 組を代表に統合し（`Rb3c541a72`・`Rdf3e2d120`）、Phase 4 の対象は **149 件**。
 >    全文 PDF は **148 件取得済み・1 件未取得**（`fulltext/missing_list.md`）。上の 4. の「152 件」「138 件取得済み」は 10-17 時点の値。
+> 6. **2026-11-19 の MTG で出た検討事項（2026-11-20 追加、分析のみ・プロトコルは未変更）:**
+>    (a) 体形の変化（太る・痩せる）を I_scale に含めるか → `docs/reference/body_shape_scope_analysis.md`
+>    （体形の語を含む 696 件の行き先を `scripts/trace_body_shape.py` で追跡。P3b の再判定候補 61 件・Phase 4 の協議待ち 14 件）。
+>    (b) AI を使ったレビュー論文が信頼性・再現性をどう担保しているか → `docs/reference/ai_use_in_reviews_survey.md`（暫定）。
+>    どちらも計画に入れるかは次回 MTG で決める。
 
 ---
 
@@ -209,6 +214,7 @@ SurveyProtocol/
 │   ├── make_screening_xlsx.py   # ★判定シートの Excel 版（評価者の作業ファイル）
 │   ├── make_screening_stage2.py # ★stage 2（著者の Exclude 分を第2評価者へ）
 │   ├── score_screening.py       # ★Phase 3b 集計（κ・協議リスト・最終判定）
+│   ├── trace_body_shape.py      # 体形の語を含む記録がどの段で落ちたかを追跡（読み取り専用、2026-11-20）
 │   ├── make_fulltext_sheets.py  # ★Phase 4 割当表と判定シート（Excel、プルダウン）。score_fulltext.py が集計、test_phase4_pipeline.py が検証
 │   └── *_audit.py               # Venue照合・正規化衝突・PubMed固有件数などの監査
 ├── screening/                   # ★Phase 3b の判定シート一式 → §11（フェーズ別サブフォルダ、詳細は screening/README.md §0）
@@ -219,6 +225,7 @@ SurveyProtocol/
 │   └── final/                   # final_decisions.csv（最終判定）
 ├── outputs/                     # 上記スクリプトの出力（監査CSV・実行ログ）
 │   ├── enriched_abstracts.csv   # ★ DOI から補完した要旨のキャッシュ（人手判定の材料専用）
+│   ├── body_shape_trace.csv     # trace_body_shape.py の出力（696件）
 │   ├── snowballing_log.csv      # スノーボーリング結果（17列。判定は判定シートに統合）
 │   └── snowballing_log_pre20260810.csv  # 旧12列版（Rev.10 改修前。経緯として保存）
 ├── fulltext/                    # ★Phase 4 の全文 PDF（pdf/・by_reviewer/ は git 管理外）と manifest.csv
@@ -244,6 +251,8 @@ SurveyProtocol/
         ├── normalization_design.md       # Venue正規化の設計案（案1〜6、未適用）
         ├── reviewer_briefing.md          # 評価者向け説明資料（詳細版）
         ├── reviewer_briefing_preread.{md,tex,pdf}  # 事前配布資料
+        ├── body_shape_scope_analysis.md  # 体形の変化を対象に含めるか（11-19 MTG、分析のみ）
+        ├── ai_use_in_reviews_survey.md   # AI を使ったレビューの信頼性・再現性の担保（11-19 MTG、暫定）
         ├── known_items.md                # 既知文献リスト（known_item_test.py が読む）
         └── known_item_analysis.md        # ★自動生成: 脱落分析
 ```
