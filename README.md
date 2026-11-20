@@ -36,6 +36,8 @@
 >    （体形の語を含む 696 件の行き先を `scripts/trace_body_shape.py` で追跡。P3b の再判定候補 61 件・Phase 4 の協議待ち 14 件）。
 >    (b) AI を使ったレビュー論文が信頼性・再現性をどう担保しているか → `docs/reference/ai_use_in_reviews_survey.md`（暫定）。
 >    どちらも計画に入れるかは次回 MTG で決める。
+> 7. **2026-11-21、Rev.33:** (a) は採用した。体形の変化を I のスケール操作に含め、軸 1 の下位区分の判定を `rule.md` §3.3 に書いた。
+>    Phase 3b で落ちた体形の 61 件を再判定するシートは `screening/rescreen_bodyshape/`。Phase 4 の暫定結果は `screening/phase4/provisional_decisions_20261121.csv`(体形 7 件・AR/MR 2 件は保留)。
 
 ---
 

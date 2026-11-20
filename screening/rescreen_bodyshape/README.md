@@ -11,5 +11,5 @@
 
 - 生成: `python -X utf8 scripts/make_bodyshape_rescreen.py`(既存の xlsx は上書きしない。作り直すなら `--force`)。3 人分を作ってあるので、担当の 2 名に配る。
 - 対象の選び方: `scripts/trace_body_shape.py` の語のリスト `SHAPE`(事前に固定)に当たり、Phase 3b で落ちたもの(`outputs/body_shape_trace.csv` の stage が「P3b …」)。語が偶然一致しただけの論文も含む。
-- 規則: シートの「はじめに」に、`body_shape_scope_analysis.md` §3 の規則の**案**を載せた。MTG で規則(Rev.33)が確定したら、文言を合わせて作り直す(記入前なら `--force`)。
+- 規則: `rule.md` Rev.33(2026-11-21)。シートの「はじめに」にその文言を載せた。
 - 集計(未実装): 回収後、`targets.csv` と突き合わせて κ と、Include になった件数を出す。
