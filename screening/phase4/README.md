@@ -48,9 +48,10 @@ Phase 3b(Title/Abstract)のファイルは `../stage1/` など。
 
 | ファイル | 内容 |
 |---|---|
-| `prompt_v0.2.txt` | プロンプト本文(実行に使う)。`{record_id}` と `{full_text}` を差し込む |
+| `prompt_v0.3.txt` | プロンプト本文(英語。`run_locate.py` の既定)。v0.2 の英訳で、指示の中身は同じ。`{record_id}` と `{full_text}` を差し込む。**v0.3 ではまだテストしていない** |
+| `prompt_v0.2.txt` | プロンプト本文(日本語)。11-13 のテストに使った版。`--prompt v0.2` で再現できる |
 | `prompt_v0.2_notes.md` | プロンプトの設計メモ(役割分担、検査、未決の点) |
-| `run_locate.py` | 1 件ずつ LLM(`claude -p`)に渡して、応答をそのまま `runs/` に保存する。入力は `fulltext/txt/<record_id>.txt` |
+| `run_locate.py` | 1 件ずつ LLM(`claude -p`)に渡して、応答をそのまま `runs/` に保存する。入力は `fulltext/txt/<record_id>.txt`。出力先は v0.2 が `runs/<model>/`、v0.3 が `runs/<model>_v0.3/` |
 | `verify_locate.py` | 引用が本文にあるかの照合と、実行どうしの比較(決定論的) |
 | `build_result_xlsx.py` | 結果を Excel にまとめる(列別の集計・論文×列・引用一覧・要確認の引用・3 回とも 0 件) |
 | `diag36.py` | 本文と一致しなかった引用を、本文の最も近い箇所と並べて表示する(原因分けの下調べ) |
@@ -61,12 +62,12 @@ Phase 3b(Title/Abstract)のファイルは `../stage1/` など。
 使い方(テスト用):
 
 ```
-python -X utf8 run_locate.py <ids.txt> <run 番号> [--workers N]
+python -X utf8 run_locate.py <ids.txt> <run 番号> [--workers N] [--prompt v0.2|v0.3]
 python -X utf8 verify_locate.py <model> <run 番号...>
 python -X utf8 build_result_xlsx.py <出力.xlsx>
 ```
 
-**テストの結果(両者 Include の 33 件 × 3 回、claude-sonnet-5-5、費用の目安 約 8.7 ドル):**
+**テストの結果(両者 Include の 33 件 × 3 回、claude-sonnet-5-5、プロンプト v0.2(日本語)、費用の目安 約 8.7 ドル):**
 
 - 引用 4,470 個のうち、本文と一致したのは 4,445 個(99.4%)。照合は、空白・PDF の合字・行末ハイフン・ソフトハイフン・曲がった引用符・大文字小文字の違いを無視する。
 - 一致しなかった 21 個のうち、AI が原文を変えたのは 14 個(0.3%)。数字の誤写 2、語の脱落・つなぎ合わせ 5、語の置き換え・語順変更 7。残りの 7 個は、PDF から取り出した本文の側で、頁の境目・ヘッダー・表の見出しが文の途中に挟まっていたもの。
