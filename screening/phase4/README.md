@@ -54,6 +54,8 @@ Phase 3b(Title/Abstract)のファイルは `../stage1/` など。
 | `run_locate.py` | 1 件ずつ LLM(`claude -p`)に渡して、応答をそのまま `runs/` に保存する。入力は `fulltext/txt/<record_id>.txt`。出力先は v0.2 が `runs/<model>/`、v0.3 が `runs/<model>_v0.3/` |
 | `verify_locate.py` | 引用が本文にあるかの照合と、実行どうしの比較(決定論的) |
 | `build_result_xlsx.py` | 結果を Excel にまとめる(列別の集計・論文×列・引用一覧・要確認の引用・3 回とも 0 件) |
+| `compare_v02_v03.py` | v0.2 と v0.3 のテスト結果を `build_result_xlsx.py` と同じ規則で比べる(画面に要約) |
+| `build_compare_xlsx.py` | v0.2 と v0.3 の比較を Excel にまとめる(概要・列別の比較・英語版だけ 0 件・範囲が大きく減った組など)。OneDrive `サーベイ_Phase4_AI抜き出しテスト結果_英語版_1124.xlsx` はこれで作った |
 | `diag36.py` | 本文と一致しなかった引用を、本文の最も近い箇所と並べて表示する(原因分けの下調べ) |
 | `runs/<model>/run<k>/` | 応答の生の出力(JSON)。モデル ID・実行日時・費用を含む |
 | `runs/<model>/cause_labels.csv` | 本文と一致しなかった 36 個の原因の分類(Claude が本文と見比べた。人の確認待ち) |
@@ -65,6 +67,8 @@ Phase 3b(Title/Abstract)のファイルは `../stage1/` など。
 python -X utf8 run_locate.py <ids.txt> <run 番号> [--workers N] [--prompt v0.2|v0.3]
 python -X utf8 verify_locate.py <model> <run 番号...>
 python -X utf8 build_result_xlsx.py <出力.xlsx>
+python -X utf8 compare_v02_v03.py claude-sonnet-5-5 claude-sonnet-5-5_v0.3
+python -X utf8 build_compare_xlsx.py <出力.xlsx>
 ```
 
 **テストの結果(両者 Include の 33 件 × 3 回、claude-sonnet-5-5、プロンプト v0.2(日本語)、費用の目安 約 8.7 ドル):**
@@ -89,7 +93,7 @@ python -X utf8 build_result_xlsx.py <出力.xlsx>
 - 英語版は引用が 24% 少なく、3 回の出力はやや揃う。照合の一致率は変わらない。
 - 日本語版が引用した範囲(文字数)のうち、英語版も引用したのは 62%。逆は 85%。英語版は範囲を絞る方向に変わった。
 - 英語版だけ 0 件になった組が 13(`social_context` 6、`attribution_quote` 4、`scale_direction` 2、`n_analyzed` 1)。日本語版の引用を読むと、多くは関係の薄い箇所(仮想の部屋の説明など)だったが、`Rf838e7bc8` の `scale_direction`(「胴とお腹を大きくし、腕を太くした」)は答えになる箇所で、英語版は 3 回とも挙げなかった。
-- 照合の数値は `compare_v02_v03.py`(scratchpad で実行、`build_result_xlsx.py` と同じ規則)。出力は `runs/claude-sonnet-5-5_v0.3/`(追跡しない)。
+- 照合の数値は `compare_v02_v03.py`(`build_result_xlsx.py` と同じ規則)、Excel は `build_compare_xlsx.py`。出力は `runs/claude-sonnet-5-5_v0.3/`(追跡しない)。
 
 **この結果から言えること。** 再現性は「同じ出力が出る」ではなく、「出力を保存して公開し、引用が本文にあることを誰でも機械的に照合できる」ことで担保する。引用が適切な箇所かどうかと、値の記入は人が行う。数字を AI が誤写した例があるので、人は引用ではなく原文の数字を確かめる。
 
