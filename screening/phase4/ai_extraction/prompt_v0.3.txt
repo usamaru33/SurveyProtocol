@@ -1,0 +1,87 @@
+This task is part of a systematic review of self-scale perception in virtual reality. The
+reviewers record 17 items of fact from each paper. Your job is to find the passages in the
+paper that the reviewers need to read, and to show them verbatim. The reviewers read the
+values and record them, so you return quotations only.
+
+The <paper> tag below contains the full text of one paper. Page boundaries are marked with
+[p.N]. For each of the 17 items below, extract the passages needed to determine the value
+of that item.
+
+Rules for quotations
+- Copy strings from inside <paper> exactly as they appear. A program will check your output
+  by searching for each quotation in the text inside <paper>. A quotation that differs by
+  even one character is treated as nonexistent and discarded. Therefore, copy spelling
+  errors, end-of-line hyphens, and symbols exactly as they appear in the text. Do not
+  paraphrase, summarize, translate, or omit text with an ellipsis (...).
+- Each quotation is one continuous span of about one to three sentences. Put passages that
+  are far apart into separate quotations.
+- The page is the number in the [p.N] marker that comes immediately before the quotation.
+  If a quotation crosses a page boundary, split it into two quotations at the boundary.
+- If several passages are relevant to an item, list all of them. For example, if the
+  number of participants appears both in the abstract and in the method section, list
+  both. For a paper with several experiments, list the passages for every experiment.
+  The reviewers may not read passages you do not list, so when in doubt, include the
+  passage.
+- If the paper has no passage relevant to an item, give that item an empty array. Do not
+  fill it with loosely related passages.
+
+You write only quotations and pages. Do not include reading the values (counting
+participants, choosing from options, summarizing results), judging whether the paper
+should be included in the review, or classifying the study or assessing its quality.
+People do these in a separate procedure.
+
+Items (passages to find)
+1. n_total: Passages that give the number of participants, i.e., the total before any
+   exclusions.
+2. n_analyzed: Passages that give the number of participants used in the analysis, i.e.,
+   exclusions, dropouts, and the final number of participants.
+3. population: Passages that give the participants' background (students, general
+   recruitment, etc.), age, and gender.
+4. device: Passages that give the model name of the HMD used.
+5. scale_target: Passages that show what was scaled: the whole body, a body part, eye
+   height, interpupillary distance (IPD), the environment, or objects. If the study did
+   not manipulate scale and only measured, passages that show this.
+6. scale_factor: Passages that give the scaling factor or value of the manipulation (e.g.,
+   0.5x, 2x, an eye height of 1.7 m).
+7. scale_direction: Passages that show whether the scale was reduced, enlarged, or both.
+8. non_visual: Passages that show whether senses other than vision were presented
+   (auditory, haptic, synchrony with walking or body movement, vestibular, etc.).
+9. non_visual_detail: Passages that show what non-visual stimulation was presented and how.
+10. action_contingent: Passages that show whether the non-visual cues were generated in
+    response to the participant's own movements.
+11. task: Passages that show the task the participants performed (distance estimation,
+    size estimation or matching, reaching or grasping, walking or locomotion, affordance
+    judgments, body size judgments, answering questionnaires, etc.).
+12. outcome_measures: Passages that show what was measured and how (subjective reports,
+    questionnaires, behavioral measures, physiological measures). Include the names of
+    questionnaires here.
+13. social_context: Passages that show whether the participant was alone in the virtual
+    environment or whether other avatars or people were present.
+14. individual_diff: Passages that show that participant characteristics (height, VR
+    experience, gender, age) were recorded or used in the analysis.
+15. null_effect: Passages that show conditions or measures for which the effect of the
+    scale manipulation was not significant.
+16. main_finding: Passages in which the authors state the main results: the key points of
+    the results section, the opening of the discussion, the conclusion, and the result
+    sentences of the abstract.
+17. attribution_quote: Passages that show whether the change in perception is described as
+    caused by a change in one's own body or by a change in the surrounding world (e.g.,
+    statements to the effect of "I felt that I had become smaller" or "the world looked
+    bigger").
+
+Output
+Output only JSON in the following form, with no preamble or explanation. Include the keys
+for all 17 items, in this order.
+
+{
+  "record_id": "<the ID you were given>",
+  "fields": {
+    "n_total": [{"quote": "<verbatim text>", "page": 4}],
+    "n_analyzed": [],
+    "population": [{"quote": "<verbatim text>", "page": 4}, {"quote": "<verbatim text>", "page": 5}]
+  }
+}
+
+<paper record_id="{record_id}">
+{full_text}
+</paper>
