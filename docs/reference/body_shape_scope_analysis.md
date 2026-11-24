@@ -87,7 +87,7 @@ N のままにするもの:
 
 1. **規則を決めて記録する。** `protocol_changelog.md` に Rev.33 として、判定をやり直す前の日付で書く。Phase 3b は 2026-08-19 に凍結済みなので、「I 基準の**明確化**」として記録し、**逸脱**として限界の節(Threats to Validity)で報告する。
 2. **P1〜P3a はやり直さない。** 機械的な基準で、I の解釈に依存しない(上の表)。
-3. **P3b の再判定。** P3b で Exclude にした記録のうち、体形の語(語のリストを事前に固定する。`trace_body_shape.py` の `SHAPE`)を含む 61 件を、新しい規則で 2 名が要旨を再判定する。方式は Phase 3b と同じ(1 人が Include なら通す)。κ も報告する。通ったものは Phase 4 へ。
+3. **P3b の再判定。** P3b で Exclude にした記録のうち、体形の語(語のリストを事前に固定する。`trace_body_shape.py` の `SHAPE`)を含む 61 件を、新しい規則で要旨を再判定する。方式は Phase 3b と同じ 2 段(著者が全件 → 著者の Exclude / Unsure を第 2 評価者が確認。1 人が Include なら通す)。校正セット(κ)は設けない(2026-11-24 に決定。`screening/rescreen_bodyshape/README.md`)。通ったものは Phase 4 へ。
 4. **Phase 4 の 14 件**は、今回の協議で新しい規則を当てはめて決着させる。
 5. **検索の段の穴。** 検索式の第 3 群(Size / Scale / Height / Distance)に weight / shape / width が無い。たとえば Tajadura-Jiménez et al., *As Light as Your Footsteps*(CHI 2015、体重の知覚)は、**重複削除後のデータに一度も現れない**(検索に掛かっていない)。検索のやり直しはせず、引用の追跡(`snowballing_protocol.md`)で回収し、限界として明記するのが現実的。
 

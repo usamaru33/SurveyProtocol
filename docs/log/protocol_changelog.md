@@ -14,7 +14,7 @@
 2. **軸 1(Unimodal)の下位区分の判定を `rule.md` §3.3(1) に書く。** 第一の判定は「自己身体のジオメトリが変わるか」。全身 → Visual-Global(眼高・IPD は追従するだけなので別区分にしない。全身と部位の両方も Global)、一部だけ → Visual-Local、ジオメトリは変えず視点のパラメータだけ → Visual-Perspective。「変える」は一様な拡大・縮小に限らず、体形の変化を含む(全身の体形 → Global、腹部・背中だけ → Local)。
 3. **再判定の手続き。**
    - Phase 1〜3a はやり直さない(機械的な基準で、I の解釈に依存しない)。
-   - Phase 3b で除外した記録のうち、題名か要旨に体形の語(`scripts/trace_body_shape.py` の `SHAPE`。事前に固定)を含む **61 件**を、この規則で要旨から再判定する。**手続きは Phase 3b と同じ 2 段**(liberal accelerated): 第 1 段で著者が全件を判定し、校正セット(20%、13 件)は 3 名全員が判定する。第 2 段で、著者が Exclude / Unsure にしたもの(校正セットを除く)を第 2 評価者(Phase 3b と同じハッシュで 2 名に振り分け)が確認する。1 名の Include で Phase 4 へ、2 名の Exclude で除外。κ は校正セットで出す(13 件なので参考値とし、一致率を併記する)。校正セットは Phase 3b と同じハッシュの順位で取った(Phase 3b の閾値をそのまま当てると 9 件=15% になるため、件数だけ 20% に合わせた)(`screening/rescreen_bodyshape/`、2026-11-21 に 2 名全件方式から変更。記入前)。
+   - Phase 3b で除外した記録のうち、題名か要旨に体形の語(`scripts/trace_body_shape.py` の `SHAPE`。事前に固定)を含む **61 件**を、この規則で要旨から再判定する。**手続きは Phase 3b と同じ 2 段**(liberal accelerated): 第 1 段で著者が全件を判定する。第 2 段で、著者が Exclude / Unsure にしたものを第 2 評価者(Phase 3b と同じハッシュで 2 名に振り分け)が確認する。1 名の Include で Phase 4 へ、2 名の Exclude で除外。Phase 3b と違い、校正セット(κ)は設けない。基準の運用の一致は Phase 3b 本番の校正で確認済みで、61 件の 20%(13 件)では κ が安定しないため(`screening/rescreen_bodyshape/`。2026-11-21 に 2 名全件方式から 2 段に、2026-11-24 に校正セットを外した。どちらも記入前)。
    - Phase 4 で体形を理由に保留した 7 件(協議 2026-11-20 では「サイズ操作なし」で Exclude になったものを含む)を、この規則で協議し直す。
    - 検索式の第 3 群(Size / Scale / Height / Distance)に weight / shape / width が無い穴は、検索のやり直しではなく引用の追跡(`snowballing_protocol.md`)で回収し、限界として報告する。
 

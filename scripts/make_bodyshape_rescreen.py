@@ -15,14 +15,12 @@ make_bodyshape_rescreen.py — 体形の論文だけで Phase 3b(Title/Abstract)
   体形の論文を、Rev.33 の規則で読み直す。
 
 【手続き — Phase 3b と同じ 2 段(liberal accelerated)】
-  - 第 1 段: 著者が全 61 件を判定。校正セット(20%、切り上げで 13 件)は他の 2 名も判定する(κ 用)。
-    校正セットは Phase 3b と同じハッシュ md5("cal:"+key) % 100 の小さい順に取る(Phase 3b の規則の
-    「% 100 < 20」をそのまま当てると 9 件=15% にしかならないため、同じ順位で件数だけ 20% に合わせた。
-    Phase 3b で校正セットだった記録は必ず含まれる)。
-  - 第 2 段(`--stage2`、著者の記入後): 著者が Exclude / Unsure にした記録(校正セットを除く)を、
+  - 第 1 段: 著者が全 61 件を判定。
+  - 第 2 段(`--stage2`、著者の記入後): 著者が Exclude / Unsure にした記録を、
     Phase 3b と同じ `second_reviewer_of`(md5("2nd:"+key))で Kataoka / WATANABE に振り分ける。
-  - Include は 1 人で通す。2 人とも Exclude で除外。κ は校正セットで出す(13 件なので参考値。一致率を併記)。
-  方法の節に「Phase 3b と同じ手続きで再判定した」と 1 文で書けるように、手続きを Phase 3b に揃えた。
+  - Include は 1 人で通す。2 人とも Exclude で除外。
+  - 校正セット(κ)は設けない(2026-11-24 の決定)。基準の運用の一致は Phase 3b 本番の校正で確認済みで、
+    61 件の 20%(13 件)では κ が安定しないため。方法の節では、Phase 3b との違いとしてこの 1 点を書く。
 
 【独立性】
   - 評価者ごとに別ファイル。前回の判定・除外理由はシートに入れない(引きずられないように)。
@@ -32,8 +30,8 @@ make_bodyshape_rescreen.py — 体形の論文だけで Phase 3b(Title/Abstract)
 【入出力】
   入力: outputs/body_shape_trace.csv、screening/stage1/sheet_author.csv(題名・要旨などのメタ)、
         screening/final/final_decisions.csv と screening/_archive/stage2/*.xlsx(前回の判定。targets.csv 用)
-  出力: screening/rescreen_bodyshape/targets.csv(割当: calibration・second_reviewer と前回の判定)
-        screening/rescreen_bodyshape/rescreen_sheet_<id>.xlsx(第 1 段。著者 61 件 / 他 2 名は校正セット 13 件)
+  出力: screening/rescreen_bodyshape/targets.csv(割当: second_reviewer と前回の判定)
+        screening/rescreen_bodyshape/rescreen_sheet_author.xlsx(第 1 段。著者 61 件)
         screening/rescreen_bodyshape/rescreen_stage2_sheet_<id>.xlsx(第 2 段)
         いずれの xlsx も .gitignore 対象。
 
@@ -47,8 +45,6 @@ from __future__ import annotations
 
 import argparse
 import csv
-import hashlib
-import math
 import sys
 from pathlib import Path
 
@@ -61,13 +57,13 @@ csv.field_size_limit(10 ** 9)
 from openpyxl import Workbook, load_workbook  # noqa: E402
 
 import make_screening_xlsx as mx  # noqa: E402
-from make_screening_sheets import CALIBRATION_PCT, REVIEWERS, SECOND_REVIEWERS, second_reviewer_of  # noqa: E402
+from make_screening_sheets import REVIEWERS, SECOND_REVIEWERS, second_reviewer_of  # noqa: E402
 
 OUT = ROOT / "screening" / "rescreen_bodyshape"
 
-# 再判定のシートに出す列(Phase 3b の列から、校正セット・ブロックなど今回は意味の無い列を外す)
+# 再判定のシートに出す列(Phase 3b の列から、校正セット・ブロックなど今回は使わない列を外す)
 KEEP = ["record_id", "decision", "reason", "note", "title", "abstract", "venue", "year",
-        "rank", "has_abstract", "calibration", "abstract_source", "doi"]
+        "rank", "has_abstract", "abstract_source", "doi"]
 
 INTRO = [
     ("Phase 3b 再判定(体形の変化)  判定シート", "title"),
@@ -107,7 +103,7 @@ INTRO = [
     ("前回の判定はこのシートには入れていません。前回に引きずられずに読んでください。", ""),
     ("", ""),
     ("■ お願い", "h"),
-    ("他の評価者のファイルは開かないでください(評価者間一致度 κ が意味を失います)。", "warn"),
+    ("他の評価者のファイルは開かないでください(判定の独立性のため)。", "warn"),
     ("", ""),
     ("■ 使い方のヒント", "h"),
     ("・見出し行は固定してあります。オートフィルタで「判定」を (空白) で絞ると未記入だけ表示できます。", ""),
@@ -120,8 +116,7 @@ INTRO = [
 
 
 STAGE_NOTE = {
-    "author": "このシートは第 1 段(全件)です。「校正セット」列が Y の論文は、他の 2 名も同じものを判定します。",
-    "calibration": "このシートは校正セット(全体の 20%)です。3 名全員が同じ論文を判定し、評価者間一致度(κ)を出します。",
+    "author": "このシートは第 1 段(全件)です。",
     "stage2": "このシートは第 2 段です。第 1 段で Include にならなかった論文を確認してください。",
 }
 
@@ -147,23 +142,9 @@ def stage2_decisions() -> dict[str, dict]:
     return out
 
 
-def calibration_ids(trace: list[dict]) -> set[str]:
-    """校正セット(全件の 20%、切り上げ)。Phase 3b と同じハッシュ md5("cal:"+key) % 100 の小さい順に取る。
-
-    Phase 3b の規則(% 100 < 20)をそのまま当てると 61 件中 9 件(15%)にしかならないので、
-    同じハッシュの順位で件数だけ 20% に合わせる。Phase 3b で校正セットだった記録は必ず含まれる(単調)。
-    """
-    n = math.ceil(len(trace) * CALIBRATION_PCT / 100)
-    def h(t):
-        v = int(hashlib.md5(("cal:" + t["Key"]).encode("utf-8")).hexdigest(), 16)
-        return (v % 100, v)
-    return {t["rid"] for t in sorted(trace, key=h)[:n]}
-
-
 def build_targets(trace, meta) -> list[dict]:
     final = {r["record_id"]: r for r in read_csv(ROOT / "screening" / "final" / "final_decisions.csv")}
     s2 = stage2_decisions()
-    cal = calibration_ids(trace)
     targets = []
     for t in sorted(trace, key=lambda t: t["rid"]):
         m = meta[t["rid"]]
@@ -174,9 +155,7 @@ def build_targets(trace, meta) -> list[dict]:
                     f"{f['reviewer_b']}={f['decision_b']} {f['reason_b']})")
         else:
             prev = "協議リスト外(stage 1 の著者と stage 2 の第 2 評価者がともに Exclude)"
-        c = t["rid"] in cal
-        targets.append({"record_id": t["rid"], "calibration": "Y" if c else "N",
-                        "second_reviewer": "" if c else second_reviewer_of(t["Key"]),
+        targets.append({"record_id": t["rid"], "second_reviewer": second_reviewer_of(t["Key"]),
                         "title": m["title"], "venue": m["venue"], "year": m["year"],
                         "doi": m["doi"], "shape_terms": t["terms"], "p3b_previous": prev,
                         "stage2_reviewer": s.get("who", ""), "stage2_decision": s.get("decision", ""),
@@ -204,16 +183,14 @@ def write_sheet(dst: Path, who: str, rows: list[dict], force: bool, stage: str) 
     print(f"[INFO] 出力: {dst.name}  {len(rows)} 行  担当={REVIEWERS[who]}")
 
 
-def sheet_row(m: dict, cal: bool) -> dict:
-    row = {k: ("" if k in ("decision", "reason", "note") else m.get(k, "")) for k in KEEP}
-    row["calibration"] = "Y" if cal else "N"
-    return row
+def sheet_row(m: dict) -> dict:
+    return {k: ("" if k in ("decision", "reason", "note") else m.get(k, "")) for k in KEEP}
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="体形の論文だけの Phase 3b 再判定シートを作る(Phase 3b と同じ 2 段)")
     ap.add_argument("--stage2", action="store_true",
-                    help="著者の記入後: 著者が Exclude / Unsure にした記録(校正セットを除く)を第 2 評価者へ")
+                    help="著者の記入後: 著者が Exclude / Unsure にした記録を第 2 評価者へ")
     ap.add_argument("--force", action="store_true", help="既存の xlsx を上書きする(記入済みがあれば止まる)")
     args = ap.parse_args()
 
@@ -233,18 +210,14 @@ def main() -> None:
             w = csv.DictWriter(f, fieldnames=list(targets[0]))
             w.writeheader()
             w.writerows(targets)
-        cal = [t for t in targets if t["calibration"] == "Y"]
-        print(f"[INFO] 対象 {len(targets)} 件(校正セット {len(cal)} 件)→ {tpath.relative_to(ROOT)}")
-        # stage 1: 著者は全件、他の 2 名は校正セットだけ
-        all_rows = [sheet_row(meta[t["record_id"]], t["calibration"] == "Y") for t in targets]
-        cal_rows = [r for r in all_rows if r["calibration"] == "Y"]
+        print(f"[INFO] 対象 {len(targets)} 件 → {tpath.relative_to(ROOT)}")
+        # stage 1: 著者が全件
+        all_rows = [sheet_row(meta[t["record_id"]]) for t in targets]
         write_sheet(OUT / "rescreen_sheet_author.xlsx", "author", all_rows, args.force, "author")
-        for who in SECOND_REVIEWERS:
-            write_sheet(OUT / f"rescreen_sheet_{who}.xlsx", who, cal_rows, args.force, "calibration")
         print("[NEXT] 著者の記入が終わったら --stage2 で第 2 段のシートを作る")
         return
 
-    # stage 2: 著者が Exclude / Unsure にしたもの(校正セットは既に 3 名が判定済みなので除く)
+    # stage 2: 著者が Exclude / Unsure にしたもの
     targets = {t["record_id"]: t for t in read_csv(tpath)}
     ws = load_workbook(OUT / "rescreen_sheet_author.xlsx", data_only=True)["判定"]
     head = [str(c.value or "") for c in ws[1]]
@@ -256,10 +229,10 @@ def main() -> None:
     per = {w: [] for w in SECOND_REVIEWERS}
     for rid, d in sorted(author.items()):
         t = targets[rid]
-        if t["calibration"] == "Y" or d == "Include":
+        if d == "Include":
             continue
-        per[t["second_reviewer"]].append(sheet_row(meta[rid], False))
-    n_inc = sum(1 for k, d in author.items() if d == "Include" and targets[k]["calibration"] == "N")
+        per[t["second_reviewer"]].append(sheet_row(meta[rid]))
+    n_inc = sum(1 for d in author.values() if d == "Include")
     print(f"[INFO] 著者: Include {n_inc} 件は 1 人で通す / 第 2 評価者へ: "
           + " / ".join(f"{REVIEWERS[w]} {len(v)} 件" for w, v in per.items()))
     for who, rows in per.items():
